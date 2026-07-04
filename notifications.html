@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Notifications — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4)}
+body{background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;height:100vh;overflow:hidden}
+.nav{background:rgba(6,8,24,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;position:sticky;top:0;z-index:10}
+.nav-back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;flex-shrink:0}
+.nav-title{font-family:"Fredoka One",cursive;font-size:1rem;flex:1}
+.btn{border:none;border-radius:.85rem;padding:.55rem .9rem;font-family:"Fredoka One",cursive;font-size:.8rem;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--text)}
+.page{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;padding-bottom:2rem}
+.notif-item{display:flex;align-items:flex-start;gap:.85rem;padding:.9rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;position:relative}
+.notif-item.unread{background:rgba(107,63,255,.05);border-left:3px solid #6B3FFF}
+.notif-icon{width:2.6rem;height:2.6rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.notif-title{font-weight:600;font-size:.88rem;line-height:1.4}
+.notif-desc{font-size:.75rem;color:var(--muted);margin-top:.2rem;line-height:1.4}
+.notif-time{font-size:.65rem;color:var(--muted);margin-top:.3rem}
+.dot{width:.5rem;height:.5rem;border-radius:50%;background:#6B3FFF;position:absolute;top:1rem;right:1rem}
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.tf-toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.tf-toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="nav">
+    <div class="nav-back" onclick="goBack()">←</div>
+    <div class="nav-title">🔔 Notifications</div>
+    <button class="btn" onclick="markAllRead()" id="markBtn" style="display:none">Mark all read</button>
+  </div>
+  <div id="list"></div>
+</div>
+<div class="tf-toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var firebaseConfig={apiKey:"AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk",authDomain:"tolaanfur-5b5f5.firebaseapp.com",projectId:"tolaanfur-5b5f5",storageBucket:"tolaanfur-5b5f5.firebasestorage.app",messagingSenderId:"188890145767",appId:"1:188890145767:web:6ec8fe6fae4ddd90891342"};
+var app=firebase.apps.find(function(a){return a.name==="notif2";})||firebase.initializeApp(firebaseConfig,"notif2");
+var db=app.firestore();
+var auth=app.auth();
+var currentUser=null;
+var notifications=[];
+
+var TYPES={
+  friend_request:{icon:"👤",bg:"rgba(107,63,255,.2)"},
+  friend_accepted:{icon:"✅",bg:"rgba(16,185,129,.2)"},
+  group_joined:{icon:"👥",bg:"rgba(37,99,235,.2)"},
+  group_message:{icon:"💬",bg:"rgba(37,99,235,.2)"},
+  quiz_completed:{icon:"🏆",bg:"rgba(245,158,11,.2)"},
+  lesson_completed:{icon:"📚",bg:"rgba(16,185,129,.2)"},
+  streak:{icon:"🔥",bg:"rgba(239,68,68,.2)"},
+  level_up:{icon:"⚡",bg:"rgba(168,85,247,.2)"},
+  badge:{icon:"🎖️",bg:"rgba(201,152,42,.2)"},
+  system:{icon:"📢",bg:"rgba(100,116,139,.2)"}
+};
+
+function timeAgo(ts){
+  var diff=Date.now()-ts;
+  var min=Math.floor(diff/60000);
+  var hr=Math.floor(diff/3600000);
+  var day=Math.floor(diff/86400000);
+  if(min<1)return "Just now";
+  if(min<60)return min+"m ago";
+  if(hr<24)return hr+"h ago";
+  if(day<7)return day+"d ago";
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+}
+
+function render(){
+  var list=document.getElementById("list");
+  var unread=notifications.filter(function(n){return !n.read;});
+  document.getElementById("markBtn").style.display=unread.length>0?"block":"none";
+  if(notifications.length===0){
+    list.innerHTML="<div class="empty"><div style="font-size:3rem;margin-bottom:.75rem">🔔</div><div style="font-family:Fredoka One,cursive;font-size:1.1rem;color:var(--text);margin-bottom:.3rem">No notifications yet</div><div style="font-size:.8rem">We will let you know when something happens</div></div>";
+    return;
+  }
+  list.innerHTML=notifications.map(function(n){
+    var t=TYPES[n.type]||TYPES.system;
+    return "<div class="notif-item "+(n.read?"":"unread")+"" onclick="markRead('"+n.id+"')"><div class="notif-icon" style="background:"+t.bg+"">"+t.icon+"</div><div style="flex:1"><div class="notif-title">"+(n.title||"Notification")+"</div>"+(n.body?"<div class="notif-desc">"+n.body+"</div>":"")+"<div class="notif-time">"+timeAgo(n.ts||Date.now())+"</div></div>"+(n.read?"":"<div class="dot"></div>")+"</div>";
+  }).join("");
+}
+
+function markRead(id){
+  if(!currentUser)return;
+  db.collection("notifications").doc(id).update({read:true}).catch(function(){});
+  var n=notifications.find(function(x){return x.id===id;});
+  if(n)n.read=true;
+  render();
+}
+
+function markAllRead(){
+  if(!currentUser)return;
+  var batch=db.batch();
+  notifications.filter(function(n){return !n.read;}).forEach(function(n){
+    batch.update(db.collection("notifications").doc(n.id),{read:true});
+    n.read=true;
+  });
+  batch.commit().catch(function(){});
+  render();
+  showToast("✅ All marked as read");
+}
+
+function loadNotifs(){
+  if(!currentUser){
+    document.getElementById("list").innerHTML="<div class="empty"><div style="font-size:3rem;margin-bottom:.75rem">🔒</div><div style="font-family:Fredoka One,cursive;font-size:1.1rem;color:var(--text)">Login required</div></div>";
+    return;
+  }
+  db.collection("notifications").where("to","==",currentUser.uid).orderBy("ts","desc").limit(50).onSnapshot(function(snap){
+    notifications=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    render();
+  },function(){render();});
+}
+
+function goBack(){
+  try{if(window.parent&&window.parent!==window)window.parent.postMessage("go-home","*");}catch(e){}
+}
+
+function showToast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove("show");},2500);
+}
+
+auth.onAuthStateChanged(function(user){currentUser=user;loadNotifs();});
+</script>
+</body>
+</html>
