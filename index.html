@@ -36,9 +36,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
 
 /* SCREEN */
-.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;-webkit-transform:translateZ(0);
+.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;align-items:center;
-  padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(9rem + env(safe-area-inset-bottom));touch-action:pan-y}
+  padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(5.5rem + env(safe-area-inset-bottom))}
 .screen.no-tab{padding-bottom:2rem}
 
 /* AUTH SCREEN */
@@ -95,12 +95,12 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
 /* LOGO */
 .lw{display:flex;flex-direction:column;align-items:center;padding:.8rem 0 .6rem}
-.tfl{width:52px;height:52px;border-radius:12px;overflow:hidden;
+.tfl{width:72px;height:72px;border-radius:16px;overflow:hidden;
   box-shadow:0 6px 24px rgba(0,191,255,.4),0 0 40px rgba(107,63,255,.25);animation:bob 3s ease-in-out infinite}
 .tfl img{width:100%;height:100%;object-fit:cover}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .l-ar{font-family:'Tajawal',sans-serif;font-size:.85rem;direction:rtl;text-align:center;opacity:.85;margin-bottom:.2rem;margin-top:.5rem}
-.l-nm{font-size:.85rem;font-family:'Fredoka One',cursive;font-size:1.9rem;letter-spacing:.06em;text-align:center;
+.l-nm{font-family:'Fredoka One',cursive;font-size:1.9rem;letter-spacing:.06em;text-align:center;
   background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .l-sb{color:var(--sl2);font-size:.74rem;margin-top:.2rem}
 
@@ -122,8 +122,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .prof-stat-lbl{font-size:.65rem;color:var(--sl2);margin-top:.1rem}
 
 /* MENU GRID */
-.mg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;width:100%;max-width:560px}
-.mc{background:var(--card);border:1.5px solid var(--bdr);padding:.65rem;border-radius:1.2rem;padding:1.1rem;
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;width:100%;max-width:560px}
+.mc{background:var(--card);border:1.5px solid var(--bdr);border-radius:1.2rem;padding:1.1rem;
   cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;backdrop-filter:blur(12px);
   display:flex;flex-direction:column;gap:.4rem}
 .mc:active{transform:scale(.96)}
@@ -257,7 +257,7 @@ select.inp2 option{background:var(--bg2)}
 @keyframes spin2{to{transform:rotate(360deg)}}
 
 /* ═══ STORIES ═══ */
-.stories-bar{display:flex;gap:.6rem;overflow-x:auto;padding:.15rem 0 .3rem;scrollbar-width:none;width:100%;max-width:560px}
+.stories-bar{display:flex;gap:.75rem;overflow-x:auto;padding:.5rem 0 .75rem;scrollbar-width:none;width:100%;max-width:560px}
 .stories-bar::-webkit-scrollbar{display:none}
 .story-bubble{display:flex;flex-direction:column;align-items:center;gap:.35rem;cursor:pointer;flex-shrink:0}
 .story-ring{width:3.8rem;height:3.8rem;border-radius:50%;padding:3px;background:linear-gradient(135deg,#F59E0B,#EF4444,#8B5CF6);flex-shrink:0}
@@ -357,7 +357,7 @@ select.inp2 option{background:var(--bg2)}
 <div id="bg"></div>
 <div id="app">
   <div class="loading">
-    <div class="tfl" style="width:52px;height:52px;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
+    <div class="tfl" style="width:80px;height:80px;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
       <img src="icon.png" alt="TF" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/>
     </div>
     <div class="spinner"></div>
@@ -1030,16 +1030,8 @@ function render() {
       notifications: rNotifications,
     };
     const fn = map[SC] || rHome;
-    // Bewaar scroll positie op home scherm
-    const _scr = app2.querySelector('.screen');
-    const _scrollY = (SC === 'home' && _scr) ? _scr.scrollTop : 0;
     app2.innerHTML = fn() + (needsTabs() ? rTabs() : '');
     bind();
-    // Herstel scroll positie
-    if(SC === 'home' && _scrollY > 0){
-      const _newScr = app2.querySelector('.screen');
-      if(_newScr) _newScr.scrollTop = _scrollY;
-    }
     if(SC === 'qiblah') setTimeout(startCompass, 400);
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
@@ -1089,7 +1081,7 @@ function rTabs() {
 // ══════════════════════════════════════════════
 function rLoading() {
   return `<div class="loading">
-    <div class="tfl" style="width:52px;height:52px;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
+    <div class="tfl" style="width:80px;height:80px;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
       <img src="icon.png" alt="TF" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/>
     </div>
     <div class="spinner"></div>
@@ -1104,8 +1096,8 @@ function rLogin() {
   return `<div class="auth-screen">
     <div class="lw" style="margin-bottom:1.5rem">
       <div class="tfl"><img src="icon.png" alt="TF" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/></div>
-      <div class="l-ar" style="font-size:.68rem;margin-top:.1rem">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
-      <div style="font-size:.56rem;color:rgba(255,255,255,.45);margin-top:.05rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
+      <div class="l-ar">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
+      <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-top:.15rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
       <div class="l-nm">TOLAANFUR</div>
     </div>
     <div class="auth-card">
@@ -1205,7 +1197,7 @@ function rHome() {
     {id:'hijri-cal',i:'🌙',n:'Islamic Calendar',d:'Hijri date & Ramadan',c:'#4C1D95'},
     {id:'qiblah',i:'🧭',n:'Qibla Direction',d:"Direction of Ka'bah",c:'#D97706'},
     {id:'media',i:'📱',n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
-    {id:'community',i:'🌐',n:_om('Community'),d:_om('Groups & Leaderboards'),c:'#059669'},
+
   ];
 
   const av = AV[(profile?.avatar||0)%AV.length];
@@ -1213,7 +1205,7 @@ function rHome() {
 
   return `<div class="screen" style="padding-top:0">
     <!-- HEADER met logo + stories cirkel eromheen -->
-    <div style="position:relative;display:flex;flex-direction:column;align-items:center;padding:max(env(safe-area-inset-top),.5rem) 1rem .3rem;width:100%">
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;width:100%">
 
       <!-- Stories cirkels rondom het logo -->
       ${!isGuest && allStories.length > 0 ? `
@@ -1232,8 +1224,8 @@ function rHome() {
         ${!isGuest && allStories.find(g=>g.isOwn) ? `<div style="position:absolute;top:-4px;right:-4px;width:1.2rem;height:1.2rem;border-radius:50%;background:var(--gr);border:2px solid var(--bg);display:grid;place-items:center;font-size:.55rem;color:#fff;font-weight:700">${allStories.find(g=>g.isOwn)?.stories?.length||''}</div>` : ''}
       </div>
 
-      <div class="l-ar" style="font-size:.68rem;margin-top:.1rem">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
-      <div style="font-size:.56rem;color:rgba(255,255,255,.45);margin-top:.05rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
+      <div class="l-ar">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
+      <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-top:.15rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
       <div class="l-nm">TOLAANFUR</div>
       <div class="l-sb">${esc(dt)}</div>
       <div id="home-hijri" style="font-size:.65rem;color:rgba(201,152,42,.6);margin-top:.15rem"></div>
