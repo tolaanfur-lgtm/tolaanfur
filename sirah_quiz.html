@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Sirah Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--night:#04060F;--gold:#C9982A;--gold2:#E8C97A;--text:#EEF0FF;--muted:rgba(238,240,255,.4);--border:rgba(255,255,255,.08);--card:rgba(255,255,255,.04)}
+body{background:var(--night);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* Ambient */
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ac{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:af 8s ease-in-out infinite alternate}
+.a1{width:300px;height:300px;background:#4C1D95;top:-80px;left:-80px}
+.a2{width:250px;height:250px;background:#1E3A8A;bottom:-60px;right:-60px;animation-delay:-4s}
+@keyframes af{0%{transform:scale(1)}100%{transform:scale(1.2) translate(15px,-15px)}}
+
+.container{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:1rem}
+
+/* Header */
+.header{text-align:center;padding:1.5rem 1rem 1rem}
+.title{font-family:'Fredoka One',cursive;font-size:2rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:.8rem;color:var(--muted);margin-top:.3rem}
+.arabic{font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold2);margin-bottom:.3rem}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:.85rem;padding:.7rem;text-align:center}
+.stat-n{font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA}
+.stat-l{font-size:.62rem;color:var(--muted);margin-top:.1rem;text-transform:uppercase;letter-spacing:.05em}
+
+/* Level grid */
+.level-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.4rem;margin-bottom:1rem}
+.lbtn{aspect-ratio:1;border-radius:.65rem;display:grid;place-items:center;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:rgba(255,255,255,.2);position:relative;transition:transform .1s}
+.lbtn:active{transform:scale(.95)}
+.lbtn.ready{background:linear-gradient(135deg,#1D4ED8,#6B3FFF);border-color:#6B3FFF;color:#fff;box-shadow:0 4px 12px rgba(107,63,255,.3);cursor:pointer}
+.lbtn.done{background:linear-gradient(135deg,#059669,#10B981);border-color:#10B981;color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.3)}
+.lbtn.locked{cursor:not-allowed;opacity:.4}
+.lstar{position:absolute;top:1px;right:2px;font-size:.5rem}
+
+/* Section */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:1.1rem;padding:1rem;margin-bottom:.75rem}
+.sec-title{font-family:'Fredoka One',cursive;font-size:.95rem;color:#A78BFA;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+
+/* Quiz screen */
+.quiz-screen{display:none}
+.progress-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:.85rem}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1D4ED8,#6B3FFF);border-radius:3px;transition:width .4s}
+
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:1.1rem;padding:1.25rem;margin-bottom:1rem}
+.q-label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
+.q-text{font-size:1rem;font-weight:600;line-height:1.55;color:var(--text)}
+
+.opt-btn{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:.85rem;padding:.85rem 1rem;cursor:pointer;text-align:left;font-size:.9rem;color:var(--text);font-family:'Inter',sans-serif;display:flex;align-items:center;gap:.75rem;margin-bottom:.55rem;transition:border-color .15s,background .15s}
+.opt-btn:active:not(:disabled){transform:scale(.99)}
+.opt-btn.correct{background:rgba(16,185,129,.15);border-color:#10B981;color:#10B981}
+.opt-btn.wrong{background:rgba(244,63,94,.1);border-color:#F43F5E;color:#F43F5E}
+.opt-btn:disabled{cursor:not-allowed}
+.opt-letter{width:1.8rem;height:1.8rem;border-radius:.4rem;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0}
+.opt-btn.correct .opt-letter{background:#10B981;color:#fff}
+.opt-btn.wrong .opt-letter{background:#F43F5E;color:#fff}
+
+/* Buttons */
+.btn{width:100%;padding:.85rem;border-radius:.85rem;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;border:none;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,#1D4ED8,#6B3FFF);color:#fff}
+.btn-secondary{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text)}
+.btn-gold{background:linear-gradient(135deg,#92400E,#C9982A,#E8C97A);color:#1a0a00;font-weight:700}
+
+/* Result card */
+.result-card{background:linear-gradient(135deg,rgba(107,63,255,.15),rgba(29,78,216,.1));border:1px solid rgba(107,63,255,.3);border-radius:1.1rem;padding:1.5rem;text-align:center}
+.result-score{font-family:'Fredoka One',cursive;font-size:3rem;color:#A78BFA;line-height:1}
+.result-msg{font-size:.95rem;font-weight:600;color:#FBBF24;margin:1rem 0}
+.result-xp{display:inline-block;background:rgba(107,63,255,.2);border:1px solid rgba(107,63,255,.3);border-radius:2rem;padding:.4rem 1rem;font-family:'Fredoka One',cursive;color:#A78BFA;margin-bottom:1rem}
+
+/* Admin */
+.admin-section{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:1rem;padding:1rem;margin-bottom:.75rem}
+.field{margin-bottom:.65rem}
+.field label{font-size:.7rem;color:var(--muted);font-weight:600;display:block;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field textarea{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:.75rem;padding:.65rem .9rem;color:var(--text);font-size:.9rem;outline:none;font-family:'Inter',sans-serif;-webkit-appearance:none}
+.field input:focus,.field textarea:focus{border-color:rgba(107,63,255,.5)}
+.field textarea{resize:vertical;min-height:60px}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.65rem}
+.opt-row label{font-size:.68rem;color:var(--muted);margin-bottom:.25rem;display:block}
+.correct-btn{width:100%;padding:.4rem;border-radius:.5rem;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:.72rem;font-weight:700;cursor:pointer;margin-top:.25rem;transition:all .15s;font-family:'Inter',sans-serif}
+.correct-btn.sel{background:rgba(16,185,129,.2);border-color:#10B981;color:#10B981}
+
+/* Q Navigator */
+.q-nav{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.75rem}
+.q-dot{width:2rem;height:2rem;border-radius:.4rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);transition:all .15s}
+.q-dot.filled{background:rgba(107,63,255,.2);border-color:#6B3FFF;color:#A78BFA}
+.q-dot.active{background:linear-gradient(135deg,#1D4ED8,#6B3FFF);border-color:#6B3FFF;color:#fff}
+
+/* Progress bar admin */
+.prog-bar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-bottom:.5rem}
+.prog-fill{height:100%;background:linear-gradient(90deg,#1D4ED8,#6B3FFF);border-radius:3px;transition:width .3s}
+
+/* Tabs */
+.tabs{display:flex;gap:.4rem;background:rgba(255,255,255,.04);border-radius:.85rem;padding:.25rem;margin-bottom:1rem}
+.tab{flex:1;text-align:center;padding:.5rem;border-radius:.65rem;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s}
+.tab.on{background:linear-gradient(135deg,#1D4ED8,#6B3FFF);color:#fff}
+
+/* Confetti */
+.cf{position:fixed;pointer-events:none;z-index:100;border-radius:50%;animation:cff linear forwards}
+@keyframes cff{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(540deg)}}
+
+/* Toast */
+.toast-el{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1D4ED8;color:#fff;padding:.6rem 1.2rem;border-radius:2rem;font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast-el.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="amb"><div class="ac a1"></div><div class="ac a2"></div></div>
+
+<div class="container">
+  <!-- Tabs -->
+  <div class="tabs" id="tabsDiv">
+    <div class="tab on" onclick="switchTab('play')">🏆 Play</div>
+    <div class="tab" id="adminTab" onclick="switchTab('admin')" style="display:none">✏️ Admin</div>
+  </div>
+  <script>
+    // Lees admin param uit URL
+    const _isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+    if(_isAdmin) document.getElementById('adminTab').style.display = 'block';
+  </script>
+
+  <!-- ══ PLAY TAB ══ -->
+  <div id="tab-play">
+    <div class="header" style="padding-top:.5rem">
+      <div class="arabic">سِيرَةُ النَّبِيِّ ﷺ</div>
+      <div class="title">Sirah Quiz</div>
+      <div class="subtitle">Prophet Muhammad ﷺ · 30 Levels · 15 Questions each</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="statXP">0</div><div class="stat-l">Total XP</div></div>
+      <div class="stat"><div class="stat-n" id="statDone">0</div><div class="stat-l">Levels done</div></div>
+      <div class="stat"><div class="stat-n" id="statPct">0%</div><div class="stat-l">Progress</div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">📋 Select Level</div>
+      <div class="level-grid" id="levelGrid"></div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:.5rem">🟢 Ready · ✅ Completed · ⚪ No questions yet</div>
+    </div>
+  </div>
+
+  <!-- ══ QUIZ SCREEN ══ -->
+  <div class="quiz-screen" id="quizScreen">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+      <button onclick="exitQuiz()" class="btn btn-secondary" style="width:auto;padding:.5rem .9rem;font-size:.82rem">← Back</button>
+      <div style="font-family:'Fredoka One',cursive;font-size:.95rem;color:#A78BFA" id="quizTitle">Level 1</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="quizProgress" style="width:0%"></div></div>
+    <div class="stats" style="margin-bottom:.85rem">
+      <div class="stat"><div class="stat-n" id="qNum">1/15</div><div class="stat-l">Question</div></div>
+      <div class="stat"><div class="stat-n" id="qScore">0</div><div class="stat-l">Score</div></div>
+      <div class="stat"><div class="stat-n" id="qStreak">0🔥</div><div class="stat-l">Streak</div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-label" id="qLabel">Question 1 of 15</div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div id="optionsDiv"></div>
+    <!-- Result -->
+    <div class="result-card" id="resultCard" style="display:none">
+      <div class="result-score" id="resultScore">0/15</div>
+      <div style="color:var(--muted);font-size:.82rem;margin:.25rem 0">correct answers</div>
+      <div class="result-msg" id="resultMsg">Well done!</div>
+      <div class="result-xp" id="resultXP">+0 XP</div>
+      <div style="display:flex;gap:.6rem">
+        <button class="btn btn-secondary" onclick="exitQuiz()" style="flex:1">← Levels</button>
+        <button class="btn btn-primary" onclick="retryLevel()" style="flex:1">↺ Retry</button>
+        <button class="btn btn-primary" id="nextLvlBtn" onclick="nextLevelPlay()" style="flex:1;display:none">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADMIN TAB ══ -->
+  <div id="tab-admin" style="display:none">
+    <!-- Level selector -->
+    <div class="sec">
+      <div class="sec-title">🔷 Select Level to Edit</div>
+      <div class="level-grid" id="adminLevelGrid"></div>
+    </div>
+
+    <!-- Level title -->
+    <div class="sec">
+      <div class="sec-title">📝 Level Details</div>
+      <div class="field">
+        <label>Level Title (e.g. Birth & Early Life)</label>
+        <input id="levelTitle" placeholder="Level title..." oninput="saveLevelTitle()"/>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div style="font-size:.78rem;color:var(--muted)" id="adminProgress">0/15 questions filled</div>
+        <div class="prog-bar" style="flex:1;margin:0 .75rem"><div class="prog-fill" id="adminProgFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Question editor -->
+    <div class="sec">
+      <div class="sec-title">❓ Question Editor</div>
+      <div class="q-nav" id="adminQNav"></div>
+      <div class="admin-section">
+        <div class="field">
+          <label>Question</label>
+          <textarea id="adminQ" placeholder="Type your question here..." oninput="saveAdminQ()"></textarea>
+        </div>
+        <label style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:.4rem">Answer Options — tap ✓ to mark correct</label>
+        <div class="opts-grid">
+          <div class="opt-row">
+            <label>A)</label>
+            <input id="adminA" placeholder="Option A" oninput="saveAdminQ()"/>
+            <button class="correct-btn" id="cb0" onclick="setCorrect(0)">✓ Correct</button>
+          </div>
+          <div class="opt-row">
+            <label>B)</label>
+            <input id="adminB" placeholder="Option B" oninput="saveAdminQ()"/>
+            <button class="correct-btn" id="cb1" onclick="setCorrect(1)">✓ Correct</button>
+          </div>
+          <div class="opt-row">
+            <label>C)</label>
+            <input id="adminC" placeholder="Option C" oninput="saveAdminQ()"/>
+            <button class="correct-btn" id="cb2" onclick="setCorrect(2)">✓ Correct</button>
+          </div>
+          <div class="opt-row">
+            <label>D)</label>
+            <input id="adminD" placeholder="Option D" oninput="saveAdminQ()"/>
+            <button class="correct-btn" id="cb3" onclick="setCorrect(3)">✓ Correct</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button onclick="prevAdminQ()" class="btn btn-secondary" style="flex:1;padding:.55rem;font-size:.82rem">← Prev</button>
+          <button onclick="clearAdminQ()" class="btn btn-secondary" style="flex:1;padding:.55rem;font-size:.82rem;color:#F43F5E;border-color:rgba(244,63,94,.3)">🗑 Clear</button>
+          <button onclick="nextAdminQ()" class="btn btn-secondary" style="flex:1;padding:.55rem;font-size:.82rem">Next →</button>
+        </div>
+      </div>
+      <button onclick="saveAll()" class="btn btn-gold">💾 Save All Progress</button>
+    </div>
+
+    <!-- Export/Import -->
+    <div class="sec">
+      <div class="sec-title">📤 Export / Import</div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.6rem">
+        <button onclick="exportData()" class="btn btn-secondary" style="flex:1;padding:.65rem;font-size:.82rem">📤 Export JSON</button>
+        <button onclick="importData()" class="btn btn-primary" style="flex:1;padding:.65rem;font-size:.82rem">📥 Import JSON</button>
+      </div>
+      <textarea id="exportArea" placeholder="JSON data will appear here — copy to backup or paste to import..." style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:.75rem;padding:.65rem;color:var(--text);font-size:.72rem;height:100px;outline:none;resize:vertical;font-family:monospace"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="toast-el" id="toastEl"></div>
+
+<script>
+// ════════════════════════════════
+// DATA
+// ════════════════════════════════
+const TOTAL_LEVELS = 30;
+const QS_PER_LEVEL = 15;
+const CF_COLORS = ['#FBBF24','#A78BFA','#10B981','#60A5FA','#F43F5E','#fff'];
+
+let data = JSON.parse(localStorage.getItem('sirah_builder') || 'null') || {levels:{}};
+for(let i=1;i<=TOTAL_LEVELS;i++){
+  if(!data.levels[i]) data.levels[i]={title:'',questions:Array(QS_PER_LEVEL).fill(null).map(()=>({q:'',opts:['','','',''],ans:-1}))};
+}
+
+let completedLevels = JSON.parse(localStorage.getItem('sirah_done') || '[]');
+let totalXP = parseInt(localStorage.getItem('sirah_xp') || '0');
+
+// Quiz state
+let quiz = {level:0,q:0,score:0,streak:0,answered:false,questions:[]};
+
+// Admin state
+let adminLevel = 1;
+let adminQ = 0;
+
+// ════════════════════════════════
+// TABS
+// ════════════════════════════════
+function switchTab(tab){
+  document.getElementById('tab-play').style.display = tab==='play'?'block':'none';
+  document.getElementById('tab-admin').style.display = tab==='admin'?'block':'none';
+  document.getElementById('quizScreen').style.display = 'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['play','admin'][i]===tab));
+  if(tab==='play') buildLevelGrid();
+  if(tab==='admin') buildAdminGrid();
+}
+
+// ════════════════════════════════
+// PLAY — LEVEL GRID
+// ════════════════════════════════
+function countFilled(lvl){
+  return data.levels[lvl].questions.filter(q=>q.q.trim()!==''&&q.ans>=0).length;
+}
+
+function buildLevelGrid(){
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  let doneCount = 0;
+  for(let i=1;i<=TOTAL_LEVELS;i++){
+    const f = countFilled(i);
+    const done = completedLevels.includes(i);
+    if(done) doneCount++;
+    const btn = document.createElement('div');
+    btn.className = 'lbtn ' + (done?'done':f>0?'ready':'locked');
+    btn.innerHTML = i + (done?'<span class="lstar">⭐</span>':'');
+    if(f>0) btn.onclick = ()=>startLevel(i);
+    grid.appendChild(btn);
+  }
+  document.getElementById('statXP').textContent = totalXP;
+  document.getElementById('statDone').textContent = completedLevels.length;
+  document.getElementById('statPct').textContent = Math.round(completedLevels.length/TOTAL_LEVELS*100)+'%';
+}
+
+// ════════════════════════════════
+// PLAY — QUIZ
+// ════════════════════════════════
+function startLevel(lvl){
+  const qs = data.levels[lvl].questions.filter(q=>q.q.trim()!==''&&q.ans>=0);
+  if(!qs.length){showToast('⚠️ No questions in this level yet');return;}
+  quiz = {level:lvl,q:0,score:0,streak:0,answered:false,questions:qs};
+  document.getElementById('tab-play').style.display='none';
+  document.getElementById('quizScreen').style.display='block';
+  document.getElementById('resultCard').style.display='none';
+  document.getElementById('quizTitle').textContent = 'Level '+lvl+(data.levels[lvl].title?' — '+data.levels[lvl].title:'');
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = quiz.questions[quiz.q];
+  const total = quiz.questions.length;
+  const pct = (quiz.q/total)*100;
+  document.getElementById('quizProgress').style.width = pct+'%';
+  document.getElementById('qNum').textContent = (quiz.q+1)+'/'+total;
+  document.getElementById('qScore').textContent = quiz.score;
+  document.getElementById('qStreak').textContent = quiz.streak+'🔥';
+  document.getElementById('qLabel').textContent = 'Question '+(quiz.q+1)+' of '+total;
+  document.getElementById('qText').textContent = q.q;
+  quiz.answered = false;
+  const letters = ['A','B','C','D'];
+  const div = document.getElementById('optionsDiv');
+  div.innerHTML = '';
+  q.opts.forEach((opt,i)=>{
+    if(!opt.trim()) return;
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = '<span class="opt-letter">'+letters[i]+'</span>'+opt;
+    btn.onclick = ()=>selectAnswer(i,q.ans,btn);
+    div.appendChild(btn);
+  });
+}
+
+function selectAnswer(sel,correct,clickedBtn){
+  if(quiz.answered) return;
+  quiz.answered = true;
+  document.querySelectorAll('.opt-btn').forEach((btn,i)=>{
+    btn.disabled = true;
+    const letter = btn.querySelector('.opt-letter').textContent;
+    const idx = 'ABCD'.indexOf(letter);
+    if(idx===correct) btn.classList.add('correct');
+    else if(idx===sel&&sel!==correct) btn.classList.add('wrong');
+  });
+  if(sel===correct){quiz.score++;quiz.streak++;}
+  else{quiz.streak=0;}
+  document.getElementById('qScore').textContent = quiz.score;
+  document.getElementById('qStreak').textContent = quiz.streak+'🔥';
+  setTimeout(()=>{
+    quiz.q++;
+    if(quiz.q<quiz.questions.length) showQuestion();
+    else showResult();
+  },900);
+}
+
+function showResult(){
+  document.getElementById('quizProgress').style.width='100%';
+  document.getElementById('optionsDiv').innerHTML='';
+  document.getElementById('resultCard').style.display='block';
+  const total = quiz.questions.length;
+  const pct = Math.round((quiz.score/total)*100);
+  const xp = quiz.score*10;
+  let msg, emoji;
+  if(pct===100){msg='🏆 Perfect! MashaAllah!';emoji='🌟';}
+  else if(pct>=80){msg='✨ Excellent! Keep it up!';emoji='🎉';}
+  else if(pct>=60){msg='👍 Good job! Try again to improve!';emoji='💪';}
+  else{msg='📚 Keep studying the Sirah!';emoji='🤲';}
+  document.getElementById('resultScore').textContent = quiz.score+'/'+total;
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultXP').textContent = '+'+xp+' XP';
+  // Save
+  if(pct>=60&&!completedLevels.includes(quiz.level)){
+    completedLevels.push(quiz.level);
+    localStorage.setItem('sirah_done',JSON.stringify(completedLevels));
+  }
+  totalXP += xp;
+  localStorage.setItem('sirah_xp',totalXP);
+  // Confetti
+  if(pct>=60) spawnConfetti();
+  // Next button
+  const nextLvl = quiz.level+1;
+  const nextBtn = document.getElementById('nextLvlBtn');
+  if(nextLvl<=TOTAL_LEVELS && countFilled(nextLvl)>0 && pct>=60){
+    nextBtn.style.display='block';
+  } else {nextBtn.style.display='none';}
+}
+
+function exitQuiz(){
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('tab-play').style.display='block';
+  document.getElementById('resultCard').style.display='none';
+  buildLevelGrid();
+}
+
+function retryLevel(){ exitQuiz(); startLevel(quiz.level); }
+function nextLevelPlay(){ exitQuiz(); startLevel(quiz.level+1); }
+
+function spawnConfetti(){
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const c=document.createElement('div');c.className='cf';
+      const sz=Math.random()*8+4;
+      c.style.cssText='width:'+sz+'px;height:'+sz+'px;background:'+CF_COLORS[Math.floor(Math.random()*CF_COLORS.length)]+';left:'+Math.random()*100+'vw;top:-10px;animation-duration:'+(Math.random()*2+1.5)+'s';
+      document.body.appendChild(c);setTimeout(()=>c.remove(),3500);
+    },i*25);
+  }
+}
+
+// ════════════════════════════════
+// ADMIN
+// ════════════════════════════════
+function buildAdminGrid(){
+  const grid = document.getElementById('adminLevelGrid');
+  grid.innerHTML='';
+  for(let i=1;i<=TOTAL_LEVELS;i++){
+    const f=countFilled(i);
+    const btn=document.createElement('div');
+    btn.className='lbtn '+(f>0?'ready':'')+(i===adminLevel?' done':'');
+    btn.style.fontSize='.78rem';
+    btn.textContent=i;
+    btn.onclick=(function(lvl){return function(){selectAdminLevel(lvl);};})(i);
+    grid.appendChild(btn);
+  }
+  document.getElementById('levelTitle').value=data.levels[adminLevel].title||'';
+  buildAdminQNav();
+  loadAdminQ();
+  updateAdminProgress();
+}
+
+function selectAdminLevel(lvl){
+  saveAdminQ();
+  adminLevel=lvl;adminQ=0;
+  document.getElementById('levelTitle').value=data.levels[lvl].title||'';
+  buildAdminGrid();
+  buildAdminQNav();
+  loadAdminQ();
+  updateAdminProgress();
+}
+
+function saveLevelTitle(){
+  data.levels[adminLevel].title=document.getElementById('levelTitle').value;
+}
+
+function buildAdminQNav(){
+  const nav=document.getElementById('adminQNav');nav.innerHTML='';
+  data.levels[adminLevel].questions.forEach((q,i)=>{
+    const filled=q.q.trim()!==''&&q.ans>=0;
+    const dot=document.createElement('div');
+    dot.className='q-dot'+(filled?' filled':'')+(i===adminQ?' active':'');
+    dot.textContent=i+1;
+    dot.onclick=(function(qi){return function(){saveAdminQ();adminQ=qi;buildAdminQNav();loadAdminQ();};})(i);
+    nav.appendChild(dot);
+  });
+}
+
+function updateAdminProgress(){
+  const f=countFilled(adminLevel);
+  const pct=Math.round((f/QS_PER_LEVEL)*100);
+  document.getElementById('adminProgress').textContent=f+'/'+QS_PER_LEVEL+' questions filled';
+  document.getElementById('adminProgFill').style.width=pct+'%';
+}
+
+function loadAdminQ(){
+  const q=data.levels[adminLevel].questions[adminQ];
+  document.getElementById('adminQ').value=q.q||'';
+  ['adminA','adminB','adminC','adminD'].forEach((id,i)=>document.getElementById(id).value=q.opts[i]||'');
+  ['cb0','cb1','cb2','cb3'].forEach((id,i)=>document.getElementById(id).classList.toggle('sel',q.ans===i));
+  document.getElementById('adminQ').focus();
+}
+
+function saveAdminQ(){
+  const q=data.levels[adminLevel].questions[adminQ];
+  q.q=document.getElementById('adminQ').value;
+  q.opts=[document.getElementById('adminA').value,document.getElementById('adminB').value,document.getElementById('adminC').value,document.getElementById('adminD').value];
+  buildAdminQNav();
+  updateAdminProgress();
+}
+
+function setCorrect(idx){
+  saveAdminQ();
+  data.levels[adminLevel].questions[adminQ].ans=idx;
+  ['cb0','cb1','cb2','cb3'].forEach((id,i)=>document.getElementById(id).classList.toggle('sel',i===idx));
+  buildAdminQNav();
+  showToast('✓ Option '+'ABCD'[idx]+' marked as correct');
+}
+
+function prevAdminQ(){saveAdminQ();if(adminQ>0){adminQ--;buildAdminQNav();loadAdminQ();}}
+function nextAdminQ(){saveAdminQ();if(adminQ<QS_PER_LEVEL-1){adminQ++;buildAdminQNav();loadAdminQ();}}
+function clearAdminQ(){data.levels[adminLevel].questions[adminQ]={q:'',opts:['','','',''],ans:-1};loadAdminQ();buildAdminQNav();updateAdminProgress();showToast('🗑 Question cleared');}
+
+function saveAll(){
+  localStorage.setItem('sirah_builder',JSON.stringify(data));
+  showToast('💾 All progress saved!');
+  buildAdminGrid();
+}
+
+function exportData(){
+  saveAll();
+  document.getElementById('exportArea').value=JSON.stringify(data,null,2);
+  showToast('📤 Exported! Copy the JSON below');
+}
+
+function importData(){
+  const json=document.getElementById('exportArea').value.trim();
+  if(!json){showToast('⚠️ Paste JSON first');return;}
+  try{
+    data=JSON.parse(json);
+    localStorage.setItem('sirah_builder',JSON.stringify(data));
+    selectAdminLevel(1);
+    showToast('✅ Imported successfully!');
+  }catch(e){showToast('❌ Invalid JSON');}
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tT);
+  window._tT=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+buildLevelGrid();
+</script>
+</body>
+</html>
