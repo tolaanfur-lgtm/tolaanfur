@@ -36,7 +36,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
 
 /* SCREEN */
-.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;-webkit-transform:translateZ(0);
   display:flex;flex-direction:column;align-items:center;
   padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(8rem + env(safe-area-inset-bottom));touch-action:pan-y}
 .screen.no-tab{padding-bottom:2rem}
@@ -1030,8 +1030,16 @@ function render() {
       notifications: rNotifications,
     };
     const fn = map[SC] || rHome;
+    // Bewaar scroll positie op home scherm
+    const _scr = app2.querySelector('.screen');
+    const _scrollY = (SC === 'home' && _scr) ? _scr.scrollTop : 0;
     app2.innerHTML = fn() + (needsTabs() ? rTabs() : '');
     bind();
+    // Herstel scroll positie
+    if(SC === 'home' && _scrollY > 0){
+      const _newScr = app2.querySelector('.screen');
+      if(_newScr) _newScr.scrollTop = _scrollY;
+    }
     if(SC === 'qiblah') setTimeout(startCompass, 400);
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
