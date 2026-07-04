@@ -298,7 +298,7 @@ select.inp2 option{background:var(--bg2)}
 .bg-opt{width:2.5rem;height:2.5rem;border-radius:.5rem;cursor:pointer;border:2.5px solid transparent}
 .bg-opt.on{border-color:#fff;transform:scale(1.1)}
 
-/* Meldingen */
+/* Notifications */
 .notif-screen{width:100%;max-width:560px}
 .notif-item{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;cursor:pointer}
 .notif-item.unread{border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.08)}
@@ -336,7 +336,7 @@ select.inp2 option{background:var(--bg2)}
 .rank-pts{font-family:'Fredoka One',cursive;font-size:.95rem;color:#FBBF24;margin-left:auto;flex-shrink:0}
 .rank-badge{font-size:.7rem;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:2rem;padding:.12rem .5rem;color:#FBBF24}
 
-/* Groepen */
+/* Groups */
 .group-card{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:1rem;margin-bottom:.6rem;cursor:pointer;transition:transform .12s}
 .group-card:active{transform:scale(.98)}
 .group-ico{width:3rem;height:3rem;border-radius:.75rem;display:grid;place-items:center;font-size:1.4rem;flex-shrink:0}
@@ -429,7 +429,7 @@ function startFriendListeners(){
   // Inkomende vriendschapsverzoeken
   db.collection('friend_requests').where('to','==',uid).where('status','==','pending')
     .onSnapshot(snap=>{friendRequests=snap.docs.map(d=>({id:d.id,...d.data()}));updateBadge();if(SC==='friends')render();});
-  // Vrienden
+  // Friends
   db.collection('friendships').where('users','array-contains',uid)
     .onSnapshot(async snap=>{
       const fids=snap.docs.map(d=>d.data().users.find(u=>u!==uid)).filter(Boolean);
@@ -531,7 +531,7 @@ function openChat(friend){
   }, err=>{
     console.log('Chat error:', err);
     const c = document.getElementById('cmsgs');
-    if(c) c.innerHTML = '<div style="text-align:center;color:var(--rd);padding:2rem">Fout bij laden. Probeer opnieuw.</div>';
+    if(c) c.innerHTML = '<div style="text-align:center;color:var(--rd);padding:2rem">Fout bij laden. Try again.</div>';
   });
 
   _chatUnsubscribe = ()=> ref.off('value');
@@ -618,7 +618,7 @@ let allStories = [];       // Alle actieve stories
 let myStories = [];        // Eigen stories
 let storyViewer = null;    // {stories:[], idx:0, storyIdx:0}
 let storyTimer = null;
-let notifications = [];    // Meldingen lijst
+let notifications = [];    // Notifications lijst
 let unreadNotifs = 0;
 let storyCreatorType = 'text'; // 'text' of 'photo'
 let storyBgColor = 'linear-gradient(135deg,#1E3A8A,#6B3FFF)';
@@ -755,7 +755,7 @@ async function createStory() {
     SC = 'home';
     render();
   } catch (e) {
-    toast({ i: '❌', t: 'Mislukt', s: e.message });
+    toast({ i: '❌', t: 'Failed', s: e.message });
     if (btn) { btn.textContent = 'Publiceren ✓'; btn.disabled = false; }
   }
 }
@@ -1000,28 +1000,28 @@ function render() {
       home: rHome,
       profile: rProfile,
       'edit-profile': rEditProfile,
-      'play-cats': rCats,
-      'play-map': rMap,
-      quiz: rQuiz,
-      res: rRes,
+      'play-cats': ()=>rIframe('lessons.html'),
+      'play-map': ()=>rIframe('lessons.html'),
+      quiz: ()=>rIframe('lessons.html'),
+      res: ()=>rIframe('lessons.html'),
       tasbih: rTasbih,
-      prayer: rPrayer,
-      qiblah: rQiblah,
+      prayer: ()=>rIframe('prayer.html'),
+      qiblah: ()=>rIframe('prayer.html#qiblah'),
       admin: rAdmin,
-      'admin-cat': rACat,
-      'admin-lvl': rALvl,
-      'admin-q': rAQ,
-      'admin-addq': rQFrm,
-      'admin-editq': rQFrm,
+      'admin-cat': ()=>rIframe('lessons.html'),
+      'admin-lvl': ()=>rIframe('lessons.html'),
+      'admin-q': ()=>rIframe('lessons.html'),
+      'admin-addq': ()=>rIframe('lessons.html'),
+      'admin-editq': ()=>rIframe('lessons.html'),
       comingsoon: rComingSoon,
-      'hijri-cal': rHijriCal,
+      'hijri-cal': ()=>rIframe('calendar.html'),
       'sirah-quiz': rSirahQuiz,
-      media: rMedia,
-      community: rCommunity,
-      'create-group': rCreateGroup,
-      'group-chat': rGroupChat,
+      media: ()=>rIframe('media.html'),
+      community: ()=>rIframe('community.html'),
+      'create-group': ()=>rIframe('community.html'),
+      'group-chat': ()=>rIframe('community.html'),
       'dua-cat': rDuaTab,
-      friends: rFriends,
+      friends: ()=>rIframe('friends.html'),
       chats: rChats,
       chat: rChat,
       'story-view': rStoryView,
@@ -1068,10 +1068,10 @@ function rTabs() {
   const isOm=localStorage.getItem('tf_ln')==='om';
   const tabs=[
     {id:'home',i:'🏠',l:isOm?omLabels.home:'Start'},
-    {id:'friends',i:'👥',l:isOm?omLabels.friends:'Vrienden',badge:reqBadge},
+    {id:'friends',i:'👥',l:isOm?omLabels.friends:'Friends',badge:reqBadge},
     {id:'community',i:'🌐',l:isOm?omLabels.community:'Community'},
-    {id:'notifications',i:'🔔',l:isOm?omLabels.notif:'Meldingen',badge:unreadNotifs},
-    {id:'profile',i:'👤',l:isOm?omLabels.profile:'Profiel'}
+    {id:'notifications',i:'🔔',l:isOm?omLabels.notif:'Notifications',badge:unreadNotifs},
+    {id:'profile',i:'👤',l:isOm?omLabels.profile:'Profile'}
   ];
   return`<div class="tabs">${tabs.map(t=>`<button class="tab${SC===t.id?' on':''}" data-go="${t.id}"><span class="ti" style="position:relative">${t.i}${t.badge?`<span id="chatBadge" style="position:absolute;top:-.2rem;right:-.4rem;background:var(--rd);border-radius:50%;min-width:.9rem;height:.9rem;font-size:.52rem;font-weight:700;color:#fff;display:grid;place-items:center;padding:0 .15rem">${t.badge}</span>`:''}</span><span class="tl">${t.l}</span></button>`).join('')}</div>`;
 }
@@ -1154,7 +1154,7 @@ function rRegister() {
       </div>
       <button class="btn bp" id="regBtn" style="margin-top:.5rem">Create Account →</button>
       <div style="text-align:center;margin-top:1rem">
-        <button class="btn-link" id="toLogin">← Terug naar inloggen</button>
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
       </div>
     </div>
   </div>`;
@@ -1175,7 +1175,7 @@ function rForgotPw() {
       </div>
       <button class="btn bp" id="fwBtn">Herstelmail versturen →</button>
       <div style="text-align:center;margin-top:1rem">
-        <button class="btn-link" id="toLogin">← Terug naar inloggen</button>
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
       </div>
     </div>
   </div>`;
@@ -1195,9 +1195,9 @@ function rHome() {
     {id:'tasbih',i:'📿',n:_om('Tasbih & Zikr'),d:_om('Dhikr & practice'),c:'#6B3FFF'},
     {id:'prayer',i:'🕌',n:_om('Prayer Times'),d:_om('Salah tijden & Adhan'),c:'#059669'},
     {id:'hijri-cal',i:'🌙',n:'Islamic Calendar',d:'Hijri date & Ramadan',c:'#4C1D95'},
-
+    {id:'qiblah',i:'🧭',n:'Qibla Direction',d:"Direction of Ka'bah",c:'#D97706'},
     {id:'media',i:'📱',n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
-
+    {id:'community',i:'🌐',n:_om('Community'),d:_om('Groups & Leaderboards'),c:'#059669'},
   ];
 
   const av = AV[(profile?.avatar||0)%AV.length];
@@ -1268,12 +1268,12 @@ function rProfile() {
   
   return `<div class="screen">
     <div class="nav" style="padding-top:.75rem">
-      <div class="nt">👤 Profiel</div>
+      <div class="nt">👤 Profile</div>
       <button onclick="var l=localStorage.getItem('tf_ln');localStorage.setItem('tf_ln',l==='om'?'nl':'om');render();toast({i:'🌍',t:l==='om'?'English':'Afaan Oromoo'})" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;color:var(--sl2);padding:.35rem .65rem;font-size:.8rem;cursor:pointer">${localStorage.getItem('tf_ln')==='om'?'🇬🇧':'🇪🇹'}</button>
       ${!isGuest?`<button class="btn bs bsm" data-go="edit-profile">✏️ Edit</button>`:''}
     </div>
     
-    <!-- Profiel header -->
+    <!-- Profile header -->
     <div class="prof-header">
       <div class="prof-avatar" style="background:${avatarColor}">${avatar}</div>
       <div class="prof-name">${esc(name)}</div>
@@ -1300,7 +1300,7 @@ function rProfile() {
       <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--b3);margin-bottom:.4rem">Maak een gratis account aan</div>
       <div style="font-size:.82rem;color:var(--sl2);margin-bottom:1rem;line-height:1.5">Sla je voortgang op, synchroniseer tussen apparaten en maak gebruik van alle functies.</div>
       <button class="btn bp" id="toRegisterProf">Create Account →</button>
-      <div style="margin-top:.75rem"><button class="btn-link" id="toLoginProf">Al een account? Inloggen</button></div>
+      <div style="margin-top:.75rem"><button class="btn-link" id="toLoginProf">Al een account? Login</button></div>
     </div>` : ''}
     
     <!-- Tasbih statistieken -->
@@ -1322,7 +1322,7 @@ function rProfile() {
       </div>
     </div>
     
-    <!-- Instellingen -->
+    <!-- Settings -->
     ${!isGuest ? `<div class="sec">
       <div class="sh"><div class="st">⚙️ Account</div></div>
       <button class="btn bs" id="logoutBtn" style="color:var(--rd);border-color:rgba(244,63,94,.25)">🚪 Logout</button>
@@ -1341,7 +1341,7 @@ function rEditProfile() {
   const d = CX.dr || {name, bio, avatar: curAvatar, avatarColor: curColor};
   
   return `<div class="screen">
-    <div class="nav"><button class="bk" data-go="profile">← Terug</button><div class="nt">Profiel bewerken</div></div>
+    <div class="nav"><button class="bk" data-go="profile">← Back</button><div class="nt">Profile bewerken</div></div>
     
     <div class="sec">
       <!-- Avatar preview -->
@@ -1369,12 +1369,23 @@ function rEditProfile() {
 // ══════════════════════════════════════════════
 // COMING SOON
 // ══════════════════════════════════════════════
+
+function rIframe(src) {
+  return `<div class="screen" style="padding:0;overflow:hidden">
+    <iframe 
+      src="${src}" 
+      style="width:100%;height:100%;border:none;display:block"
+      allow="geolocation"
+    ></iframe>
+  </div>`;
+}
+
 function rComingSoon() {
   const phases = [
-    {fase:'Fase 2',items:['💬 Privatechat','👥 Vrienden toevoegen','🤝 Vriendschapsverzoeken'],color:'#1E90FF'},
-    {fase:'Fase 3',items:['📸 Stories (24u)','🔔 Meldingen','📱 Push notificaties'],color:'#6B3FFF'},
+    {fase:'Fase 2',items:['💬 Privatechat','👥 Friends toevoegen','🤝 Friend requesten'],color:'#1E90FF'},
+    {fase:'Fase 3',items:['📸 Stories (24u)','🔔 Notifications','📱 Push notificaties'],color:'#6B3FFF'},
     {fase:'Fase 4',items:['📿 Verbeterde Tasbih','🕌 Geavanceerde Prayer Times','🧭 Qiblah met kaart'],color:'#059669'},
-    {fase:'Fase 5',items:['👥 '+_om('Groepen'),'🌐 Community','🏆 Leaderboarden'],color:'#D97706'},
+    {fase:'Fase 5',items:['👥 '+_om('Groups'),'🌐 Community','🏆 Leaderboarden'],color:'#D97706'},
   ];
   return `<div class="screen">
     <div class="nav" style="padding-top:.75rem"><div class="nt">🚀 Roadmap</div></div>
@@ -1514,7 +1525,7 @@ function rDuaTab() {
   if(zkCat !== null) {
     const cat = DUA_CATS[zkCat];
     return `<div style="width:100%;max-width:560px">
-      <button onclick="zkCat=null;render()" style="background:var(--card);border:1px solid var(--bdr);border-radius:.65rem;color:#fff;padding:.5rem .9rem;cursor:pointer;font-size:.85rem;margin-bottom:.85rem;font-weight:600">← Terug</button>
+      <button onclick="zkCat=null;render()" style="background:var(--card);border:1px solid var(--bdr);border-radius:.65rem;color:#fff;padding:.5rem .9rem;cursor:pointer;font-size:.85rem;margin-bottom:.85rem;font-weight:600">← Back</button>
       <div class="sec">
         <div class="sh"><div class="st" style="color:${cat.kleur}">${cat.ico} ${cat.nm}</div></div>
         ${cat.duas.map((d,i)=>`
@@ -1627,7 +1638,7 @@ function rPrayer() {
           ` : `
             <div style="font-size:2rem;margin-bottom:.5rem">🕌</div>
             <div style="font-size:.88rem;color:var(--sl2);margin-bottom:1rem">Tap "Get location" for exact prayer times</div>
-            <button class="btn bt" id="glBtn2">📍 Locatie ophalen</button>
+            <button class="btn bt" id="glBtn2">📍 Get location</button>
           `}
         </div>
       ` : ALLE.map(g => {
@@ -1680,14 +1691,7 @@ function rPrayer() {
         💡 Zorg dat je telefoon niet op stil staat voor Azan geluid. Tik op "Test" om het geluid te controleren.
       </div>
     </div>
-    <div style="width:100%;max-width:560px"><div style="background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;cursor:pointer" data-go="qiblah">
-      <div style="width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,#92400E,#D97706);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;box-shadow:0 4px 15px rgba(217,119,6,.4)">🧭</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:.95rem;color:#FCD34D">Qibla Direction</div>
-        <div style="font-size:.7rem;color:rgba(252,211,77,.6);margin-top:.15rem">Find the direction of Ka'bah</div>
-      </div>
-      <div style="font-size:1.2rem;color:#F59E0B">›</div>
-    </div></div>
+    <div style="width:100%;max-width:560px"><button class="btn bs" data-go="qiblah">🧭 Qibla Direction</button></div>
   </div>`;
 }
 
@@ -1700,7 +1704,7 @@ function rQiblah() {
 
     <!-- Header -->
     <div style="width:100%;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;display:flex;align-items:center;gap:.75rem;max-width:560px">
-      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Terug</button>
+      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Back</button>
       <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;background:linear-gradient(90deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🧭 Qibla Direction</div>
     </div>
 
@@ -1828,7 +1832,7 @@ function rQiblah() {
       ` : `
       <div style="text-align:center;padding:1rem">
         <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah richting te berekenen</div>
-        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Locatie ophalen</button>
+        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get location</button>
       </div>`}
     </div>
   </div>`;
@@ -1891,7 +1895,7 @@ function rMap(){
       </div>`;
   }).join('');
   return`<div class="screen">
-    <div class="nav"><button class="bk" data-go="play-cats">← Terug</button><div class="nt">${cat.ico} ${esc(cat.nm)}</div></div>
+    <div class="nav"><button class="bk" data-go="play-cats">← Back</button><div class="nt">${cat.ico} ${esc(cat.nm)}</div></div>
     <div style="width:100%;max-width:480px">${nodes||`<div class="em"><div class="emi">🎮</div><div class="emt">Nog geen levels gepubliceerd.</div></div>`}</div>
   </div>`;
 }
@@ -2059,7 +2063,7 @@ function rACat(){
     <div class="lis">${(lv.qs||[]).length}/10 vragen</div></div>
     <div class="lia"><button class="btn bs bsm" data-el="${lv.id}">✏️</button><button class="btn br bsm" data-dl="${lv.id}">🗑️</button></div>
   </div>`).join(''):'';
-  return`<div class="screen"><div class="nav"><button class="bk" data-go="admin">← Terug</button><div class="nt">${isN?'Nieuwe categorie':'Edit'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-go="admin">← Back</button><div class="nt">${isN?'Nieuwe categorie':'Edit'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Naam</label><input class="inp2" id="cnm" value="${esc(d.nm)}" placeholder="Categorienaam" maxlength="30"/></div>
       <div class="fld2"><label class="lbl2">Omschrijving</label><input class="inp2" id="cds" value="${esc(d.ds)}" placeholder="Korte omschrijving" maxlength="70"/></div>
@@ -2081,7 +2085,7 @@ function rACat(){
 function rALvl(){
   const cat=DATA.categories.find(c=>c.id===CX.cid),lv=cat&&(cat.levels||[]).find(l=>l.id===CX.lid),isN=!lv;
   const d=CX.dr||{ttl:lv?.ttl||'',ps:lv?.ps||70,tpq:lv?.tpq||20,hn:lv?.hn||2,df:lv?.df||1,yt:lv?.yt||'',pub:lv?.pub||false};
-  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Terug</button><div class="nt">${isN?'Nieuw level':'Level bewerken'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Back</button><div class="nt">${isN?'Nieuw level':'Level bewerken'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Naam</label><input class="inp2" id="lttl" value="${esc(d.ttl)}" placeholder="Levelnaam" maxlength="25"/></div>
       <div class="fld2"><label class="lbl2">Slagingspercentage (%)</label><input class="inp2" type="number" id="lps" value="${d.ps}" min="10" max="100"/></div>
@@ -2114,7 +2118,7 @@ function rAQ(){
       <button class="btn br bsm" data-dq="${i}">🗑️</button>
     </div>
   </div>`).join('');
-  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Terug</button><div class="nt">📝 ${esc(cat.nm)} L${lv.id} (${(lv.qs||[]).length}/10)</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Back</button><div class="nt">📝 ${esc(cat.nm)} L${lv.id} (${(lv.qs||[]).length}/10)</div></div>
     ${(lv.qs||[]).length<10?`<div style="width:100%;max-width:560px;margin-bottom:.85rem"><button class="btn bp" id="aqBtn">+ Vraag toevoegen</button></div>`:`<div style="width:100%;max-width:560px;margin-bottom:.85rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:.85rem;padding:.75rem;text-align:center;font-size:.85rem;color:var(--gr)">✅ 10/10 compleet!</div>`}
     <div style="width:100%;max-width:560px">${ql||`<div class="em"><div class="emi">❓</div><div class="emt">Nog geen vragen.</div></div>`}</div>
   </div>`;
@@ -2125,7 +2129,7 @@ function rQFrm(){
   const ex=ie&&CX.qi!==undefined?lv.qs[CX.qi]:null;
   const d=CX.dr||{txt:ex?.txt||'',opts:[ex?.opts[0]||'',ex?.opts[1]||'',ex?.opts[2]||'',ex?.opts[3]||''],ans:ex?.ans||'',ht:ex?.ht||'',ex2:ex?.ex||''};
   const ao=(d.opts||[]).filter(o=>o.trim()).map((o,i)=>`<option value="${esc(o)}"${o===d.ans?' selected':''}>${'ABCD'[i]}. ${esc(o)}</option>`).join('');
-  return`<div class="screen"><div class="nav"><button class="bk" data-bq>← Terug</button><div class="nt">${ie?'Edit':'Vraag toevoegen'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-bq>← Back</button><div class="nt">${ie?'Edit':'Vraag toevoegen'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Vraag</label><textarea class="inp2" id="qtxt" rows="3" placeholder="Vraagstelling...">${esc(d.txt)}</textarea></div>
       <div class="dv2">Antwoordopties A t/m D</div>
@@ -2154,7 +2158,7 @@ function rFriends() {
     </div>`;}).join('')}</div>` : '';
 
   return`<div class="screen">
-    <div class="nav" style="padding-top:.75rem"><div class='nt'>👥 ${_om('Vrienden')}</div></div>
+    <div class="nav" style="padding-top:.75rem"><div class='nt'>👥 ${_om('Friends')}</div></div>
 
     ${ig?`<div class="sec" style="text-align:center"><div style="font-size:2rem;margin-bottom:.5rem">🔐</div>
       <div style="font-family:'Fredoka One',cursive;color:var(--b3);font-size:1rem;margin-bottom:.4rem">Login required</div>
@@ -2180,8 +2184,8 @@ function rFriends() {
       </div>`).join('')}
     </div>`:''}
 
-    <!-- Vrienden lijst -->
-    <div class="sec"><div class="sh"><div class="st">👥 Mijn Vrienden (${myFriends.length})</div></div>
+    <!-- Friends lijst -->
+    <div class="sec"><div class="sh"><div class="st">👥 Mijn Friends (${myFriends.length})</div></div>
       ${myFriends.length?myFriends.map(f=>`<div class="friend-card">
         <div class="friend-av" style="background:${AC[(f.avatarColor||0)%AC.length]}">${AV[(f.avatar||0)%AV.length]}</div>
         <div style="flex:1">
@@ -2192,7 +2196,7 @@ function rFriends() {
           <button class="btn bp bsm" onclick="openChat(${JSON.stringify({uid:f.uid,displayName:f.displayName||'?',avatar:f.avatar||0,avatarColor:f.avatarColor||0}).replace(/"/g,'&quot;')})">💬</button>
           <button class="btn bs bsm" onclick="removeFriend('${f.uid}','${esc(f.displayName||'?')}')">✕</button>
         </div>
-      </div>`).join(''):`<div class="empty-friends"><div style="font-size:2.5rem;margin-bottom:.5rem">👥</div><div style="font-size:.88rem;line-height:1.5">Nog geen vrienden.<br/>Zoek gebruikers hierboven!</div></div>`}
+      </div>`).join(''):`<div class="empty-friends"><div style="font-size:2.5rem;margin-bottom:.5rem">👥</div><div style="font-size:.88rem;line-height:1.5">Nog geen vrienden.<br/>Search users hierboven!</div></div>`}
     </div>`}
   </div>`;
 }
@@ -2223,7 +2227,7 @@ function rChats() {
             </div>
           </div>
           ${unread>0?`<div style="background:var(--b3);border-radius:50%;min-width:1.3rem;height:1.3rem;display:grid;place-items:center;font-size:.7rem;font-weight:700;color:#fff;padding:0 .25rem">${unread}</div>`:''}
-        </div>`;}).join(''):`<div class="empty-friends"><div style="font-size:2.5rem;margin-bottom:.5rem">💬</div><div style="font-size:.88rem;line-height:1.5">Nog geen gesprekken.<br/>Voeg eerst vrienden toe!</div><button class="btn bp" style="max-width:240px;margin-top:.75rem" data-go="friends">👥 Vrienden toevoegen</button></div>`}
+        </div>`;}).join(''):`<div class="empty-friends"><div style="font-size:2.5rem;margin-bottom:.5rem">💬</div><div style="font-size:.88rem;line-height:1.5">Nog geen gesprekken.<br/>Voeg eerst vrienden toe!</div><button class="btn bp" style="max-width:240px;margin-top:.75rem" data-go="friends">👥 Friends toevoegen</button></div>`}
     </div>`}
   </div>`;
 }
@@ -2244,7 +2248,7 @@ function rChat() {
       padding:max(env(safe-area-inset-top),.6rem) .85rem .6rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0">
       <button onclick="SC='chats';render();if(_chatUnsubscribe){_chatUnsubscribe();_chatUnsubscribe=null;}"
         style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;
-        cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Terug</button>
+        cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Back</button>
       <div style="width:2.1rem;height:2.1rem;border-radius:50%;background:${ac};display:grid;place-items:center;
         font-size:1rem;flex-shrink:0;position:relative">
         ${av}
@@ -2331,10 +2335,10 @@ function rStoriesBar() {
         ${ownGroup ? AV[(profile?.avatar||0)%AV.length] : '➕'}
       </div>
     </div>
-    <span style="font-size:.6rem;color:var(--sl2);max-width:3.5rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ownGroup ? 'My story' : 'Toevoegen'}</span>
+    <span style="font-size:.6rem;color:var(--sl2);max-width:3.5rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ownGroup ? 'My story' : 'Add'}</span>
   </div>`;
 
-  // Vrienden stories
+  // Friends stories
   friendGroups.forEach((g, i) => {
     const realIdx = allStories.indexOf(g);
     const seen = g.stories.every(s => Object.keys(s.views||{}).includes(currentUser?.uid||''));
@@ -2412,7 +2416,7 @@ function rStoryCreate() {
 
   return `<div class="story-creator">
     <div class="sc-header">
-      <button class="bk" onclick="SC='home';render()">← Terug</button>
+      <button class="bk" onclick="SC='home';render()">← Back</button>
       <div class="nt">📸 Story maken</div>
     </div>
 
@@ -2448,7 +2452,7 @@ function rStoryCreate() {
 function rNotifications() {
   if (!currentUser || currentUser.isAnonymous) {
     return `<div class="screen">
-      <div class="nav" style="padding-top:.75rem"><div class='nt'>🔔 ${_om('Meldingen')}</div></div>
+      <div class="nav" style="padding-top:.75rem"><div class='nt'>🔔 ${_om('Notifications')}</div></div>
       <div class="sec" style="text-align:center">
         <div style="font-size:2rem;margin-bottom:.5rem">🔐</div>
         <div style="font-family:'Fredoka One',cursive;color:var(--b3);font-size:1rem;margin-bottom:.4rem">Login required</div>
@@ -2457,15 +2461,15 @@ function rNotifications() {
     </div>`;
   }
 
-  // Markeer als gelezen
+  // Mark as read
   setTimeout(markAllNotifsRead, 1000);
 
   const notifIcons = { story: '📸', friend_request: '👥', friend_accept: '🤝', message: '💬' };
 
   return `<div class="screen">
     <div class="nav" style="padding-top:.75rem">
-      <div class='nt'>🔔 ${_om('Meldingen')}</div>
-      ${notifications.length ? `<button class="btn bs bsm" onclick="markAllNotifsRead()">Alles gelezen</button>` : ''}
+      <div class='nt'>🔔 ${_om('Notifications')}</div>
+      ${notifications.length ? `<button class="btn bs bsm" onclick="markAllNotifsRead()">All read</button>` : ''}
     </div>
     <div class="notif-screen">
       ${notifications.length ? notifications.map(n => `
@@ -2501,7 +2505,7 @@ function handleNotifClick(id, type, fromUid) {
 // ═══ LOCATIE + GEBEDSTIJDEN ═══
 function getLoc(){
   if(!navigator.geolocation){toast({i:'❌',t:'GPS niet beschikbaar'});return;}
-  toast({i:'📍',t:'Locatie ophalen...'});
+  toast({i:'📍',t:'Get location...'});
   navigator.geolocation.getCurrentPosition(async pos=>{
     const lt=pos.coords.latitude, lg=pos.coords.longitude;
     PS.loc={lat:lt,lng:lg};
@@ -2532,7 +2536,7 @@ function getLoc(){
       toast({i:'✅',t:'Bijgewerkt!',s:PS.city+' · '+result.methodName});
     } else {
       svp();render();
-      toast({i:'⚠️',t:'API niet beschikbaar',s:'Probeer opnieuw'});
+      toast({i:'⚠️',t:'API niet beschikbaar',s:'Try again'});
     }
   }, e=>toast({i:'❌',t:'Locatie mislukt',s:e.message}));
 }
@@ -2831,7 +2835,7 @@ async function fetchPrayerTimes(lat, lng, countryCode) {
 let comTab = 'ranglijst'; // 'ranglijst' | 'groepen'
 let rankTab = 'quiz';     // 'quiz' | 'tasbih' | 'streak'
 let allUsers = [];         // Alle gebruikers voor ranglijst
-let myGroups = [];         // Groepen waar ik lid van ben
+let myGroups = [];         // Groups waar ik lid van ben
 let allGroups = [];        // Alle publieke groepen
 let activeGroup = null;    // Actieve groep voor chat
 let groupMessages = [];    // Berichten in actieve groep
@@ -3017,12 +3021,12 @@ function rCommunity() {
       <div class="com-tab${tab==='groepen'?' on':''}" onclick="comTab='groepen';render()">👥 Groups</div>
     </div>
 
-    ${tab==='ranglijst' ? rRanglijst() : rGroepen()}
+    ${tab==='ranglijst' ? rLeaderboard() : rGroups()}
     ${profile?.isAdmin ? `<div class="sec" style="width:100%;max-width:560px;margin-top:.5rem"><div class="sh"><div class="st">⚙️ Community Admin</div></div><button class="btn bs bsm" data-go="admin" style="width:100%;border-color:rgba(245,158,11,.25);color:#F59E0B">⚙️ Manage Community</button></div>` : ''}
   </div>`;
 }
 
-function rRanglijst() {
+function rLeaderboard() {
   const ig = !currentUser || currentUser.isAnonymous;
   const tab = rankTab || 'quiz';
 
@@ -3065,8 +3069,8 @@ function rRanglijst() {
 
     <!-- Top lijst -->
     <div class="sec">
-      <div class="sh"><div class="st">🏆 Top ${gesorteerd.length}</div><div style="font-size:.72rem;color:var(--sl2)">${tab==='quiz'?'Quiz punten':tab==='tasbih'?'Tasbih teller':'Dagelijkse streak'}</div></div>
-      ${gesorteerd.length === 0 ? `<div class="em"><div class="emi">⏳</div><div class="emt">Ranglijst laden...</div></div>` :
+      <div class="sh"><div class="st">🏆 Top ${gesorteerd.length}</div><div style="font-size:.72rem;color:var(--sl2)">${tab==='quiz'?'Quiz punten':tab==='tasbih'?'Tasbih teller':'Daily streak'}</div></div>
+      ${gesorteerd.length === 0 ? `<div class="em"><div class="emi">⏳</div><div class="emt">Leaderboard laden...</div></div>` :
         gesorteerd.slice(0,20).map((u, i) => {
           const pos = i+1;
           const isMe = u.uid === currentUser?.uid;
@@ -3088,7 +3092,7 @@ function rRanglijst() {
   </div>`;
 }
 
-function rGroepen() {
+function rGroups() {
   const ig = !currentUser || currentUser.isAnonymous;
 
   if(ig) return `<div class="sec" style="text-align:center">
@@ -3145,14 +3149,14 @@ function rCreateGroup() {
   const kleuren = ['#2563EB','#059669','#6B3FFF','#D97706','#DC2626','#0891B2','#BE185D','#7C3AED'];
 
   return `<div class="screen">
-    <div class="nav"><button class="bk" onclick="SC='community';comTab='groepen';render()">← Terug</button><div class="nt">➕ Create group</div></div>
+    <div class="nav"><button class="bk" onclick="SC='community';comTab='groepen';render()">← Back</button><div class="nt">➕ Create group</div></div>
     <div class="sec">
       <!-- Preview -->
       <div style="display:flex;align-items:center;gap:.75rem;background:rgba(255,255,255,.04);border-radius:.85rem;padding:.85rem;margin-bottom:1rem">
         <div style="width:3rem;height:3rem;border-radius:.75rem;background:${d.kleur}22;border:1px solid ${d.kleur}44;display:grid;place-items:center;font-size:1.4rem">${d.icoon}</div>
         <div>
           <div style="font-weight:700;font-size:.95rem">${d.naam||'Naam van de groep'}</div>
-          <div style="font-size:.72rem;color:var(--sl2)">${d.beschrijving||'Beschrijving...'}</div>
+          <div style="font-size:.72rem;color:var(--sl2)">${d.beschrijving||'Description...'}</div>
         </div>
       </div>
 
@@ -3160,7 +3164,7 @@ function rCreateGroup() {
         <input class="i2" id="gNaam" value="${esc(d.naam)}" placeholder="Bijv. Islamitische Jongeren NL" maxlength="40"
           oninput="window._newGroup=window._newGroup||{};window._newGroup.naam=this.value;document.querySelector('.group-preview-nm').textContent=this.value||'Naam van de groep'"/>
       </div>
-      <div class="f2"><label class="lb2">Beschrijving</label>
+      <div class="f2"><label class="lb2">Description</label>
         <textarea class="i2" id="gDesc" rows="2" placeholder="Waar gaat deze groep over?" maxlength="100"
           oninput="window._newGroup=window._newGroup||{};window._newGroup.beschrijving=this.value">${esc(d.beschrijving)}</textarea>
       </div>
@@ -3198,7 +3202,7 @@ function rGroupChat() {
   return `<div class="gchat-screen">
     <!-- Header -->
     <div style="background:rgba(6,8,24,.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08);padding:max(env(safe-area-inset-top),.6rem) .85rem .6rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0">
-      <button onclick="SC='community';comTab='groepen';render();if(_groupUnsubscribe){_groupUnsubscribe();_groupUnsubscribe=null;}" style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Terug</button>
+      <button onclick="SC='community';comTab='groepen';render();if(_groupUnsubscribe){_groupUnsubscribe();_groupUnsubscribe=null;}" style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Back</button>
       <div style="width:2.2rem;height:2.2rem;border-radius:.5rem;background:${(activeGroup.kleur||'#2563EB')}22;border:1px solid ${(activeGroup.kleur||'#2563EB')}44;display:grid;place-items:center;font-size:1rem;flex-shrink:0">${activeGroup.icoon||'🕌'}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.9rem;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(activeGroup.naam||'Groep')}</div>
@@ -3262,7 +3266,7 @@ function bind() {
       toast({i:'✅', t:'Welkom terug!'});
     } catch(e) {
       const msgs = {'auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-email':'Invalid email address.','auth/too-many-requests':'Too many attempts. Try again later.','auth/invalid-credential':'Incorrect email or password.'};
-      if(err){err.textContent=msgs[e.code]||'Inloggen mislukt.';err.style.display='block';}
+      if(err){err.textContent=msgs[e.code]||'Login mislukt.';err.style.display='block';}
       if(btn){btn.textContent='Login →';btn.disabled=false;}
     }
   });
@@ -3345,7 +3349,7 @@ function bind() {
     }
   });
 
-  // Profiel
+  // Profile
   on($('logoutBtn'), 'click', async () => {
     if(confirm('Wil je uitloggen?')) {
       await auth.signOut();
@@ -3381,7 +3385,7 @@ function bind() {
         await db.collection('users').doc(currentUser.uid).update(updates);
       }
       if(profile)Object.assign(profile,updates);
-      toast({i:'✅',t:'Profiel opgeslagen!'});
+      toast({i:'✅',t:'Profile opgeslagen!'});
       go('profile');
     } catch(e) {
       toast({i:'❌',t:'Save mislukt'});
@@ -3415,7 +3419,7 @@ function bind() {
       if(result){PS.times=result.times;PS.lastCalc=new Date().toDateString();svp();render();toast({i:'✅',t:'Bijgewerkt!'});}
     }
   });
-  // Vrienden zoeken
+  // Friends zoeken
   const fsEl = document.getElementById('friendSearch');
   if(fsEl){
     let stimer;
@@ -3551,15 +3555,15 @@ if('serviceWorker' in navigator){
 
 // Oromoo vertalingen
 var _OM = {
-  "Start":"Mana","Vrienden":"Hiriyoota","Community":"Hawaasa","Meldingen":"Beeksisa","Profiel":"Profaayila",
+  "Start":"Mana","Friends":"Hiriyoota","Community":"Hawaasa","Notifications":"Beeksisa","Profile":"Profaayila",
   "Prayer Times":"Yeroo Salaataa","Qibla Direction":"Qiblah","Tasbih & Zikr":"Tasbiih fi Zikrii",
-  "Lessons & Quiz":"Barnoota fi Qormaata","Stories":"Seenaa","Chat":"Dubbii","Inloggen":"Seeni",
-  "Registreren":"Galmaai","Logout":"Bahi","Instellingen":"Qindaa ina","Ranglijst":"Sadarkaa",
-  "Groepen":"Gareelee","My Groups":"Gareelee koo","Discover Groups":"Gareelee argadhu",
+  "Lessons & Quiz":"Barnoota fi Qormaata","Stories":"Seenaa","Chat":"Dubbii","Login":"Seeni",
+  "Register":"Galmaai","Logout":"Bahi","Settings":"Qindaa ina","Leaderboard":"Sadarkaa",
+  "Groups":"Gareelee","My Groups":"Gareelee koo","Discover Groups":"Gareelee argadhu",
   "Joinen":"Makamu","Leave":"Gadi lakkisi","members":"miseensota","No notifications":"Beeksisni hin jiru",
   "Online":"Interneetarra","Offline":"Ala","Welkom terug":"Baga deebitee",
   "Assalamu Alaykum":"Assalamu Alaykum","Volgend gebed":"Salaata itti aanu",
-  "Refresh":"Haaromsi","Zonsopgang":"Bahaa Aduu","Azan Instellingen":"Qindaa ina Azaana",
+  "Refresh":"Haaromsi","Zonsopgang":"Bahaa Aduu","Azan Settings":"Qindaa ina Azaana",
   "PER PRAYER":"Salaata hundaaf","ADHAN SOUND":"Sagalee Azaana","Test":"Qormaata",
   "Admin Panel":"Bulchiinsa","Level":"Sadarkaa","Points":"Qabxii","Today":"Har a",
   "Streak":"Itti fufinsa","Total":"Waliigala","Levels voltooid":"Sadarkaa xumurame",
@@ -3574,16 +3578,16 @@ var _OM = {
   "Goed!":"Sirrii!","Fout!":"Dogoggora!","Score":"Qabxii","Volgende":"Itti aanu","Afronden":"Xumuuri",
   "Email address":"Imeelii","Password":"Jecha darbii","Naam":"Maqaa",
   "Nog geen account?":"Herreega hin qabdu?","Al een account?":"Herreega qabda?",
-  "Forgot password?":"Jecha darbii dagatte?","Verstuur":"Ergi","Zoeken":"Barbaadi",
-  "← Terug":"Deebi i","Terug":"Deebi i","Loading...":"Fe amaa...",
+  "Forgot password?":"Jecha darbii dagatte?","Verstuur":"Ergi","Search":"Barbaadi",
+  "← Back":"Deebi i","Terug":"Deebi i","Loading...":"Fe amaa...",
   "Fajr":"Fajr","Dhuhr":"Dhuhr","Asr":"Asr","Maghrib":"Maghrib","Isha":"Isha",
   "MWL":"MWL","ISNA":"ISNA","Mekka":"Makkaa","Karachi":"Karachi","Egypte":"Masri",
   "📿 Tasbih":"📿 Tasbiih","🤲 Zikr":"🤲 Zikrii","📖 Dua":"📖 Dua",
   "🎓 Quiz & XP":"🎓 Qormaata fi XP","📿 Tasbih (teller)":"📿 Tasbiih",
   "🔥 Streak":"🔥 Itti fufinsa","Top":"Ol",
   "Rang":"Sadarkaa","Geen vrienden nog":"Hiriyoonni hin jiran ammallee",
-  "Vriendenverzoeken":"Gaaffii hiriyummaa","Verzoek sturen":"Gaaffii ergi",
-  "Annuleren":"Haquu","Bevestigen":"Mirkaneessi",
+  "Friendsverzoeken":"Gaaffii hiriyummaa","Verzoek sturen":"Gaaffii ergi",
+  "Cancel":"Haquu","Bevestigen":"Mirkaneessi",
   "Morning Adhkar":"Zikrii Waaree",
   "Evening Adhkar":"Zikrii Galgala", 
   "Before Sleep":"Rafuu Dura",
@@ -3606,7 +3610,7 @@ var _OM = {
   "Jouw score":"Qabxii kee","Volgende les":"Barnoota itti aanu",
   "Opnieuw":"Irra deebi i","Klaar":"Xumuure",
   "Geen lessen beschikbaar":"Barnoota hin jiru ammallee",
-  "Vriendschapsverzoek":"Gaaffii hiriyummaa",
+  "Friend request":"Gaaffii hiriyummaa",
   "sent you a friend request":"gaaffii hiriyummaa siif erge",
   "sent you a message":"ergaa siif erge",
   "heeft een story geplaatst":"seenaa maxxanse",
@@ -3615,11 +3619,11 @@ var _OM = {
   "Al vrienden":"Hiriyoota turre","Zoek vrienden...":"Hiriyoota barbaadi...",
   "Geen vrienden nog":"Hiriyoonni hin jiran ammallee",
   "Top":"Ol","Jouw positie":"Bakka kee",
-  "Ranglijst":"Sadarkaa","Quiz punten":"Qabxii Qormaataa",
+  "Leaderboard":"Sadarkaa","Quiz punten":"Qabxii Qormaataa",
   "Tasbih teller":"Lakkaa isa Tasbiih",
-  "Dagelijkse streak":"Itti fufinsa guyyaa guyyaa",
+  "Daily streak":"Itti fufinsa guyyaa guyyaa",
   "Create group":"Garee uumuu","Groep verlaten":"Garee gadi lakkisuu",
-  "Beschrijving":"Ibsa","Naam":"Maqaa","Icoon":"Mallattoo",
+  "Description":"Ibsa","Naam":"Maqaa","Icoon":"Mallattoo",
   "Kleur":"Halluu","Publiek":"Uummataa","Private":"Dhuunfaa",
   "Create group ✓":"Garee uumi ✓",
   "Wees de eerste die een bericht stuurt!":"Ergaa jalqabaa ergi!",
@@ -3630,7 +3634,7 @@ var _OM = {
   "Account":"Herreega","Registreer":"Galmaai",
   "Password":"Jecha darbii","Naam":"Maqaa",
   "Bio":"Waa ee kootii","Save":"Olkaa i",
-  "Profiel bijwerken":"Profaayila haaromsi",
+  "Profile bijwerken":"Profaayila haaromsi",
   "Avatar":"Fakkii","Kleur":"Halluu",
   "Level":"Sadarkaa","XP":"XP"
 };
