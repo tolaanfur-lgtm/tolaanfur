@@ -36,7 +36,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
 
 /* SCREEN */
-.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;-webkit-transform:translateZ(0);overscroll-behavior:contain;
+.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;align-items:center;
   padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(7rem + env(safe-area-inset-bottom));touch-action:pan-y}
 .screen.no-tab{padding-bottom:2rem}
@@ -972,8 +972,8 @@ auth.onAuthStateChanged(async user => {
         }
       }
     }, 1000);
-    // Welcomest toast (eenmalig na inloggen)
-    setTimeout(()=>toast({i:'👋',t:_om('Assalamu Alaykum')+'!',s:`${_om('Welcome terug')} ${profile?.displayName||''}!`}),600);
+    // Welkomst toast (eenmalig na inloggen)
+    setTimeout(()=>toast({i:'👋',t:_om('Assalamu Alaykum')+'!',s:`${_om('Welkom terug')} ${profile?.displayName||''}!`}),600);
   } else {
     currentUser = null;
     profile = null;
@@ -1030,14 +1030,8 @@ function render() {
       notifications: rNotifications,
     };
     const fn = map[SC] || rHome;
-    const _scr = app2.querySelector('.screen');
-    const _sy = (SC === 'home' && _scr) ? _scr.scrollTop : 0;
     app2.innerHTML = fn() + (needsTabs() ? rTabs() : '');
     bind();
-    if(SC === 'home' && _sy > 10){
-      const _ns = app2.querySelector('.screen');
-      if(_ns) setTimeout(()=>{ _ns.scrollTop = _sy; }, 0);
-    }
     if(SC === 'qiblah') setTimeout(startCompass, 400);
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
@@ -1077,7 +1071,7 @@ function rTabs() {
     {id:'friends',i:'👥',l:isOm?omLabels.friends:'Vrienden',badge:reqBadge},
     {id:'community',i:'🌐',l:isOm?omLabels.community:'Community'},
     {id:'notifications',i:'🔔',l:isOm?omLabels.notif:'Meldingen',badge:unreadNotifs},
-    {id:'profile',i:'👤',l:isOm?omLabels.profile:'Profile'}
+    {id:'profile',i:'👤',l:isOm?omLabels.profile:'Profiel'}
   ];
   return`<div class="tabs">${tabs.map(t=>`<button class="tab${SC===t.id?' on':''}" data-go="${t.id}"><span class="ti" style="position:relative">${t.i}${t.badge?`<span id="chatBadge" style="position:absolute;top:-.2rem;right:-.4rem;background:var(--rd);border-radius:50%;min-width:.9rem;height:.9rem;font-size:.52rem;font-weight:700;color:#fff;display:grid;place-items:center;padding:0 .15rem">${t.badge}</span>`:''}</span><span class="tl">${t.l}</span></button>`).join('')}</div>`;
 }
@@ -1684,12 +1678,9 @@ function rPrayer() {
         💡 Zorg dat je telefoon niet op stil staat voor Azan geluid. Tik op "Test" om het geluid te controleren.
       </div>
     </div>
-    <div style="width:100%;max-width:560px"><div style="background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;cursor:pointer" data-go="qiblah">
-      <div style="width:2.8rem;height:2.8rem;border-radius:50%;background:linear-gradient(135deg,#92400E,#D97706);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🧭</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:.9rem;color:#FCD34D">Qibla Direction</div>
-        <div style="font-size:.68rem;color:rgba(252,211,77,.6);margin-top:.1rem">Find the direction of Ka'bah</div>
-      </div>
+    <div style="width:100%;max-width:560px"><div style="background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);border-radius:1rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer" data-go="qiblah">
+      <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,#92400E,#D97706);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🧭</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:.88rem;color:#FCD34D">Qibla Direction</div><div style="font-size:.65rem;color:rgba(252,211,77,.5);margin-top:.1rem">Find the direction of Ka'bah</div></div>
       <div style="color:#F59E0B">›</div>
     </div></div>
   </div>`;
@@ -3263,10 +3254,10 @@ function bind() {
     if(btn){btn.textContent='Loading...';btn.disabled=true;}
     try {
       await auth.signInWithEmailAndPassword(email, pw);
-      toast({i:'✅', t:'Welcome terug!'});
+      toast({i:'✅', t:'Welkom terug!'});
     } catch(e) {
       const msgs = {'auth/user-not-found':'No account found with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-email':'Invalid email address.','auth/too-many-requests':'Too many attempts. Try again later.','auth/invalid-credential':'Incorrect email or password.'};
-      if(err){err.textContent=msgs[e.code]||'Login failed.';err.style.display='block';}
+      if(err){err.textContent=msgs[e.code]||'Inloggen mislukt.';err.style.display='block';}
       if(btn){btn.textContent='Login →';btn.disabled=false;}
     }
   });
@@ -3301,7 +3292,7 @@ function bind() {
       await auth.signInAnonymously();
       toast({i:'👤', t:'Continue as guest'});
     } catch(e) {
-      toast({i:'❌', t:'Guest mode not available'});
+      toast({i:'❌', t:'Enable Anonymous Auth in Firebase Console'});
       if(btn){btn.textContent='👤 Continue as guest';btn.disabled=false;}
     }
   });
@@ -3332,7 +3323,7 @@ function bind() {
       toast({i:'🎉', t:'Account created!', s:`Welcome ${name}!`});
     } catch(e) {
       const msgs = {'auth/email-already-in-use':'Dit e-mailadres is al in gebruik.','auth/invalid-email':'Ongeldig e-mailadres.','auth/weak-password':'Password is te zwak.'};
-      if(err){err.textContent=msgs[e.code]||'Registration failed.';err.style.display='block';}
+      if(err){err.textContent=msgs[e.code]||'Registratie mislukt.';err.style.display='block';}
       if(btn){btn.textContent='Create Account →';btn.disabled=false;}
     }
   });
@@ -3561,7 +3552,7 @@ var _OM = {
   "Registreren":"Galmaai","Logout":"Bahi","Instellingen":"Qindaa ina","Ranglijst":"Sadarkaa",
   "Groepen":"Gareelee","My Groups":"Gareelee koo","Discover Groups":"Gareelee argadhu",
   "Joinen":"Makamu","Leave":"Gadi lakkisi","members":"miseensota","No notifications":"Beeksisni hin jiru",
-  "Online":"Interneetarra","Offline":"Ala","Welcome terug":"Baga deebitee",
+  "Online":"Interneetarra","Offline":"Ala","Welkom terug":"Baga deebitee",
   "Assalamu Alaykum":"Assalamu Alaykum","Volgend gebed":"Salaata itti aanu",
   "Refresh":"Haaromsi","Zonsopgang":"Bahaa Aduu","Azan Instellingen":"Qindaa ina Azaana",
   "PER PRAYER":"Salaata hundaaf","ADHAN SOUND":"Sagalee Azaana","Test":"Qormaata",
@@ -3628,7 +3619,7 @@ var _OM = {
   "Create group ✓":"Garee uumi ✓",
   "Wees de eerste die een bericht stuurt!":"Ergaa jalqabaa ergi!",
   "Join de groep om berichten te sturen":"Garee makamu ergaa erguuf",
-  "Welcome":"Baga nagaan dhufte",
+  "Welkom":"Baga nagaan dhufte",
   "Maak een account aan":"Herreega bani",
   "om alles te gebruiken":"hundumaa fayyadamuuf",
   "Account":"Herreega","Registreer":"Galmaai",
