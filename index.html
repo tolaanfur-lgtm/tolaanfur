@@ -38,7 +38,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 /* SCREEN */
 .screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;align-items:center;
-  padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(7rem + env(safe-area-inset-bottom));touch-action:pan-y}
+  padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(5.5rem + env(safe-area-inset-bottom))}
 .screen.no-tab{padding-bottom:2rem}
 
 /* AUTH SCREEN */
@@ -1195,7 +1195,9 @@ function rHome() {
     {id:'tasbih',i:'📿',n:_om('Tasbih & Zikr'),d:_om('Dhikr & practice'),c:'#6B3FFF'},
     {id:'prayer',i:'🕌',n:_om('Prayer Times'),d:_om('Salah tijden & Adhan'),c:'#059669'},
     {id:'hijri-cal',i:'🌙',n:'Islamic Calendar',d:'Hijri date & Ramadan',c:'#4C1D95'},
+    {id:'qiblah',i:'🧭',n:'Qibla Direction',d:"Direction of Ka'bah",c:'#D97706'},
     {id:'media',i:'📱',n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
+    {id:'community',i:'🌐',n:_om('Community'),d:_om('Groups & Leaderboards'),c:'#059669'},
   ];
 
   const av = AV[(profile?.avatar||0)%AV.length];
@@ -1678,11 +1680,7 @@ function rPrayer() {
         💡 Zorg dat je telefoon niet op stil staat voor Azan geluid. Tik op "Test" om het geluid te controleren.
       </div>
     </div>
-    <div style="width:100%;max-width:560px"><div style="background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);border-radius:1rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer" data-go="qiblah">
-      <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,#92400E,#D97706);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🧭</div>
-      <div style="flex:1"><div style="font-weight:700;font-size:.88rem;color:#FCD34D">Qibla Direction</div><div style="font-size:.65rem;color:rgba(252,211,77,.5);margin-top:.1rem">Find the direction of Ka'bah</div></div>
-      <div style="color:#F59E0B">›</div>
-    </div></div>
+    <div style="width:100%;max-width:560px"><button class="btn bs" data-go="qiblah">🧭 Qibla Direction</button></div>
   </div>`;
 }
 
