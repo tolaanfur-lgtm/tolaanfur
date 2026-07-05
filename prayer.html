@@ -492,11 +492,12 @@ function rPrayer() {
           ${PS.loc ? `
             <div class="spin" style="margin:.5rem auto"></div>
             <div style="font-size:.85rem;color:var(--sl2);margin-top:.75rem">Prayer Times laden...</div>
-            <button id="glBtn2" style="margin-top:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.75rem;color:rgba(255,255,255,.6);padding:.5rem 1rem;font-size:.8rem;cursor:pointer">↺ Opnieuw proberen</button>
+            <button onclick="startCompass()" style="background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:.85rem;color:#fff;padding:.65rem 1.25rem;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:.75rem;width:100%;max-width:16rem">🧭 Enable Compass</button>
+      <button id="glBtn2" style="margin-top:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.75rem;color:rgba(255,255,255,.6);padding:.5rem 1rem;font-size:.8rem;cursor:pointer">↺ Opnieuw proberen</button>
           ` : `
             <div style="font-size:2rem;margin-bottom:.5rem">🕌</div>
             <div style="font-size:.88rem;color:var(--sl2);margin-bottom:1rem">Tap "Get location" for exact prayer times</div>
-            <button class="btn bt" id="glBtn2">📍 Locatie ophalen</button>
+            <button class="btn bt" id="glBtn2">📍 Get Location</button>
           `}
         </div>
       ` : ALLE.map(g => {
@@ -689,7 +690,8 @@ function rQiblah() {
       ` : `
       <div style="text-align:center;padding:1rem">
         <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah richting te berekenen</div>
-        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Locatie ophalen</button>
+        <button onclick="startCompass()" style="background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:.85rem;color:#fff;padding:.65rem 1.25rem;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:.75rem;width:100%;max-width:16rem">🧭 Enable Compass</button>
+      <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
       </div>`}
     </div>
   </div>`;
@@ -780,6 +782,10 @@ async function fetchPrayerTimes(lat, lng, countryCode) {
   return null;
 }
 function startCompass(){
+  // Verberg enable knop
+  var enableBtn = document.getElementById('enable-compass-btn');
+  if(enableBtn) enableBtn.style.display = 'none';
+  
   if(_cmpH) window.removeEventListener('deviceorientation', _cmpH, true);
   
   _cmpH = function(e){
