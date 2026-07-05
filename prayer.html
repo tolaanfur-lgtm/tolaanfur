@@ -688,7 +688,7 @@ function rQiblah() {
     </div>
   </div>`;
 }
-function getLoc(){
+async function getLoc(){
   if(!navigator.geolocation){toast({i:'❌',t:'GPS not available'});return;}
   toast({i:'📍',t:'Getting location...'});
   navigator.geolocation.getCurrentPosition(async pos=>{
@@ -725,7 +725,7 @@ function getLoc(){
     }
   }, e=>toast({i:'❌',t:'Location failed',s:e.message}));
 }
-function fetchPrayerTimes(lat, lng, countryCode) {
+async function fetchPrayerTimes(lat, lng, countryCode) {
   const METHODS = {'NL':3,'BE':3,'DE':3,'FR':3,'GB':3,'SE':3,'NO':3,'DK':3,'FI':3,'IT':3,'ES':3,'PT':3,'AT':3,'CH':3,'US':2,'CA':2,'SA':4,'AE':4,'KW':4,'BH':4,'QA':4,'PK':5,'IN':5,'BD':5,'EG':1};
   const method = PS.method || METHODS[countryCode] || 3;
   PS.method = method;
