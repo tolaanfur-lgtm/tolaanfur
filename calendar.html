@@ -501,7 +501,7 @@ function rHijriCal(){
   setTimeout(()=>renderIslamicCalendar('hijri-container'),50);
   return `<div class="screen">
     <div class="nav" style="padding-top:.75rem">
-      <button onclick="SC='home';render()" class="btn bs" style="position:absolute;left:1rem;padding:.35rem .75rem;font-size:.8rem">←</button>
+      <button onclick="goBack()" ontouchend="goBack()" class="btn bs" style="position:absolute;left:1rem;padding:.35rem .75rem;font-size:.8rem">←</button>
       <div class="nt">🌙 Islamic Calendar</div>
     </div>
     <div id="hijri-container" style="width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;padding:.5rem 0">
