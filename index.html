@@ -369,6 +369,8 @@ select.inp2 option{background:var(--bg2)}
 <script>
 'use strict';
 var isGuest = true;
+var friendsUnread = 0;
+var friendReqCount = 0;
 
 // ══════════════════════════════════════════════
 // FIREBASE CONFIG
@@ -1026,6 +1028,19 @@ function loadCommunityUnread() {
   });
 }
 
+function updateFriendsBadge() {
+  var total = friendsUnread + friendReqCount;
+  // Update friends tab badge in tabbar
+  var tabs = document.getElementById('tabs-wrap');
+  if(tabs) {
+    var friendBadges = tabs.querySelectorAll('[data-friends-badge]');
+    friendBadges.forEach(function(b) {
+      b.textContent = total > 0 ? total : '';
+      b.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
+}
+
 function render() {
   try {
     const map = {
@@ -1057,9 +1072,9 @@ function render() {
       'create-group': function(){ return rIframe('community.html'); },
       'group-chat': function(){ return rIframe('community.html'); },
       'dua-cat': rDuaTab,
-      friends: rFriends,
-      chats: rChats,
-      chat: rChat,
+      friends: function(){ return rIframe('friends.html'); },
+      chats: function(){ return rIframe('friends.html'); },
+      chat: function(){ return rIframe('friends.html'); },
       'story-view': rStoryView,
       'story-create': rStoryCreate,
       'notifications': function(){ return rIframe('notifications.html'); },
@@ -4006,12 +4021,19 @@ window.addEventListener('message', function(e) {
   if(e.data === 'go-home') { SC = 'home'; render(); }
   if(e.data && e.data.type === 'comm-badge') {
     communityUnread = e.data.count || 0;
-    // Update alleen de badge zonder re-render
     var badges = document.querySelectorAll('[data-comm-badge]');
     badges.forEach(function(b){
       b.textContent = communityUnread > 0 ? communityUnread : '';
       b.style.display = communityUnread > 0 ? 'flex' : 'none';
     });
+  }
+  if(e.data && e.data.type === 'friends-badge') {
+    friendsUnread = e.data.count || 0;
+    updateFriendsBadge();
+  }
+  if(e.data && e.data.type === 'req-badge') {
+    friendReqCount = e.data.count || 0;
+    updateFriendsBadge();
   }
 });
 
