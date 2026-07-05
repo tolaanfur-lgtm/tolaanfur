@@ -366,6 +366,12 @@ function toast(o){
 }
 function go(s){ SC=s; render(); }
 function _om(t){ return t; }
+
+function goPage(id){
+  if(id === 'p-prayer') { SC = 'prayer'; render(); }
+  else if(id === 'p-qibla') { SC = 'qiblah'; render(); }
+}
+
 function goBack(){
   try{ if(window.parent&&window.parent!==window)window.parent.postMessage('go-home','*'); }catch(e){}
 }
@@ -687,6 +693,22 @@ function rQiblah() {
       </div>`}
     </div>
   </div>`;
+}
+function tAz(id){
+  if(!PS.azan) PS.azan = {fajr:true,dhuhr:false,asr:true,maghrib:true,isha:true};
+  PS.azan[id] = !PS.azan[id];
+  svp();
+  render();
+}
+
+function getDistanceToMecca(lat, lng) {
+  const R = 6371; // km
+  const mLat = 21.4225, mLng = 39.8262;
+  const dLat = (mLat-lat)*Math.PI/180;
+  const dLng = (mLng-lng)*Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat*Math.PI/180)*Math.cos(mLat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 async function getLoc(){
   if(!navigator.geolocation){toast({i:'❌',t:'GPS not available'});return;}
