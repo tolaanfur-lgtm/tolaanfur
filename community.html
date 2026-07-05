@@ -116,7 +116,12 @@ textarea.inp{resize:none;height:4.5rem}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 var CFG={apiKey:"AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk",authDomain:"tolaanfur-5b5f5.firebaseapp.com",projectId:"tolaanfur-5b5f5",storageBucket:"tolaanfur-5b5f5.firebasestorage.app",messagingSenderId:"188890145767",appId:"1:188890145767:web:6ec8fe6fae4ddd90891342"};
-var fbApp=firebase.apps.length>0?firebase.apps[0]:firebase.initializeApp(CFG);
+var fbApp;
+try {
+  fbApp = firebase.app('comm2');
+} catch(e) {
+  fbApp = firebase.initializeApp(CFG, 'comm2');
+}
 var db=fbApp.firestore();
 var auth=fbApp.auth();
 var me=null,myP=null,tab='groups',gid=null,msgUnsub=null,groups=[];
@@ -154,8 +159,8 @@ function renderTab(){
 
 function renderGroups(){
   var c=document.getElementById('tab-content');
-  if(!me){
-    c.innerHTML='<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">🔒</div><div style="margin-top:.5rem">Please login</div></div>';
+  if(!me && groups.length === 0){
+    c.innerHTML='<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">🔒</div><div style="margin-top:.5rem">Loading...</div></div>';
     return;
   }
   if(!groups.length){
@@ -363,6 +368,14 @@ function updateTotalBadge(){
     }
   } catch(e){}
 }
+
+// Laad groepen direct bij openen
+db.collection('groups').get().then(function(snap){
+  if(groups.length === 0){
+    groups = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderTab();
+  }
+}).catch(function(){});
 
 auth.onAuthStateChanged(function(user){
   me=user;
