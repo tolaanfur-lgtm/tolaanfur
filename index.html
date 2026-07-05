@@ -1041,6 +1041,194 @@ function updateFriendsBadge() {
   }
 }
 
+function rQiblah() {
+  const qa = PS.qiblah || 0;
+  const loc = PS.loc;
+  const dist = loc ? Math.round(getDistanceToMecca(loc.lat, loc.lng)) : null;
+
+  return `<div class="screen" style="padding-top:0;background:linear-gradient(180deg,#0A0520 0%,#060818 100%)">
+
+    <!-- Header -->
+    <div style="width:100%;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;display:flex;align-items:center;gap:.75rem;max-width:560px">
+      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Terug</button>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;background:linear-gradient(90deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🧭 Qibla Direction</div>
+    </div>
+
+    <!-- Kaäba info balk -->
+    <div style="width:100%;max-width:560px;padding:0 1rem;margin-bottom:1.2rem">
+      <div style="background:linear-gradient(135deg,rgba(107,63,255,.2),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.25);border-radius:1.1rem;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.85rem">
+        <div style="font-size:2.2rem">🕋</div>
+        <div style="flex:1">
+          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Mekka</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Jouw locatie') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
+        </div>
+        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Ophalen'}</button>
+      </div>
+    </div>
+
+    <!-- Kompas -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;width:100%;padding:0 1rem">
+
+      <!-- Buitenste ring met graden -->
+      <div style="position:relative;width:300px;height:300px;flex-shrink:0">
+
+        <!-- Gloeiende achtergrond -->
+        <div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(107,63,255,.15) 0%,transparent 70%);pointer-events:none"></div>
+
+        <!-- Buiten ring decoratief - wordt groen als correct -->
+        <div id="qiblah-ring-outer" style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(139,92,246,.2);transition:all .5s"></div>
+        <div id="qiblah-ring-inner" style="position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(139,92,246,.1);transition:all .5s"></div>
+        <!-- Groene gloed ring (zichtbaar als correct gericht) -->
+        <div id="qiblah-glow-ring" style="position:absolute;inset:-4px;border-radius:50%;border:3px solid rgba(52,211,153,0);transition:all .6s;pointer-events:none"></div>
+
+        <!-- SVG kompas achtergrond -->
+        <svg width="300" height="300" viewBox="0 0 300 300" style="position:absolute;inset:0">
+          <!-- Binnenste cirkel achtergrond -->
+          <circle cx="150" cy="150" r="130" fill="rgba(6,8,24,.95)" stroke="rgba(139,92,246,.3)" stroke-width="1.5"/>
+          <circle cx="150" cy="150" r="115" fill="none" stroke="rgba(139,92,246,.1)" stroke-width="1"/>
+
+          <!-- Graden streepjes -->
+          ${Array.from({length:72},(_,i)=>{
+            const a=i*5*Math.PI/180;
+            const isMaj=i%18===0,isMed=i%9===0;
+            const r1=isMaj?105:isMed?110:115,r2=128;
+            const x1=150+r1*Math.sin(a),y1=150-r1*Math.cos(a);
+            const x2=150+r2*Math.sin(a),y2=150-r2*Math.cos(a);
+            return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${isMaj?'rgba(167,139,250,.5)':isMed?'rgba(139,92,246,.3)':'rgba(107,63,255,.15)'}" stroke-width="${isMaj?2:1}"/>`;
+          }).join('')}
+
+          <!-- N/Z/O/W labels -->
+          <text x="150" y="28" text-anchor="middle" fill="#F87171" font-family="Fredoka One" font-size="16" font-weight="bold">N</text>
+          <text x="150" y="282" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">Z</text>
+          <text x="278" y="155" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">O</text>
+          <text x="22" y="155" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">W</text>
+
+          <!-- NW/NO/ZO/ZW -->
+          <text x="55" y="58" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">NW</text>
+          <text x="245" y="58" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">NO</text>
+          <text x="245" y="252" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">ZO</text>
+          <text x="55" y="252" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">ZW</text>
+        </svg>
+
+        <!-- Draaiende naald (richting qiblah) -->
+        <div id="cmp-needle" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${qa}deg);transition:transform .4s cubic-bezier(.34,1.2,.64,1)">
+          <svg width="40" height="260" viewBox="0 0 40 260" style="overflow:visible">
+            <!-- Groene pijl naar Ka'bah -->
+            <defs>
+              <filter id="glow2"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+              <linearGradient id="needleGreen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#34D399"/>
+                <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+              <linearGradient id="needleGray" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6B7280"/>
+                <stop offset="100%" stop-color="#374151"/>
+              </linearGradient>
+            </defs>
+            <!-- Bovenste helft (richting Ka'bah - groen) -->
+            <polygon points="20,8 28,130 20,118 12,130" fill="url(#needleGreen)" filter="url(#glow2)"/>
+            <!-- Onderste helft (grijs) -->
+            <polygon points="20,252 28,130 20,142 12,130" fill="url(#needleGray)" opacity=".6"/>
+            <!-- Middelpunt -->
+            <circle cx="20" cy="130" r="7" fill="#A78BFA" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="130" r="3" fill="#fff"/>
+          </svg>
+        </div>
+
+        <!-- Ka'bah icoon in midden -->
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;margin-top:25px">
+          <span style="font-size:1.6rem;filter:drop-shadow(0 0 12px rgba(167,139,250,.8))">🕋</span>
+        </div>
+      </div>
+
+      <!-- Graden + info -->
+      ${loc ? `
+      <div style="text-align:center">
+        <div style="font-family:'Fredoka One',cursive;font-size:2.5rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="qib-deg">${Math.round(qa)}°</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah vanuit ${esc(PS.city||'jouw locatie')}</div>
+      </div>
+
+      <!-- Instructie kaart -->
+      <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:1rem;padding:.85rem 1rem;width:100%;max-width:420px;text-align:center">
+        <div style="font-size:.88rem;color:#E9D5FF;line-height:1.6">
+          🟢 Draai je telefoon tot de <strong style="color:#34D399">groene pijl</strong> rechtop staat<br/>
+          Dan kijk je richting de Ka'bah 🕋
+        </div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.4rem">
+          💡 Beweeg je telefoon in een ∞ beweging voor kalibratie
+        </div>
+      </div>
+
+      <!-- Afstand info -->
+      ${dist ? `
+      <div style="display:flex;gap:.65rem;width:100%;max-width:420px">
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA">${dist.toLocaleString()}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km tot Mekka</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#60A5FA">${Math.round(qa)}°</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">richting (°)</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#34D399">${Math.round(dist/80)}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">uur vliegen</div>
+        </div>
+      </div>` : ''}
+      ` : `
+      <div style="text-align:center;padding:1rem">
+        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah direction to calculate</div>
+        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
+      </div>`}
+    </div>
+  </div>`;
+}
+function startCompass(){
+  if(_cmpH) window.removeEventListener('deviceorientation', _cmpH, true);
+  
+  _cmpH = function(e){
+    let h = 0;
+    if(typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;
+    else if(e.alpha !== null) h = (360 - e.alpha) % 360;
+    else return;
+    
+    const rot = (PS.qiblah||0) - h;
+    const n = document.getElementById('cmp-needle');
+    if(n) n.style.transform = `rotate(${rot}deg)`;
+    
+    // Groen gloeien als correct gericht (binnen 10 graden)
+    const normRot = ((rot % 360) + 360) % 360;
+    const correct = normRot < 10 || normRot > 350;
+    updateQiblahGlow(correct);
+    
+    // Update graden teller
+    const degEl = document.getElementById('qib-deg');
+    if(degEl) degEl.textContent = Math.round((PS.qiblah||0)) + '°';
+  };
+  
+  if(typeof DeviceOrientationEvent !== 'undefined' && 
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission()
+      .then(p => {
+        if(p === 'granted'){
+          window.addEventListener('deviceorientation', _cmpH, true);
+          toast({i:'🧭', t:'Kompas actief'});
+        }
+      }).catch(()=>{});
+  } else {
+    window.addEventListener('deviceorientation', _cmpH, true);
+  }
+}
+function getDistanceToMecca(lat, lng) {
+  const R = 6371; // km
+  const mLat = 21.4225, mLng = 39.8262;
+  const dLat = (mLat-lat)*Math.PI/180;
+  const dLng = (mLng-lng)*Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat*Math.PI/180)*Math.cos(mLat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 function render() {
   try {
     const map = {
@@ -1057,7 +1245,7 @@ function render() {
       res: rRes,
       tasbih: rTasbih,
       prayer: function(){ return rIframe('prayer.html'); },
-      qiblah: function(){ return rIframe('prayer.html'); },
+      qiblah: rQiblah,
       admin: rAdmin,
       'admin-cat': rACat,
       'admin-lvl': rALvl,
@@ -1085,7 +1273,29 @@ function render() {
     const tabsHtml = needsTabs() ? rTabs() : '';
     app2.innerHTML = '<div id="screen-wrap" style="position:absolute;inset:0;">' + screenHtml + '</div>' + '<div id="tabs-wrap" style="position:fixed;bottom:0;left:0;right:0;z-index:100">' + tabsHtml + '</div>';
     bind();
-    if(SC === 'qiblah') setTimeout(startCompass, 400);
+    if(SC === 'qiblah') {
+      // Voeg Enable Compass knop toe als user gesture
+      setTimeout(function() {
+        var app = document.getElementById('app');
+        if(!app) return;
+        var existing = document.getElementById('enable-cmp');
+        if(existing) return;
+        var btn = document.createElement('button');
+        btn.id = 'enable-cmp';
+        btn.textContent = '🧭 Enable Compass';
+        btn.style.cssText = 'position:fixed;bottom:7rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:2rem;color:#fff;padding:.75rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(16,185,129,.4);z-index:999;white-space:nowrap';
+        btn.addEventListener('click', function() {
+          btn.remove();
+          startCompass();
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          btn.remove();
+          startCompass();
+        }, {passive:false});
+        document.body.appendChild(btn);
+      }, 300);
+    }
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
       // Auto-laad tijden als locatie bekend maar tijden leeg
@@ -1247,7 +1457,6 @@ function rHome() {
     {id:'sirah-quiz',i:'🏆',n:'Sirah Quiz',d:'Prophet Muhammad ﷿︾',c:'#7C3AED'},
     {id:'tasbih',i:'📿',n:_om('Tasbih & Zikr'),d:_om('Dhikr & practice'),c:'#6B3FFF'},
     {id:'prayer',i:'🕌',n:_om('Prayer Times'),d:_om('Salah tijden & Adhan'),c:'#059669'},
-    {id:'hijri-cal',i:'🌙',n:'Islamic Calendar',d:'Hijri date & Ramadan',c:'#4C1D95'},
     {id:'media',i:'📱',n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
   ];
 
@@ -1698,7 +1907,7 @@ function rPrayer() {
           ` : `
             <div style="font-size:2rem;margin-bottom:.5rem">🕌</div>
             <div style="font-size:.88rem;color:var(--sl2);margin-bottom:1rem">Tap "Get location" for exact prayer times</div>
-            <button class="btn bt" id="glBtn2">📍 Locatie ophalen</button>
+            <button class="btn bt" id="glBtn2">📍 Get Location</button>
           `}
         </div>
       ` : ALLE.map(g => {
@@ -1891,8 +2100,8 @@ function rQiblah() {
       </div>` : ''}
       ` : `
       <div style="text-align:center;padding:1rem">
-        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah richting te berekenen</div>
-        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Locatie ophalen</button>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah direction to calculate</div>
+        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
       </div>`}
     </div>
   </div>`;
@@ -2565,7 +2774,7 @@ function handleNotifClick(id, type, fromUid) {
 // ═══ LOCATIE + GEBEDSTIJDEN ═══
 function getLoc(){
   if(!navigator.geolocation){toast({i:'❌',t:'GPS niet beschikbaar'});return;}
-  toast({i:'📍',t:'Locatie ophalen...'});
+  toast({i:'📍',t:'Get Location...'});
   navigator.geolocation.getCurrentPosition(async pos=>{
     const lt=pos.coords.latitude, lg=pos.coords.longitude;
     PS.loc={lat:lt,lng:lg};
@@ -4019,7 +4228,10 @@ auth.getRedirectResult().then(result => {
 
 window.addEventListener('message', function(e) {
   if(e.data === 'go-home') { SC = 'home'; render(); }
-  if(e.data && e.data.type === 'navigate') { SC = e.data.screen; render(); }
+  if(e.data && e.data.type === 'navigate') { 
+    SC = e.data.screen; 
+    render(); 
+  }
   if(e.data && e.data.type === 'comm-badge') {
     communityUnread = e.data.count || 0;
     var badges = document.querySelectorAll('[data-comm-badge]');
