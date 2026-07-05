@@ -534,7 +534,7 @@ function openChat(friend){
   }, err=>{
     console.log('Chat error:', err);
     const c = document.getElementById('cmsgs');
-    if(c) c.innerHTML = '<div style="text-align:center;color:var(--rd);padding:2rem">Fout bij laden. Probeer opnieuw.</div>';
+    if(c) c.innerHTML = '<div style="text-align:center;color:var(--rd);padding:2rem">Fout bij laden. Try again.</div>';
   });
 
   _chatUnsubscribe = ()=> ref.off('value');
@@ -707,7 +707,7 @@ async function createStory() {
 
   try {
     if (!storyText.trim()) { 
-      toast({ i: '⚠️', t: 'Voer tekst in voor je story' }); 
+      toast({ i: '⚠️', t: 'Enter text for your story' }); 
       if (btn) { btn.textContent = 'Publiceren ✓'; btn.disabled = false; }
       return; 
     }
@@ -966,10 +966,10 @@ auth.onAuthStateChanged(async user => {
             PS.lastCalc=new Date().toDateString();
             svp();
             if(SC==='prayer')render();
-            toast({i:'✅',t:'Prayer Times geladen!'});
+            toast({i:'✅',t:'Prayer Times loaded!'});
           } else {
             if(SC==='prayer')render();
-            toast({i:'⚠️',t:'Failed to load',s:'Tik op Refresh'});
+            toast({i:'⚠️',t:'Failed to load',s:'Tap Refresh'});
           }
         } catch(e) {
           if(SC==='prayer')render();
@@ -1050,7 +1050,7 @@ function rQiblah() {
 
     <!-- Header -->
     <div style="width:100%;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;display:flex;align-items:center;gap:.75rem;max-width:560px">
-      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Terug</button>
+      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Back</button>
       <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;background:linear-gradient(90deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🧭 Qibla Direction</div>
     </div>
 
@@ -1059,10 +1059,10 @@ function rQiblah() {
       <div style="background:linear-gradient(135deg,rgba(107,63,255,.2),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.25);border-radius:1.1rem;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.85rem">
         <div style="font-size:2.2rem">🕋</div>
         <div style="flex:1">
-          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Mekka</div>
-          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Jouw locatie') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Makkah</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Your location') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
         </div>
-        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Ophalen'}</button>
+        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Get Location'}</button>
       </div>
     </div>
 
@@ -1125,7 +1125,7 @@ function rQiblah() {
                 <stop offset="100%" stop-color="#374151"/>
               </linearGradient>
             </defs>
-            <!-- Bovenste helft (richting Ka'bah - groen) -->
+            <!-- Bovenste helft (towards Ka'bah - groen) -->
             <polygon points="20,8 28,130 20,118 12,130" fill="url(#needleGreen)" filter="url(#glow2)"/>
             <!-- Onderste helft (grijs) -->
             <polygon points="20,252 28,130 20,142 12,130" fill="url(#needleGray)" opacity=".6"/>
@@ -1145,17 +1145,17 @@ function rQiblah() {
       ${loc ? `
       <div style="text-align:center">
         <div style="font-family:'Fredoka One',cursive;font-size:2.5rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="qib-deg">${Math.round(qa)}°</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah vanuit ${esc(PS.city||'jouw locatie')}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah from ${esc(PS.city||'your location')}</div>
       </div>
 
       <!-- Instructie kaart -->
       <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:1rem;padding:.85rem 1rem;width:100%;max-width:420px;text-align:center">
         <div style="font-size:.88rem;color:#E9D5FF;line-height:1.6">
-          🟢 Draai je telefoon tot de <strong style="color:#34D399">groene pijl</strong> rechtop staat<br/>
-          Dan kijk je richting de Ka'bah 🕋
+          🟢 Rotate your phone until the <strong style="color:#34D399">groene pijl</strong> points up<br/>
+          You are now facing the Ka'bah 🕋
         </div>
         <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.4rem">
-          💡 Beweeg je telefoon in een ∞ beweging voor kalibratie
+          💡 Move your phone in a ∞ figure-8 motion to calibrate
         </div>
       </div>
 
@@ -1164,7 +1164,7 @@ function rQiblah() {
       <div style="display:flex;gap:.65rem;width:100%;max-width:420px">
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA">${dist.toLocaleString()}</div>
-          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km tot Mekka</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km to Makkah</div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#60A5FA">${Math.round(qa)}°</div>
@@ -1177,7 +1177,7 @@ function rQiblah() {
       </div>` : ''}
       ` : `
       <div style="text-align:center;padding:1rem">
-        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah direction to calculate</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tap "Get Location" to calculate the Qibla direction</div>
         <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
       </div>`}
     </div>
@@ -1212,7 +1212,7 @@ function startCompass(){
       .then(p => {
         if(p === 'granted'){
           window.addEventListener('deviceorientation', _cmpH, true);
-          toast({i:'🧭', t:'Kompas actief'});
+          toast({i:'🧭', t:'Compass active'});
         }
       }).catch(()=>{});
   } else {
@@ -1417,7 +1417,7 @@ function rRegister() {
       </div>
       <button class="btn bp" id="regBtn" style="margin-top:.5rem">Create Account →</button>
       <div style="text-align:center;margin-top:1rem">
-        <button class="btn-link" id="toLogin">← Terug naar inloggen</button>
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
       </div>
     </div>
   </div>`;
@@ -1438,7 +1438,7 @@ function rForgotPw() {
       </div>
       <button class="btn bp" id="fwBtn">Herstelmail versturen →</button>
       <div style="text-align:center;margin-top:1rem">
-        <button class="btn-link" id="toLogin">← Terug naar inloggen</button>
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
       </div>
     </div>
   </div>`;
@@ -1456,7 +1456,7 @@ function rHome() {
     {id:'play-cats',i:'📚',n:'Lessons',d:'Islamic knowledge',c:'#2563EB'},
     {id:'sirah-quiz',i:'🏆',n:'Sirah Quiz',d:'Prophet Muhammad ﷿︾',c:'#7C3AED'},
     {id:'tasbih',i:'📿',n:_om('Tasbih & Zikr'),d:_om('Dhikr & practice'),c:'#6B3FFF'},
-    {id:'prayer',i:'🕌',n:_om('Prayer Times'),d:_om('Salah tijden & Adhan'),c:'#059669'},
+    {id:'prayer',i:'🕌',n:_om('Prayer Times'),d:_om('Prayer times & Adhan'),c:'#059669'},
     {id:'media',i:'📱',n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
   ];
 
@@ -1601,7 +1601,7 @@ function rEditProfile() {
   const d = CX.dr || {name, bio, avatar: curAvatar, avatarColor: curColor};
   
   return `<div class="screen">
-    <div class="nav"><button class="bk" data-go="profile">← Terug</button><div class="nt">Profiel bewerken</div></div>
+    <div class="nav"><button class="bk" data-go="profile">← Back</button><div class="nt">Profiel bewerken</div></div>
     
     <div class="sec">
       <!-- Avatar preview -->
@@ -1794,7 +1794,7 @@ function rDuaTab() {
   if(zkCat !== null) {
     const cat = DUA_CATS[zkCat];
     return `<div style="width:100%;max-width:560px">
-      <button onclick="zkCat=null;render()" style="background:var(--card);border:1px solid var(--bdr);border-radius:.65rem;color:#fff;padding:.5rem .9rem;cursor:pointer;font-size:.85rem;margin-bottom:.85rem;font-weight:600">← Terug</button>
+      <button onclick="zkCat=null;render()" style="background:var(--card);border:1px solid var(--bdr);border-radius:.65rem;color:#fff;padding:.5rem .9rem;cursor:pointer;font-size:.85rem;margin-bottom:.85rem;font-weight:600">← Back</button>
       <div class="sec">
         <div class="sh"><div class="st" style="color:${cat.kleur}">${cat.ico} ${cat.nm}</div></div>
         ${cat.duas.map((d,i)=>`
@@ -1873,7 +1873,7 @@ function rPrayer() {
       <div style="display:flex;align-items:center;gap:.75rem">
         <span style="font-size:1.3rem">📍</span>
         <div style="flex:1">
-          <div style="font-weight:700;font-size:.95rem">${loc ? esc(PS.city||'Jouw locatie') : 'Location not set'}</div>
+          <div style="font-weight:700;font-size:.95rem">${loc ? esc(PS.city||'Your location') : 'Location not set'}</div>
           ${loc ? `<div style="font-size:.72rem;color:var(--sl2)">${loc.lat.toFixed(4)}°N, ${loc.lng.toFixed(4)}°O · ${methodNamen[PS.method||3]}</div>` : ''}
         </div>
         <button class="btn bt bsm" id="glBtn">${loc ? '📍 Refresh' : '📍 Get location'}</button>
@@ -1957,7 +1957,7 @@ function rPrayer() {
       }).join('')}
       
       <div style="margin-top:.75rem;padding:.65rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:.75rem;font-size:.75rem;color:rgba(245,158,11,.8);line-height:1.5">
-        💡 Zorg dat je telefoon niet op stil staat voor Azan geluid. Tik op "Test" om het geluid te controleren.
+        💡 Make sure your phone is not on silent voor Azan geluid. Tap "Test" to check the sound.
       </div>
     </div>
     <div style="width:100%;max-width:560px"><div style="background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(245,158,11,.08));border:1.5px solid rgba(245,158,11,.4);border-radius:1rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer" data-go="qiblah"><div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,#92400E,#D97706);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🧭</div><div style="flex:1"><div style="font-weight:700;font-size:.88rem;color:#FCD34D">Qibla Direction</div><div style="font-size:.65rem;color:rgba(252,211,77,.5);margin-top:.1rem">Find the direction of Ka'bah</div></div><div style="color:#F59E0B">›</div></div></div>
@@ -1973,7 +1973,7 @@ function rQiblah() {
 
     <!-- Header -->
     <div style="width:100%;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;display:flex;align-items:center;gap:.75rem;max-width:560px">
-      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Terug</button>
+      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Back</button>
       <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;background:linear-gradient(90deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🧭 Qibla Direction</div>
     </div>
 
@@ -1982,10 +1982,10 @@ function rQiblah() {
       <div style="background:linear-gradient(135deg,rgba(107,63,255,.2),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.25);border-radius:1.1rem;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.85rem">
         <div style="font-size:2.2rem">🕋</div>
         <div style="flex:1">
-          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Mekka</div>
-          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Jouw locatie') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Makkah</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Your location') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
         </div>
-        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Ophalen'}</button>
+        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Get Location'}</button>
       </div>
     </div>
 
@@ -2048,7 +2048,7 @@ function rQiblah() {
                 <stop offset="100%" stop-color="#374151"/>
               </linearGradient>
             </defs>
-            <!-- Bovenste helft (richting Ka'bah - groen) -->
+            <!-- Bovenste helft (towards Ka'bah - groen) -->
             <polygon points="20,8 28,130 20,118 12,130" fill="url(#needleGreen)" filter="url(#glow2)"/>
             <!-- Onderste helft (grijs) -->
             <polygon points="20,252 28,130 20,142 12,130" fill="url(#needleGray)" opacity=".6"/>
@@ -2068,17 +2068,17 @@ function rQiblah() {
       ${loc ? `
       <div style="text-align:center">
         <div style="font-family:'Fredoka One',cursive;font-size:2.5rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="qib-deg">${Math.round(qa)}°</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah vanuit ${esc(PS.city||'jouw locatie')}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah from ${esc(PS.city||'your location')}</div>
       </div>
 
       <!-- Instructie kaart -->
       <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:1rem;padding:.85rem 1rem;width:100%;max-width:420px;text-align:center">
         <div style="font-size:.88rem;color:#E9D5FF;line-height:1.6">
-          🟢 Draai je telefoon tot de <strong style="color:#34D399">groene pijl</strong> rechtop staat<br/>
-          Dan kijk je richting de Ka'bah 🕋
+          🟢 Rotate your phone until the <strong style="color:#34D399">groene pijl</strong> points up<br/>
+          You are now facing the Ka'bah 🕋
         </div>
         <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.4rem">
-          💡 Beweeg je telefoon in een ∞ beweging voor kalibratie
+          💡 Move your phone in a ∞ figure-8 motion to calibrate
         </div>
       </div>
 
@@ -2087,7 +2087,7 @@ function rQiblah() {
       <div style="display:flex;gap:.65rem;width:100%;max-width:420px">
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA">${dist.toLocaleString()}</div>
-          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km tot Mekka</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km to Makkah</div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#60A5FA">${Math.round(qa)}°</div>
@@ -2100,7 +2100,7 @@ function rQiblah() {
       </div>` : ''}
       ` : `
       <div style="text-align:center;padding:1rem">
-        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah direction to calculate</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tap "Get Location" to calculate the Qibla direction</div>
         <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
       </div>`}
     </div>
@@ -2164,7 +2164,7 @@ function rMap(){
       </div>`;
   }).join('');
   return`<div class="screen">
-    <div class="nav"><button class="bk" data-go="play-cats">← Terug</button><div class="nt">${cat.ico} ${esc(cat.nm)}</div></div>
+    <div class="nav"><button class="bk" data-go="play-cats">← Back</button><div class="nt">${cat.ico} ${esc(cat.nm)}</div></div>
     <div style="width:100%;max-width:480px">${nodes||`<div class="em"><div class="emi">🎮</div><div class="emt">Nog geen levels gepubliceerd.</div></div>`}</div>
   </div>`;
 }
@@ -2332,7 +2332,7 @@ function rACat(){
     <div class="lis">${(lv.qs||[]).length}/10 vragen</div></div>
     <div class="lia"><button class="btn bs bsm" data-el="${lv.id}">✏️</button><button class="btn br bsm" data-dl="${lv.id}">🗑️</button></div>
   </div>`).join(''):'';
-  return`<div class="screen"><div class="nav"><button class="bk" data-go="admin">← Terug</button><div class="nt">${isN?'Nieuwe categorie':'Edit'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-go="admin">← Back</button><div class="nt">${isN?'Nieuwe categorie':'Edit'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Naam</label><input class="inp2" id="cnm" value="${esc(d.nm)}" placeholder="Categorienaam" maxlength="30"/></div>
       <div class="fld2"><label class="lbl2">Omschrijving</label><input class="inp2" id="cds" value="${esc(d.ds)}" placeholder="Korte omschrijving" maxlength="70"/></div>
@@ -2354,7 +2354,7 @@ function rACat(){
 function rALvl(){
   const cat=DATA.categories.find(c=>c.id===CX.cid),lv=cat&&(cat.levels||[]).find(l=>l.id===CX.lid),isN=!lv;
   const d=CX.dr||{ttl:lv?.ttl||'',ps:lv?.ps||70,tpq:lv?.tpq||20,hn:lv?.hn||2,df:lv?.df||1,yt:lv?.yt||'',pub:lv?.pub||false};
-  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Terug</button><div class="nt">${isN?'Nieuw level':'Level bewerken'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Back</button><div class="nt">${isN?'Nieuw level':'Level bewerken'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Naam</label><input class="inp2" id="lttl" value="${esc(d.ttl)}" placeholder="Levelnaam" maxlength="25"/></div>
       <div class="fld2"><label class="lbl2">Slagingspercentage (%)</label><input class="inp2" type="number" id="lps" value="${d.ps}" min="10" max="100"/></div>
@@ -2387,7 +2387,7 @@ function rAQ(){
       <button class="btn br bsm" data-dq="${i}">🗑️</button>
     </div>
   </div>`).join('');
-  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Terug</button><div class="nt">📝 ${esc(cat.nm)} L${lv.id} (${(lv.qs||[]).length}/10)</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-gc="${CX.cid}">← Back</button><div class="nt">📝 ${esc(cat.nm)} L${lv.id} (${(lv.qs||[]).length}/10)</div></div>
     ${(lv.qs||[]).length<10?`<div style="width:100%;max-width:560px;margin-bottom:.85rem"><button class="btn bp" id="aqBtn">+ Vraag toevoegen</button></div>`:`<div style="width:100%;max-width:560px;margin-bottom:.85rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:.85rem;padding:.75rem;text-align:center;font-size:.85rem;color:var(--gr)">✅ 10/10 compleet!</div>`}
     <div style="width:100%;max-width:560px">${ql||`<div class="em"><div class="emi">❓</div><div class="emt">Nog geen vragen.</div></div>`}</div>
   </div>`;
@@ -2398,7 +2398,7 @@ function rQFrm(){
   const ex=ie&&CX.qi!==undefined?lv.qs[CX.qi]:null;
   const d=CX.dr||{txt:ex?.txt||'',opts:[ex?.opts[0]||'',ex?.opts[1]||'',ex?.opts[2]||'',ex?.opts[3]||''],ans:ex?.ans||'',ht:ex?.ht||'',ex2:ex?.ex||''};
   const ao=(d.opts||[]).filter(o=>o.trim()).map((o,i)=>`<option value="${esc(o)}"${o===d.ans?' selected':''}>${'ABCD'[i]}. ${esc(o)}</option>`).join('');
-  return`<div class="screen"><div class="nav"><button class="bk" data-bq>← Terug</button><div class="nt">${ie?'Edit':'Vraag toevoegen'}</div></div>
+  return`<div class="screen"><div class="nav"><button class="bk" data-bq>← Back</button><div class="nt">${ie?'Edit':'Vraag toevoegen'}</div></div>
     <div class="sec">
       <div class="fld2"><label class="lbl2">Vraag</label><textarea class="inp2" id="qtxt" rows="3" placeholder="Vraagstelling...">${esc(d.txt)}</textarea></div>
       <div class="dv2">Antwoordopties A t/m D</div>
@@ -2517,7 +2517,7 @@ function rChat() {
       padding:max(env(safe-area-inset-top),.6rem) .85rem .6rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0">
       <button onclick="SC='chats';render();if(_chatUnsubscribe){_chatUnsubscribe();_chatUnsubscribe=null;}"
         style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;
-        cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Terug</button>
+        cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Back</button>
       <div style="width:2.1rem;height:2.1rem;border-radius:50%;background:${ac};display:grid;place-items:center;
         font-size:1rem;flex-shrink:0;position:relative">
         ${av}
@@ -2685,7 +2685,7 @@ function rStoryCreate() {
 
   return `<div class="story-creator">
     <div class="sc-header">
-      <button class="bk" onclick="SC='home';render()">← Terug</button>
+      <button class="bk" onclick="SC='home';render()">← Back</button>
       <div class="nt">📸 Story maken</div>
     </div>
 
@@ -2788,10 +2788,10 @@ function getLoc(){
     try{
       const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lt+'&lon='+lg+'&accept-language=nl');
       const d=await r.json();
-      PS.city=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||'Jouw locatie';
+      PS.city=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||'Your location';
       cc=(d.address?.country_code||'nl').toUpperCase();
       PS.country=cc;
-    }catch(e){PS.city='Jouw locatie';}
+    }catch(e){PS.city='Your location';}
     
     svp();render();
     toast({i:'⏳',t:'Prayer Times ophalen...'});
@@ -2805,7 +2805,7 @@ function getLoc(){
       toast({i:'✅',t:'Bijgewerkt!',s:PS.city+' · '+result.methodName});
     } else {
       svp();render();
-      toast({i:'⚠️',t:'API niet beschikbaar',s:'Probeer opnieuw'});
+      toast({i:'⚠️',t:'API niet beschikbaar',s:'Try again'});
     }
   }, e=>toast({i:'❌',t:'Locatie mislukt',s:e.message}));
 }
@@ -2898,7 +2898,7 @@ function stopAzan() {
 
 function testAzan() {
   speelAzan('test');
-  toast({i:'🔊',t:'Test Azan',s:'Hoor je het geluid?'});
+  toast({i:'🔊',t:'Test Azan',s:'Can you hear the sound?'});
 }
 
 
@@ -3012,10 +3012,10 @@ function updateQiblahGlow(correct) {
     // Toast alleen 1x tonen
     if(!window._qiblahAligned) {
       window._qiblahAligned = true;
-      toast({i:'🕋',t:'Qiblah gevonden!',s:'Je kijkt richting Ka\'bah'});
+      toast({i:'🕋',t:'Qiblah found!',s:'You are facing towards Ka\'bah'});
     }
   } else {
-    // Terug naar paars
+    // Back naar paars
     if(outer) outer.style.cssText = 'position:absolute;inset:0;border-radius:50%;border:2px solid rgba(139,92,246,.2);transition:all .5s';
     if(inner) inner.style.cssText = 'position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(139,92,246,.1);transition:all .5s';
     if(glow)  glow.style.cssText  = 'position:absolute;inset:-4px;border-radius:50%;border:3px solid rgba(52,211,153,0);transition:all .6s;pointer-events:none';
@@ -3057,7 +3057,7 @@ function startCompass(){
       .then(p => {
         if(p === 'granted'){
           window.addEventListener('deviceorientation', _cmpH, true);
-          toast({i:'🧭', t:'Kompas actief'});
+          toast({i:'🧭', t:'Compass active'});
         }
       }).catch(()=>{});
   } else {
@@ -3418,7 +3418,7 @@ function rCreateGroup() {
   const kleuren = ['#2563EB','#059669','#6B3FFF','#D97706','#DC2626','#0891B2','#BE185D','#7C3AED'];
 
   return `<div class="screen">
-    <div class="nav"><button class="bk" onclick="SC='community';comTab='groepen';render()">← Terug</button><div class="nt">➕ Create group</div></div>
+    <div class="nav"><button class="bk" onclick="SC='community';comTab='groepen';render()">← Back</button><div class="nt">➕ Create group</div></div>
     <div class="sec">
       <!-- Preview -->
       <div style="display:flex;align-items:center;gap:.75rem;background:rgba(255,255,255,.04);border-radius:.85rem;padding:.85rem;margin-bottom:1rem">
@@ -3471,7 +3471,7 @@ function rGroupChat() {
   return `<div class="gchat-screen">
     <!-- Header -->
     <div style="background:rgba(6,8,24,.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08);padding:max(env(safe-area-inset-top),.6rem) .85rem .6rem;display:flex;align-items:center;gap:.6rem;flex-shrink:0">
-      <button onclick="SC='community';comTab='groepen';render();if(_groupUnsubscribe){_groupUnsubscribe();_groupUnsubscribe=null;}" style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Terug</button>
+      <button onclick="SC='community';comTab='groepen';render();if(_groupUnsubscribe){_groupUnsubscribe();_groupUnsubscribe=null;}" style="background:rgba(255,255,255,.08);border:none;border-radius:.5rem;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0">← Back</button>
       <div style="width:2.2rem;height:2.2rem;border-radius:.5rem;background:${(activeGroup.kleur||'#2563EB')}22;border:1px solid ${(activeGroup.kleur||'#2563EB')}44;display:grid;place-items:center;font-size:1rem;flex-shrink:0">${activeGroup.icoon||'🕌'}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:.9rem;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(activeGroup.naam||'Groep')}</div>
@@ -3614,7 +3614,7 @@ function bind() {
       await auth.sendPasswordResetEmail(email);
       if(msg){msg.textContent='✅ Herstelmail verstuurd! Controleer je inbox.';msg.style.color='var(--gr)';msg.style.display='block';}
     } catch(e) {
-      if(msg){msg.textContent='Email address niet gevonden.';msg.style.display='block';}
+      if(msg){msg.textContent='Email address niet found.';msg.style.display='block';}
     }
   });
 
@@ -3840,7 +3840,7 @@ var _OM = {
   "Send a message to start":"Ergaa ergi jalqabuuf",
   "Type a message...":"Ergaa barreessi...","Nieuwe groep aanmaken":"Garee haaraa uumi",
   "Learn and test yourself":"Baradhu fi of qori","Dhikr & practice":"Zikrii fi shaakala",
-  "Salah tijden & Adhan":"Yeroo Salaataa fi Azaana","Richting Ka\'bah":"Kallatti Kabaa",
+  "Prayer times & Adhan":"Yeroo Salaataa fi Azaana","Richting Ka\'bah":"Kallatti Kabaa",
   "Share your moment":"Yeroo kee qoodi","Groups & Leaderboards":"Gareelee fi Sadarkaa",
   "Edit":"Gulaali","Morning Adhkar":"Zikrii Waaree","Evening Adhkar":"Zikrii Galgala",
   "Before Sleep":"Rafuu Dura","Quiz starten":"Qormaata jalqabi",
@@ -3848,7 +3848,7 @@ var _OM = {
   "Email address":"Imeelii","Password":"Jecha darbii","Naam":"Maqaa",
   "Nog geen account?":"Herreega hin qabdu?","Al een account?":"Herreega qabda?",
   "Forgot password?":"Jecha darbii dagatte?","Verstuur":"Ergi","Zoeken":"Barbaadi",
-  "← Terug":"Deebi i","Terug":"Deebi i","Loading...":"Fe amaa...",
+  "← Back":"Deebi i","Back":"Deebi i","Loading...":"Fe amaa...",
   "Fajr":"Fajr","Dhuhr":"Dhuhr","Asr":"Asr","Maghrib":"Maghrib","Isha":"Isha",
   "MWL":"MWL","ISNA":"ISNA","Mekka":"Makkaa","Karachi":"Karachi","Egypte":"Masri",
   "📿 Tasbih":"📿 Tasbiih","🤲 Zikr":"🤲 Zikrii","📖 Dua":"📖 Dua",

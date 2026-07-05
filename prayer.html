@@ -563,7 +563,7 @@ function rPrayer() {
       }).join('')}
       
       <div style="margin-top:.75rem;padding:.65rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:.75rem;font-size:.75rem;color:rgba(245,158,11,.8);line-height:1.5">
-        💡 Zorg dat je telefoon niet op stil staat voor Azan sound. Tik op "Test" om het geluid te controleren.
+        💡 Make sure your phone is not on silent for Azan sound. Tap "Test" to check the sound.
       </div>
     </div>
     <div style="width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
@@ -684,17 +684,17 @@ function rQiblah() {
       ${loc ? `
       <div style="text-align:center">
         <div style="font-family:'Fredoka One',cursive;font-size:2.5rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="qib-deg">${Math.round(qa)}°</div>
-        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah vanuit ${esc(PS.city||'jouw locatie')}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah from ${esc(PS.city||'your location')}</div>
       </div>
 
       <!-- Instructie kaart -->
       <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:1rem;padding:.85rem 1rem;width:100%;max-width:420px;text-align:center">
         <div style="font-size:.88rem;color:#E9D5FF;line-height:1.6">
-          🟢 Draai je telefoon tot de <strong style="color:#34D399">groene pijl</strong> rechtop staat<br/>
-          Dan kijk je richting de Ka'bah 🕋
+          🟢 Rotate your phone until the <strong style="color:#34D399">green arrow</strong> points up<br/>
+          Then you are facing the Ka'bah 🕋
         </div>
         <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.4rem">
-          💡 Beweeg je telefoon in een ∞ beweging voor kalibratie
+          💡 Move your phone in a ∞ figure-8 motion to calibrate
         </div>
       </div>
 
@@ -703,7 +703,7 @@ function rQiblah() {
       <div style="display:flex;gap:.65rem;width:100%;max-width:420px">
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA">${dist.toLocaleString()}</div>
-          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km tot Mekka</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km to Makkah</div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
           <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#60A5FA">${Math.round(qa)}°</div>
