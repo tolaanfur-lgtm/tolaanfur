@@ -344,6 +344,7 @@ select.inp2 option{background:var(--bg2)}
 <div id="app" style="position:fixed;inset:0;overflow:hidden"></div>
 <div id="tf-toast" style="position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.85rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap"></div>
 <script>
+'use strict';
 var SC = 'prayer';
 var currentUser = null;
 var profile = null;
@@ -353,13 +354,14 @@ let PS = ld('tf9_ps',{loc:null,city:'',country:'NL',qiblah:0,method:3,times:{},l
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+function svp(){sv('tf9_ps',PS);}
 function toast(o){
-  var el=document.getElementById('tf-toast');
-  if(!el)return;
-  el.textContent=typeof o==='string'?o:((o.i||'')+' '+(o.t||''));
-  el.style.opacity='1';
+  var el = document.getElementById('tf-toast');
+  if(!el) return;
+  el.textContent = typeof o === 'string' ? o : ((o.i||'') + ' ' + (o.t||''));
+  el.style.opacity = '1';
   clearTimeout(window._tt2);
-  window._tt2=setTimeout(function(){el.style.opacity='0';},2500);
+  window._tt2 = setTimeout(function(){ el.style.opacity='0'; }, 2500);
 }
 function go(s){ SC=s; render(); }
 function _om(t){ return t; }
@@ -367,9 +369,9 @@ function goBack(){
   try{ if(window.parent&&window.parent!==window)window.parent.postMessage('go-home','*'); }catch(e){}
 }
 function render(){
-  var app=document.getElementById('app');
-  if(SC==='prayer') app.innerHTML=rPrayer();
-  else if(SC==='qiblah'){ app.innerHTML=rQiblah(); setTimeout(startCompass,400); }
+  var app = document.getElementById('app');
+  if(SC==='prayer') app.innerHTML = rPrayer();
+  else if(SC==='qiblah'){ app.innerHTML = rQiblah(); setTimeout(startCompass, 400); }
   bind();
 }
 function bind(){
@@ -377,91 +379,17 @@ function bind(){
     el.addEventListener('click', function(){ go(el.dataset.go); });
     el.addEventListener('touchend', function(e){ e.preventDefault(); go(el.dataset.go); }, {passive:false});
   });
-  // Get Location buttons
-  var glBtn = document.getElementById('glBtn');
-  if(glBtn) {
-    glBtn.addEventListener('click', getLoc);
-    glBtn.addEventListener('touchend', function(e){ e.preventDefault(); getLoc(); }, {passive:false});
+  var gl = document.getElementById('glBtn');
+  if(gl){
+    gl.addEventListener('click', getLoc);
+    gl.addEventListener('touchend', function(e){ e.preventDefault(); getLoc(); }, {passive:false});
   }
-  var glBtn2 = document.getElementById('glBtn2');
-  if(glBtn2) {
-    glBtn2.addEventListener('click', getLoc);
-    glBtn2.addEventListener('touchend', function(e){ e.preventDefault(); getLoc(); }, {passive:false});
+  var gl2 = document.getElementById('glBtn2');
+  if(gl2){
+    gl2.addEventListener('click', getLoc);
+    gl2.addEventListener('touchend', function(e){ e.preventDefault(); getLoc(); }, {passive:false});
   }
 }
-
-function getLoc(){
-  if(!navigator.geolocation){toast({i:'❌',t:'GPS not available'});return;}
-  toast({i:'📍',t:'Getting location...'});
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lt=pos.coords.latitude, lg=pos.coords.longitude;
-    PS.loc={lat:lt,lng:lg};
-    
-    // Qiblah
-    const kl=21.4225,kl2=39.8262,dL=(kl2-lg)*Math.PI/180;
-    PS.qiblah=((Math.atan2(Math.sin(dL)*Math.cos(kl*Math.PI/180),Math.cos(lt*Math.PI/180)*Math.sin(kl*Math.PI/180)-Math.sin(lt*Math.PI/180)*Math.cos(kl*Math.PI/180)*Math.cos(dL)))*180/Math.PI+360)%360;
-    
-    // Stad + land
-    let cc='NL';
-    try{
-      const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lt+'&lon='+lg+'&accept-language=nl');
-      const d=await r.json();
-      PS.city=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||'Your location';
-      cc=(d.address?.country_code||'nl').toUpperCase();
-      PS.country=cc;
-    }catch(e){PS.city='Your location';}
-    
-    svp();render();
-    toast({i:'⏳',t:'Loading Prayer Times...'});
-    
-    // AlAdhan API
-    const result = await fetchPrayerTimes(lt, lg, cc);
-    if(result){
-      PS.times=result.times;
-      PS.lastCalc=new Date().toDateString();
-      svp();render();
-      toast({i:'✅',t:'Updated!',s:PS.city+' · '+result.methodName});
-    } else {
-      svp();render();
-      toast({i:'⚠️',t:'API unavailable',s:'Please try again'});
-    }
-  }, e=>toast({i:'❌',t:'Location failed',s:e.message}));
-}
-
-function fetchPrayerTimes(lat, lng, countryCode) {
-  const METHODS = {'NL':3,'BE':3,'DE':3,'FR':3,'GB':3,'SE':3,'NO':3,'DK':3,'FI':3,'IT':3,'ES':3,'PT':3,'AT':3,'CH':3,'US':2,'CA':2,'SA':4,'AE':4,'KW':4,'BH':4,'QA':4,'PK':5,'IN':5,'BD':5,'EG':1};
-  const method = PS.method || METHODS[countryCode] || 3;
-  PS.method = method;
-  const d = new Date();
-  const ds = d.getDate()+'-'+(d.getMonth()+1)+'-'+d.getFullYear();
-  const url = 'https://api.aladhan.com/v1/timings/'+ds+'?latitude='+lat+'&longitude='+lng+'&method='+method+'&school=0';
-  const methodNames = {1:'Egypte',2:'ISNA',3:'MWL — Europa',4:'Mekka',5:'Karachi',8:'Golf'};
-  try {
-    const ctrl = new AbortController();
-    const tid = setTimeout(()=>ctrl.abort(), 10000);
-    const r = await fetch(url, {signal: ctrl.signal});
-    clearTimeout(tid);
-    const json = await r.json();
-    if(json.code===200 && json.data && json.data.timings) {
-      const raw = json.data.timings;
-      const t = {
-        fajr:    (raw.Fajr    ||'--:--').substring(0,5),
-        sunrise: (raw.Sunrise ||'--:--').substring(0,5),
-        dhuhr:   (raw.Dhuhr   ||'--:--').substring(0,5),
-        asr:     (raw.Asr     ||'--:--').substring(0,5),
-        maghrib: (raw.Maghrib ||'--:--').substring(0,5),
-        isha:    (raw.Isha    ||'--:--').substring(0,5),
-        imsak:   (raw.Imsak   ||'--:--').substring(0,5),
-      };
-      return {times: t, method, methodName: methodNames[method]||'MWL'};
-    }
-  } catch(e) {
-    console.log('AlAdhan fout:', e.message);
-  }
-  return null;
-}
-
-function svp(){sv('tf9_ps',PS);}
 function stopCompass(){ clearInterval(compassInterval); }
 function rPrayer() {
   const loc = PS.loc;
@@ -506,12 +434,12 @@ function rPrayer() {
   return `<div class="screen">
     <div class="nav" style="padding-top:.75rem"><div class='nt'>🕌 ${_om('Prayer Times')}</div></div>
 
-    <!-- Location card -->
+    <!-- Locatie kaart -->
     <div class="sec">
       <div style="display:flex;align-items:center;gap:.75rem">
         <span style="font-size:1.3rem">📍</span>
         <div style="flex:1">
-          <div style="font-weight:700;font-size:.95rem">${loc ? esc(PS.city||'Jouw locatie') : 'Location not set'}</div>
+          <div style="font-weight:700;font-size:.95rem">${loc ? esc(PS.city||'Your location') : 'Location not set'}</div>
           ${loc ? `<div style="font-size:.72rem;color:var(--sl2)">${loc.lat.toFixed(4)}°N, ${loc.lng.toFixed(4)}°O · ${methodNamen[PS.method||3]}</div>` : ''}
         </div>
         <button class="btn bt bsm" id="glBtn">${loc ? '📍 Refresh' : '📍 Get location'}</button>
@@ -527,7 +455,7 @@ function rPrayer() {
       ${diffTxt ? `<div style="font-size:.8rem;color:rgba(255,255,255,.8);margin-top:.25rem">⏱ over ${diffTxt}</div>` : ''}
     </div>` : ''}
 
-    <!-- Method keuze -->
+    <!-- Methode keuze -->
     <div style="display:flex;gap:.4rem;overflow-x:auto;padding:.1rem 0 .75rem;scrollbar-width:none;width:100%;max-width:560px">
       ${[{id:3,nl:'MWL'},{id:2,nl:'ISNA'},{id:4,nl:'Mekka'},{id:5,nl:'Karachi'},{id:1,nl:'Egypte'}].map(m=>`
         <div style="background:${(PS.method||3)===m.id?'rgba(5,150,105,.25)':'var(--card)'};border:1.5px solid ${(PS.method||3)===m.id?'#059669':'var(--bdr)'};border-radius:2rem;padding:.3rem .8rem;font-size:.73rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;color:${(PS.method||3)===m.id?'#34D399':'var(--sl2)'}" data-method="${m.id}">${m.nl}</div>
@@ -545,25 +473,25 @@ function rPrayer() {
           ` : `
             <div style="font-size:2rem;margin-bottom:.5rem">🕌</div>
             <div style="font-size:.88rem;color:var(--sl2);margin-bottom:1rem">Tap "Get location" for exact prayer times</div>
-            <button class="btn bt" id="glBtn2">📍 Get Location</button>
+            <button class="btn bt" id="glBtn2">📍 Locatie ophalen</button>
           `}
         </div>
       ` : ALLE.map(g => {
         const tijd = tijden[g.id] || '--:--';
-        const isNext = heeftTijden && g.id === volgende.id;
+        const isVolgende = heeftTijden && g.id === volgende.id;
         const isZons = g.id === 'sunrise';
         return `<div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
           <div style="font-size:1.2rem;width:1.8rem;text-align:center">${g.ico}</div>
           <div style="flex:1">
-            <div style="font-weight:${isZons?'400':'600'};font-size:.9rem;color:${isZons?'rgba(255,255,255,.5)':'#F0F4FF'}">${g.nl}${isNext?'<span style="background:#059669;border-radius:2rem;padding:.12rem .5rem;font-size:.6rem;font-weight:700;color:#fff;margin-left:.5rem">Next</span>':''}</div>
+            <div style="font-weight:${isZons?'400':'600'};font-size:.9rem;color:${isZons?'rgba(255,255,255,.5)':'#F0F4FF'}">${g.nl}${isVolgende?'<span style="background:#059669;border-radius:2rem;padding:.12rem .5rem;font-size:.6rem;font-weight:700;color:#fff;margin-left:.5rem">Volgende</span>':''}</div>
             <div style="font-family:'Tajawal',sans-serif;direction:rtl;font-size:.72rem;color:rgba(255,255,255,.35)">${g.ar}</div>
           </div>
-          <div style="font-family:'Fredoka One',cursive;font-size:${isNext?'1.2rem':'1rem'};color:${isNext?'#34D399':isZons?'rgba(255,255,255,.35)':'#60A5FA'}">${tijd}</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:${isVolgende?'1.2rem':'1rem'};color:${isVolgende?'#34D399':isZons?'rgba(255,255,255,.35)':'#60A5FA'}">${tijd}</div>
         </div>`;
       }).join('')}
     </div>
 
-    <!-- Azan settings -->
+    <!-- Azan instellingen -->
     <div class="sec">
       <div class="sh">
         <div class="st">🔔 Adhan Settings</div>
@@ -601,7 +529,6 @@ function rPrayer() {
     <div style="width:100%;max-width:560px"><button class="btn bs" data-go="qiblah">🧭 Qibla Direction</button></div>
   </div>`;
 }
-
 function rQiblah() {
   const qa = PS.qiblah || 0;
   const loc = PS.loc;
@@ -621,13 +548,13 @@ function rQiblah() {
         <div style="font-size:2.2rem">🕋</div>
         <div style="flex:1">
           <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Mekka</div>
-          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Jouw locatie') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Your location') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
         </div>
         <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Ophalen'}</button>
       </div>
     </div>
 
-    <!-- Compass -->
+    <!-- Kompas -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;width:100%;padding:0 1rem">
 
       <!-- Buitenste ring met graden -->
@@ -739,12 +666,80 @@ function rQiblah() {
       ` : `
       <div style="text-align:center;padding:1rem">
         <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tik op "Ophalen" om de Qiblah richting te berekenen</div>
-        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
+        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Locatie ophalen</button>
       </div>`}
     </div>
   </div>`;
 }
-
+function getLoc(){
+  if(!navigator.geolocation){toast({i:'❌',t:'GPS not available'});return;}
+  toast({i:'📍',t:'Getting location...'});
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lt=pos.coords.latitude, lg=pos.coords.longitude;
+    PS.loc={lat:lt,lng:lg};
+    
+    // Qiblah
+    const kl=21.4225,kl2=39.8262,dL=(kl2-lg)*Math.PI/180;
+    PS.qiblah=((Math.atan2(Math.sin(dL)*Math.cos(kl*Math.PI/180),Math.cos(lt*Math.PI/180)*Math.sin(kl*Math.PI/180)-Math.sin(lt*Math.PI/180)*Math.cos(kl*Math.PI/180)*Math.cos(dL)))*180/Math.PI+360)%360;
+    
+    // Stad + land
+    let cc='NL';
+    try{
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lt+'&lon='+lg+'&accept-language=nl');
+      const d=await r.json();
+      PS.city=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||'Your location';
+      cc=(d.address?.country_code||'nl').toUpperCase();
+      PS.country=cc;
+    }catch(e){PS.city='Your location';}
+    
+    svp();render();
+    toast({i:'⏳',t:'Loading Prayer Times...'});
+    
+    // AlAdhan API
+    const result = await fetchPrayerTimes(lt, lg, cc);
+    if(result){
+      PS.times=result.times;
+      PS.lastCalc=new Date().toDateString();
+      svp();render();
+      toast({i:'✅',t:'Updated!',s:PS.city+' · '+result.methodName});
+    } else {
+      svp();render();
+      toast({i:'⚠️',t:'API unavailable',s:'Please try again'});
+    }
+  }, e=>toast({i:'❌',t:'Location failed',s:e.message}));
+}
+function fetchPrayerTimes(lat, lng, countryCode) {
+  const METHODS = {'NL':3,'BE':3,'DE':3,'FR':3,'GB':3,'SE':3,'NO':3,'DK':3,'FI':3,'IT':3,'ES':3,'PT':3,'AT':3,'CH':3,'US':2,'CA':2,'SA':4,'AE':4,'KW':4,'BH':4,'QA':4,'PK':5,'IN':5,'BD':5,'EG':1};
+  const method = PS.method || METHODS[countryCode] || 3;
+  PS.method = method;
+  const d = new Date();
+  const ds = d.getDate()+'-'+(d.getMonth()+1)+'-'+d.getFullYear();
+  const url = 'https://api.aladhan.com/v1/timings/'+ds+'?latitude='+lat+'&longitude='+lng+'&method='+method+'&school=0';
+  const methodNames = {1:'Egypte',2:'ISNA',3:'MWL — Europa',4:'Mekka',5:'Karachi',8:'Golf'};
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(()=>ctrl.abort(), 10000);
+    const r = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(tid);
+    const json = await r.json();
+    if(json.code===200 && json.data && json.data.timings) {
+      const raw = json.data.timings;
+      const t = {
+        fajr:    (raw.Fajr    ||'--:--').substring(0,5),
+        sunrise: (raw.Sunrise ||'--:--').substring(0,5),
+        dhuhr:   (raw.Dhuhr   ||'--:--').substring(0,5),
+        asr:     (raw.Asr     ||'--:--').substring(0,5),
+        maghrib: (raw.Maghrib ||'--:--').substring(0,5),
+        isha:    (raw.Isha    ||'--:--').substring(0,5),
+        imsak:   (raw.Imsak   ||'--:--').substring(0,5),
+      };
+      return {times: t, method, methodName: methodNames[method]||'MWL'};
+    }
+  } catch(e) {
+    console.log('AlAdhan fout:', e.message);
+  }
+  return null;
+}
 function startCompass(){
   if(_cmpH) window.removeEventListener('deviceorientation', _cmpH, true);
   
