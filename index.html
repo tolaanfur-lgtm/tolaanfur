@@ -1423,7 +1423,7 @@ function rEditProfile() {
 
 function rIframe(src) {
   const h = needsTabs() ? 'calc(100vh - 6rem - env(safe-area-inset-bottom) - env(safe-area-inset-top))' : 'calc(100vh - env(safe-area-inset-top))';
-  return '<div class="screen" style="padding:0;overflow:hidden"><iframe src="' + src + '" style="width:100%;height:' + h + ';border:none;display:block" allow="geolocation"></iframe></div>';
+  return '<div class="screen" style="padding:0;overflow:hidden"><iframe src="' + src + '" style="width:100%;height:' + h + ';border:none;display:block" allow="geolocation; gyroscope; accelerometer; deviceorientation"></iframe></div>';
 }
 
 
@@ -4019,6 +4019,7 @@ auth.getRedirectResult().then(result => {
 
 window.addEventListener('message', function(e) {
   if(e.data === 'go-home') { SC = 'home'; render(); }
+  if(e.data && e.data.type === 'navigate') { SC = e.data.screen; render(); }
   if(e.data && e.data.type === 'comm-badge') {
     communityUnread = e.data.count || 0;
     var badges = document.querySelectorAll('[data-comm-badge]');
