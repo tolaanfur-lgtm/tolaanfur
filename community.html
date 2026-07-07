@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Community — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4)}
+body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.page{display:none;flex-direction:column;height:100vh;overflow:hidden}
+.page.on{display:flex}
+.nav{background:rgba(6,8,24,.98);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ttl{font-family:'Fredoka One',cursive;font-size:1rem;flex:1}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;padding:.65rem;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.tab.on{color:var(--text);border-bottom-color:#6B3FFF}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:1rem}
+.btn{border:none;border-radius:.75rem;padding:.65rem 1rem;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer}
+.btn:active{opacity:.8}
+.bp{background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff}
+.bs{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.bg{background:linear-gradient(135deg,#065f46,#10B981);color:#fff}
+.br{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);color:#F87171}
+.bsm{padding:.4rem .75rem;font-size:.75rem;border-radius:.6rem}
+.gc{border:1px solid var(--border);border-radius:1rem;padding:.9rem;margin:.4rem .75rem;background:var(--card)}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:.75rem;padding:.65rem .9rem;font-size:.88rem;color:var(--text);font-family:Inter,sans-serif;outline:none;margin-bottom:.5rem}
+.inp:focus{border-color:#6B3FFF}
+textarea.inp{resize:none;height:4.5rem}
+#chat-msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:.75rem;display:flex;flex-direction:column;gap:.6rem}
+#chat-bar{flex-shrink:0;display:flex;align-items:center;gap:.5rem;padding:.65rem .75rem;padding-bottom:max(env(safe-area-inset-bottom),.65rem);border-top:1px solid var(--border);background:rgba(6,8,24,.98)}
+#chat-inp{flex:1;background:rgba(255,255,255,.08);border:1.5px solid rgba(100,140,255,.3);border-radius:2rem;padding:.65rem 1.1rem;font-size:.88rem;color:#EEF2FF;font-family:Inter,sans-serif;outline:none}
+#chat-inp:focus{border-color:#6B3FFF}
+#send-btn{width:2.6rem;height:2.6rem;min-width:2.6rem;border-radius:50%;background:linear-gradient(135deg,#6B3FFF,#9B6FFF);border:none;color:#fff;font-size:1.1rem;cursor:pointer;flex-shrink:0}
+.m{display:flex;gap:.5rem;align-items:flex-end}
+.m.me{flex-direction:row-reverse;align-self:flex-end}
+.m.them{align-self:flex-start}
+.av{width:1.8rem;height:1.8rem;min-width:1.8rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.bb{padding:.5rem .8rem;border-radius:1rem;font-size:.85rem;line-height:1.5;word-break:break-word;max-width:72vw}
+.bb.me{background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff;border-bottom-right-radius:.25rem}
+.bb.them{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:.25rem}
+.mt{font-size:.6rem;color:var(--muted);margin-top:.15rem;text-align:right}
+.lb{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.lb:last-child{border-bottom:none}
+#toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="page on" id="p-home">
+  <div class="nav">
+    <div class="back" onclick="goBack()">←</div>
+    <div class="ttl">🌐 Community</div>
+    <button class="btn bp bsm" onclick="goPage('p-create')">+ New</button>
+  </div>
+  <div class="tabs">
+    <div class="tab on" id="t-groups" onclick="switchTab('groups')">👥 Groups</div>
+    <div class="tab" id="t-lb" onclick="switchTab('lb')">🏆 Leaderboard</div>
+  </div>
+  <div class="scroll" id="tab-content"></div>
+</div>
+
+<div class="page" id="p-chat">
+  <div class="nav">
+    <div class="back" onclick="goPage('p-home')">←</div>
+    <div style="flex:1">
+      <div class="ttl" id="chat-name">Chat</div>
+      <div style="font-size:.62rem;color:var(--muted)" id="chat-info"></div>
+    </div>
+  </div>
+  <div id="chat-msgs"></div>
+  <div id="chat-bar">
+    <input id="chat-inp" type="text" placeholder="Type a message..." maxlength="500"
+      onkeypress="if(event.key==='Enter'){sendMsg();return false;}"/>
+    <button id="send-btn" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<div class="page" id="p-create">
+  <div class="nav">
+    <div class="back" onclick="goPage('p-home')">←</div>
+    <div class="ttl">➕ Create Group</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:1rem">
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:.25rem">Group Name *</div>
+    <input class="inp" id="g-name" placeholder="e.g. Quran Circle" maxlength="50"/>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:.25rem">Description</div>
+    <textarea class="inp" id="g-desc" placeholder="What is this group about?"></textarea>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:.25rem">Category</div>
+    <select class="inp" id="g-cat">
+      <option value="quran">📖 Quran</option>
+      <option value="hadith">📚 Hadith</option>
+      <option value="sirah">🕌 Sirah</option>
+      <option value="fiqh">⚖️ Fiqh</option>
+      <option value="general">💬 General</option>
+    </select>
+    <div style="display:flex;gap:.5rem;margin-top:.25rem">
+      <button class="btn bs" style="flex:1" onclick="goPage('p-home')">Cancel</button>
+      <button class="btn bp" style="flex:2" onclick="createGroup()">Create</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+
+var me = null;
+var myP = null;
+var tab = 'groups';
+var gid = null;
+var msgUnsub = null;
+var groups = [];
+var unreadCounts = {};
+var lastMsgTs = {};
+
+var AC = ['#6B3FFF','#059669','#2563EB','#DC2626','#D97706','#7C3AED','#0891B2','#BE185D'];
+var CI = {quran:'📖',hadith:'📚',sirah:'🕌',fiqh:'⚖️',general:'💬'};
+
+// Beveiliging: alle gebruikersinvoer escapen voordat het in innerHTML gaat (XSS)
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function goPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  if(id==='p-home') renderTab();
+}
+
+function goBack(){
+  try{if(window.parent&&window.parent!==window)window.parent.postMessage('go-home','*');}catch(e){}
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+function switchTab(t){
+  tab=t;
+  document.getElementById('t-groups').classList.toggle('on',t==='groups');
+  document.getElementById('t-lb').classList.toggle('on',t==='lb');
+  renderTab();
+}
+
+function renderTab(){
+  if(tab==='groups') renderGroups();
+  else renderLB();
+}
+
+function renderGroups(){
+  var c=document.getElementById('tab-content');
+  if(!groups.length){
+    c.innerHTML='<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">👥</div><div style="font-family:Fredoka One,cursive;font-size:1rem;color:var(--text);margin-top:.5rem">No groups yet</div><div style="font-size:.8rem;margin-top:.25rem">Be the first to create one!</div></div>';
+    return;
+  }
+
+  var sorted = groups.slice().sort(function(a,b){
+    var ua=unreadCounts[a.id]||0;
+    var ub=unreadCounts[b.id]||0;
+    if(ub!==ua) return ub-ua;
+    return (lastMsgTs[b.id]||0)-(lastMsgTs[a.id]||0);
+  });
+
+  var html='';
+  sorted.forEach(function(g){
+    var isMem=me&&(g.members||[]).indexOf(me.uid)>=0;
+    var cnt=(g.members||[]).length;
+    var icon=CI[g.category]||'💬';
+    var unread=isMem?(unreadCounts[g.id]||0):0;
+    var hasUnread=unread>0;
+
+    html+='<div class="gc" data-gid="'+esc(g.id)+'" style="'+(hasUnread?'border-color:rgba(107,63,255,.5);background:rgba(107,63,255,.08)':'')+'">';
+    html+='<div style="display:flex;align-items:center;gap:.75rem">';
+    html+='<div style="position:relative">';
+    html+='<div style="width:3rem;height:3rem;border-radius:.75rem;background:linear-gradient(135deg,#4C1D95,#6B3FFF);display:flex;align-items:center;justify-content:center;font-size:1.3rem">'+icon+'</div>';
+    if(hasUnread) html+='<div style="position:absolute;top:-.3rem;right:-.3rem;min-width:1.3rem;height:1.3rem;border-radius:.65rem;background:#EF4444;color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 .25rem;border:2px solid var(--bg)">'+(unread>99?'99+':unread)+'</div>';
+    html+='</div>';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="font-weight:'+(hasUnread?'800':'600')+';font-size:.92rem;color:'+(hasUnread?'#fff':'var(--text)')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(g.name||'Group')+'</div>';
+    html+='<div style="font-size:.72rem;color:var(--muted);margin-top:.1rem">'+esc(g.description||'')+'</div>';
+    html+='<div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">👥 '+cnt+' member'+(cnt!==1?'s':'')+'</div>';
+    html+='</div>';
+    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;flex-shrink:0">';
+    if(isMem){
+      html+='<span style="font-size:.7rem;color:#9B6FFF;font-weight:600">Member</span>';
+      if(hasUnread) html+='<span style="font-size:.68rem;color:#EF4444;font-weight:700">'+unread+' new</span>';
+    } else {
+      html+='<button class="btn bg bsm" data-join="'+esc(g.id)+'">Join</button>';
+    }
+    html+='</div></div></div>';
+  });
+  c.innerHTML=html;
+  // Klik-handlers koppelen (veilig alternatief voor onclick-strings)
+  c.querySelectorAll('[data-join]').forEach(function(b){
+    b.addEventListener('click',function(ev){ev.stopPropagation();joinGroup(b.getAttribute('data-join'));});
+  });
+  c.querySelectorAll('.gc[data-gid]').forEach(function(el){
+    el.addEventListener('click',function(){openChat(el.getAttribute('data-gid'));});
+  });
+}
+
+function renderLB(){
+  var c=document.getElementById('tab-content');
+  c.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.8rem">Loading...</div>';
+  db.collection('users').orderBy('xp','desc').limit(10).get().then(function(snap){
+    if(snap.empty){c.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">No data yet</div>';return;}
+    var medals=['🥇','🥈','🥉'];
+    var html='<div style="background:var(--card);border:1px solid var(--border);border-radius:1rem;margin:.75rem;overflow:hidden">';
+    snap.docs.forEach(function(d,i){
+      var u=d.data();
+      var isMe=d.id===(me&&me.uid);
+      var xp=u.xp||0;
+      var lvl=Math.floor(xp/100)+1;
+      var bg=AC[u.avatarColor||0]||'#6B3FFF';
+      var ini=(u.displayName||u.username||'U').substring(0,2).toUpperCase();
+      html+='<div class="lb" style="'+(isMe?'background:rgba(107,63,255,.08)':'')+'"><div style="width:2rem;text-align:center;font-family:Fredoka One,cursive">'+(i<3?medals[i]:'#'+(i+1))+'</div><div style="width:2.4rem;height:2.4rem;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0">'+esc(ini)+'</div><div style="flex:1"><div style="font-weight:600;font-size:.88rem">'+esc(u.displayName||u.username||'User')+(isMe?' (you)':'')+'</div><div style="font-size:.65rem;color:var(--muted)">Level '+lvl+'</div></div><div style="font-family:Fredoka One,cursive;color:#F59E0B">'+xp+' XP</div></div>';
+    });
+    html+='</div>';
+    c.innerHTML=html;
+  }).catch(function(){c.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">Could not load</div>';});
+}
+
+function joinGroup(id){
+  if(!me){showToast('🔒 Login required');return;}
+  db.collection('groups').doc(id).update({members:firebase.firestore.FieldValue.arrayUnion(me.uid)})
+    .then(function(){showToast('✅ Joined!');}).catch(function(){showToast('❌ Failed');});
+}
+
+function leaveGroup(id){
+  if(!me)return;
+  db.collection('groups').doc(id).update({members:firebase.firestore.FieldValue.arrayRemove(me.uid)})
+    .then(function(){showToast('👋 Left');}).catch(function(){showToast('❌ Failed');});
+}
+
+function createGroup(){
+  var name=document.getElementById('g-name').value.trim();
+  var desc=document.getElementById('g-desc').value.trim();
+  var cat=document.getElementById('g-cat').value;
+  if(!name){showToast('⚠️ Enter a name');return;}
+  if(!me){showToast('🔒 Login required');return;}
+  db.collection('groups').add({
+    name:name,description:desc,category:cat,
+    createdBy:me.uid,createdAt:Date.now(),members:[me.uid]
+  }).then(function(){
+    showToast('🎉 Created!');
+    document.getElementById('g-name').value='';
+    document.getElementById('g-desc').value='';
+    goPage('p-home');
+  }).catch(function(){showToast('❌ Failed');});
+}
+
+function openChat(id){
+  var g=groups.find(function(x){return x.id===id;});
+  if(!g)return;
+  gid=id;
+  // Reset unread
+  unreadCounts[id]=0;
+  try{var lr=JSON.parse(localStorage.getItem('tf_comm_read')||'{}');lr[id]=Math.floor(Date.now()/1000);localStorage.setItem('tf_comm_read',JSON.stringify(lr));}catch(e){}
+  sendBadgeToParent();
+
+  var isMem=me&&(g.members||[]).indexOf(me.uid)>=0;
+  document.getElementById('chat-name').textContent=g.name;
+  document.getElementById('chat-info').textContent=(g.members||[]).length+' members';
+  var inp=document.getElementById('chat-inp');
+  inp.disabled=!isMem;
+  inp.placeholder=isMem?'Type a message...':'Join to send messages';
+  goPage('p-chat');
+  loadMsgs(id);
+}
+
+function loadMsgs(id){
+  if(msgUnsub){msgUnsub();msgUnsub=null;}
+  var wrap=document.getElementById('chat-msgs');
+  wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem">Loading...</div>';
+  msgUnsub=db.collection('groups').doc(id).collection('messages')
+    .orderBy('ts','asc').limitToLast(50)
+    .onSnapshot(function(snap){
+      if(snap.empty){wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem">No messages yet 👋</div>';return;}
+      var html='';
+      snap.docs.forEach(function(d){
+        var m=d.data();
+        var isMe=me&&m.uid===me.uid;
+        var bg=AC[m.avatarColor||0]||'#6B3FFF';
+        var ini=(m.displayName||'U').substring(0,2).toUpperCase();
+        var time='';
+        if(m.ts){var dt=m.ts.toDate?m.ts.toDate():new Date(m.ts);time=dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+        html+='<div class="m '+(isMe?'me':'them')+'">';
+        if(!isMe) html+='<div class="av" style="background:'+bg+'">'+esc(ini)+'</div>';
+        html+='<div>';
+        if(!isMe) html+='<div style="font-size:.62rem;color:var(--muted);margin-bottom:.15rem">'+esc(m.displayName||'User')+'</div>';
+        html+='<div class="bb '+(isMe?'me':'them')+'">'+esc(m.text)+'</div>';
+        html+='<div class="mt">'+time+'</div>';
+        html+='</div></div>';
+      });
+      wrap.innerHTML=html;
+      wrap.scrollTop=wrap.scrollHeight;
+    },function(err){
+      wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted)">❌ Could not load</div>';
+      console.log('Chat error:',err.code);
+    });
+}
+
+function sendMsg(){
+  var inp=document.getElementById('chat-inp');
+  var text=(inp.value||'').trim();
+  if(!text||!me||!gid)return;
+  var g=groups.find(function(x){return x.id===gid;});
+  if(!g||(g.members||[]).indexOf(me.uid)<0){showToast('⚠️ Join first');return;}
+  inp.value='';
+  db.collection('groups').doc(gid).collection('messages').add({
+    uid:me.uid,
+    displayName:(myP&&(myP.displayName||myP.username))||(me.email||'').split('@')[0]||'User',
+    avatarColor:(myP&&myP.avatarColor)||0,
+    text:text,
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){showToast('❌ Failed');inp.value=text;});
+}
+
+var unreadUnsubs=[];
+function listenUnread(){
+  if(!me||me.isAnonymous)return;
+  // FIX: oude luisteraars eerst afsluiten — anders stapelen ze op (dubbele reads = kosten)
+  unreadUnsubs.forEach(function(u){try{u();}catch(e){}});
+  unreadUnsubs=[];
+  // Tellers opruimen van groepen waar je geen lid (meer) van bent
+  var memberIds={};
+  groups.forEach(function(g){if(me&&(g.members||[]).indexOf(me.uid)>=0)memberIds[g.id]=true;});
+  Object.keys(unreadCounts).forEach(function(k){if(!memberIds[k])delete unreadCounts[k];});
+  sendBadgeToParent();
+
+  groups.forEach(function(g){
+    if(!memberIds[g.id])return;
+    var id=g.id;
+    var unsub=db.collection('groups').doc(id).collection('messages')
+      .orderBy('ts','desc').limit(20)
+      .onSnapshot(function(snap){
+        // FIX: lastRead ALTIJD vers uit localStorage lezen — anders springt de badge terug na het lezen
+        var lastRead={};
+        try{lastRead=JSON.parse(localStorage.getItem('tf_comm_read')||'{}');}catch(e){}
+        var readTs=lastRead[id]||0;
+        var count=0;
+        var latestTs=0;
+        snap.docs.forEach(function(doc){
+          var m=doc.data();
+          var ts=m.ts&&m.ts.seconds?m.ts.seconds:0;
+          if(ts>latestTs)latestTs=ts;
+          if(ts>readTs&&m.uid!==me.uid)count++;
+        });
+        unreadCounts[id]=count;
+        lastMsgTs[id]=latestTs;
+        sendBadgeToParent();
+        if(document.getElementById('p-home').classList.contains('on')&&tab==='groups')renderGroups();
+      },function(err){console.log('Unread error:',err.code);});
+    unreadUnsubs.push(unsub);
+  });
+}
+
+function sendBadgeToParent(){
+  var total=Object.keys(unreadCounts).reduce(function(a,k){return a+(unreadCounts[k]||0);},0);
+  try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'comm-badge',count:total},'*');}catch(e){}
+}
+
+var groupsUnsub=null;
+auth.onAuthStateChanged(function(user){
+  me=user;
+  if(user&&!user.isAnonymous){
+    db.collection('users').doc(user.uid).get().then(function(doc){if(doc.exists)myP=doc.data();}).catch(function(){});
+  }
+  // FIX: bestaande groups-listener eerst afsluiten (onAuthStateChanged kan vaker vuren)
+  if(groupsUnsub){try{groupsUnsub();}catch(e){}groupsUnsub=null;}
+  groupsUnsub=db.collection('groups').onSnapshot(function(snap){
+    groups=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(me&&!me.isAnonymous)listenUnread();
+    if(document.getElementById('p-home').classList.contains('on'))renderTab();
+  },function(err){console.log('Groups error:',err.code);});
+});
+</script>
+</body>
+</html>
