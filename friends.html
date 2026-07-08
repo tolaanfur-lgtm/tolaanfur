@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Friends — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4)}
+body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.page{display:none;flex-direction:column;height:100vh;overflow:hidden}
+.page.on{display:flex}
+.nav{background:rgba(6,8,24,.98);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:.9rem}
+.ttl{font-family:'Fredoka One',cursive;font-size:1rem;flex:1}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{flex:1;padding:.65rem;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;position:relative}
+.tab.on{color:var(--text);border-bottom-color:#6B3FFF}
+.tab-badge{position:absolute;top:.3rem;right:25%;min-width:1.1rem;height:1.1rem;border-radius:.55rem;background:#EF4444;color:#fff;font-size:.6rem;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 .2rem}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:1rem}
+.btn{border:none;border-radius:.75rem;padding:.65rem 1rem;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer;transition:opacity .15s}
+.btn:active{opacity:.75}
+.bp{background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff}
+.bs{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.bg{background:linear-gradient(135deg,#065f46,#10B981);color:#fff}
+.br{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);color:#F87171}
+.bsm{padding:.4rem .75rem;font-size:.75rem;border-radius:.6rem}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:.75rem;padding:.65rem .9rem;font-size:.88rem;color:var(--text);font-family:Inter,sans-serif;outline:none}
+.inp:focus{border-color:#6B3FFF}
+
+/* Chat list item */
+.chat-item{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
+.chat-item:active{background:rgba(255,255,255,.03)}
+.chat-item.unread{background:rgba(107,63,255,.04)}
+.av{width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0;color:#fff}
+.chat-info{flex:1;min-width:0}
+.chat-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-name.bold{font-weight:800;color:#fff}
+.chat-preview{font-size:.72rem;color:var(--muted);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-preview.bold{color:rgba(238,242,255,.7)}
+.chat-right{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;flex-shrink:0}
+.chat-time{font-size:.65rem;color:var(--muted)}
+.chat-time.bold{color:#9B6FFF}
+.unread-badge{min-width:1.4rem;height:1.4rem;border-radius:.7rem;background:#EF4444;color:#fff;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 .3rem}
+
+/* Friend request item */
+.req-item{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;border-bottom:1px solid var(--border)}
+
+/* Chat screen */
+#chat-msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:.75rem;display:flex;flex-direction:column;gap:.6rem}
+#chat-bar{flex-shrink:0;display:flex;align-items:center;gap:.5rem;padding:.65rem .75rem;padding-bottom:max(env(safe-area-inset-bottom),.65rem);border-top:1px solid var(--border);background:rgba(6,8,24,.98)}
+#chat-inp{flex:1;background:rgba(255,255,255,.08);border:1.5px solid rgba(100,140,255,.3);border-radius:2rem;padding:.65rem 1.1rem;font-size:.88rem;color:#EEF2FF;font-family:Inter,sans-serif;outline:none}
+#chat-inp:focus{border-color:#6B3FFF}
+#send-btn{width:2.6rem;height:2.6rem;min-width:2.6rem;border-radius:50%;background:linear-gradient(135deg,#6B3FFF,#9B6FFF);border:none;color:#fff;font-size:1.1rem;cursor:pointer;flex-shrink:0}
+.m{display:flex;gap:.5rem;align-items:flex-end}
+.m.me{flex-direction:row-reverse;align-self:flex-end}
+.m.them{align-self:flex-start}
+.mav{width:1.8rem;height:1.8rem;min-width:1.8rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.bb{padding:.5rem .8rem;border-radius:1rem;font-size:.85rem;line-height:1.5;word-break:break-word;max-width:72vw}
+.bb.me{background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff;border-bottom-right-radius:.25rem}
+.bb.them{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:.25rem}
+.mt{font-size:.6rem;color:var(--muted);margin-top:.15rem;text-align:right}
+
+#toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: MAIN (Chats + Friends + Requests) -->
+<div class="page on" id="p-main">
+  <div class="nav">
+    <div class="back" onclick="goBack()">←</div>
+    <div class="ttl">👥 Friends</div>
+    <button class="btn bp bsm" onclick="goPage('p-search')">+ Add</button>
+  </div>
+  <div class="tabs">
+    <div class="tab on" id="t-chats" onclick="switchTab('chats')">
+      💬 Chats
+      <div class="tab-badge" id="chats-badge"></div>
+    </div>
+    <div class="tab" id="t-friends" onclick="switchTab('friends')">👤 Friends</div>
+    <div class="tab" id="t-requests" onclick="switchTab('requests')">
+      🔔 Requests
+      <div class="tab-badge" id="req-badge"></div>
+    </div>
+  </div>
+  <div class="scroll" id="tab-content"></div>
+</div>
+
+<!-- PAGE 2: CHAT -->
+<div class="page" id="p-chat">
+  <div class="nav">
+    <div class="back" onclick="goPage('p-main')">←</div>
+    <div style="display:flex;align-items:center;gap:.65rem;flex:1">
+      <div id="chat-av" style="width:2rem;height:2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0"></div>
+      <div>
+        <div class="ttl" id="chat-name">Chat</div>
+        <div style="font-size:.62rem;color:var(--muted)" id="chat-status">Online</div>
+      </div>
+    </div>
+  </div>
+  <div id="chat-msgs"></div>
+  <div id="chat-bar">
+    <input id="chat-inp" type="text" placeholder="Type a message..." maxlength="500"
+      onkeypress="if(event.key==='Enter'){sendMsg();return false;}"/>
+    <button id="send-btn" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- PAGE 3: SEARCH/ADD FRIENDS -->
+<div class="page" id="p-search">
+  <div class="nav">
+    <div class="back" onclick="goPage('p-main')">←</div>
+    <div class="ttl">🔍 Find Friends</div>
+  </div>
+  <div style="padding:1rem">
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+      <input class="inp" id="search-inp" placeholder="Search by username or name..." style="flex:1"/>
+      <button class="btn bp bsm" onclick="searchUsers()">Search</button>
+    </div>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+
+var me = null;
+var myP = null;
+var tab = 'chats';
+var activeChatId = null;
+var activeFriendId = null;
+var msgUnsub = null;
+
+// Data
+var friends = [];
+var requests = [];
+var chats = {}; // {friendId: {lastMsg, lastTs, unread}}
+var unreadCounts = {}; // {friendId: count}
+
+var AC = ['#6B3FFF','#059669','#2563EB','#DC2626','#D97706','#7C3AED','#0891B2','#BE185D'];
+
+// Beveiliging: alle gebruikersinvoer escapen voordat het in innerHTML gaat (XSS)
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function getChatId(a, b) {
+  return a < b ? a + '_' + b : b + '_' + a;
+}
+
+function getColor(idx) {
+  return AC[idx || 0] || '#6B3FFF';
+}
+
+function timeStr(ts) {
+  if(!ts) return '';
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  var now = new Date();
+  var diff = now - d;
+  if(diff < 86400000) return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  if(diff < 604800000) return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+}
+
+// ══ NAVIGATION ══
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  if(id === 'p-main') renderTab();
+}
+
+function goBack() {
+  try { if(window.parent && window.parent !== window) window.parent.postMessage('go-home','*'); } catch(e) {}
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ══ TABS ══
+function switchTab(t) {
+  tab = t;
+  document.getElementById('t-chats').classList.toggle('on', t==='chats');
+  document.getElementById('t-friends').classList.toggle('on', t==='friends');
+  document.getElementById('t-requests').classList.toggle('on', t==='requests');
+  renderTab();
+}
+
+function renderTab() {
+  if(tab==='chats') renderChats();
+  else if(tab==='friends') renderFriends();
+  else renderRequests();
+}
+
+// ══ RENDER CHATS ══
+function renderChats() {
+  var c = document.getElementById('tab-content');
+  if(!me) { c.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">🔒</div><div style="margin-top:.5rem">Login required</div></div>'; return; }
+  if(!friends.length) {
+    c.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">💬</div><div style="font-family:Fredoka One,cursive;font-size:1rem;color:var(--text);margin-top:.5rem">No chats yet</div><div style="font-size:.8rem;margin-top:.25rem">Add friends to start chatting!</div></div>';
+    return;
+  }
+
+  // Sorteer op laatste bericht
+  var sorted = friends.slice().sort(function(a, b) {
+    var ta = chats[a.uid] ? (chats[a.uid].lastTs || 0) : 0;
+    var tb = chats[b.uid] ? (chats[b.uid].lastTs || 0) : 0;
+    return tb - ta;
+  });
+
+  var html = '';
+  sorted.forEach(function(f) {
+    var chatData = chats[f.uid] || {};
+    var unread = unreadCounts[f.uid] || 0;
+    var hasUnread = unread > 0;
+    var bg = getColor(f.avatarColor);
+    var ini = (f.displayName || f.username || 'U').substring(0,2).toUpperCase();
+    var preview = chatData.lastMsg || 'Start a conversation...';
+    var time = chatData.lastTs ? timeStr(chatData.lastTs * 1000) : '';
+
+    html += '<div class="chat-item' + (hasUnread?' unread':'') + '" data-uid="' + esc(f.uid) + '">';
+    html += '<div class="av" style="background:' + bg + '">' + esc(ini) + '</div>';
+    html += '<div class="chat-info">';
+    html += '<div class="chat-name' + (hasUnread?' bold':'') + '">' + esc(f.displayName || f.username || 'User') + '</div>';
+    html += '<div class="chat-preview' + (hasUnread?' bold':'') + '">' + esc(preview) + '</div>';
+    html += '</div>';
+    html += '<div class="chat-right">';
+    html += '<div class="chat-time' + (hasUnread?' bold':'') + '">' + time + '</div>';
+    if(hasUnread) html += '<div class="unread-badge">' + (unread > 99 ? '99+' : unread) + '</div>';
+    html += '</div></div>';
+  });
+  c.innerHTML = html;
+  c.querySelectorAll('.chat-item[data-uid]').forEach(function(el){
+    el.addEventListener('click',function(){openChat(el.getAttribute('data-uid'));});
+  });
+}
+
+// ══ RENDER FRIENDS ══
+function renderFriends() {
+  var c = document.getElementById('tab-content');
+  if(!friends.length) {
+    c.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">👤</div><div style="font-family:Fredoka One,cursive;font-size:1rem;color:var(--text);margin-top:.5rem">No friends yet</div><div style="font-size:.8rem;margin-top:.25rem">Search for friends to connect!</div></div>';
+    return;
+  }
+  var html = '';
+  friends.forEach(function(f) {
+    var bg = getColor(f.avatarColor);
+    var ini = (f.displayName || f.username || 'U').substring(0,2).toUpperCase();
+    html += '<div class="req-item">';
+    html += '<div class="av" style="background:' + bg + '">' + esc(ini) + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:600;font-size:.9rem">' + esc(f.displayName || f.username || 'User') + '</div>';
+    html += '<div style="font-size:.72rem;color:var(--muted)">@' + esc(f.username || '') + '</div></div>';
+    html += '<div style="display:flex;gap:.4rem">';
+    html += '<button class="btn bp bsm" data-chat="' + esc(f.uid) + '">💬 Chat</button>';
+    html += '<button class="btn br bsm" data-remove="' + esc(f.uid) + '">Remove</button>';
+    html += '</div></div>';
+  });
+  c.innerHTML = html;
+  c.querySelectorAll('[data-chat]').forEach(function(b){
+    b.addEventListener('click',function(){openChat(b.getAttribute('data-chat'));});
+  });
+  c.querySelectorAll('[data-remove]').forEach(function(b){
+    b.addEventListener('click',function(){removeFriend(b.getAttribute('data-remove'));});
+  });
+}
+
+// ══ RENDER REQUESTS ══
+function renderRequests() {
+  var c = document.getElementById('tab-content');
+  if(!requests.length) {
+    c.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--muted)"><div style="font-size:2.5rem">🔔</div><div style="font-family:Fredoka One,cursive;font-size:1rem;color:var(--text);margin-top:.5rem">No requests</div></div>';
+    return;
+  }
+  var html = '';
+  requests.forEach(function(r) {
+    var bg = getColor(r.senderColor);
+    var ini = (r.senderName || 'U').substring(0,2).toUpperCase();
+    html += '<div class="req-item">';
+    html += '<div class="av" style="background:' + bg + '">' + esc(ini) + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:600;font-size:.9rem">' + esc(r.senderName || 'User') + '</div>';
+    html += '<div style="font-size:.72rem;color:var(--muted)">Wants to be your friend</div></div>';
+    html += '<div style="display:flex;gap:.4rem">';
+    html += '<button class="btn bg bsm" data-acc="' + esc(r.id) + '" data-from="' + esc(r.from) + '">✓ Accept</button>';
+    html += '<button class="btn br bsm" data-dec="' + esc(r.id) + '">✗</button>';
+    html += '</div></div>';
+  });
+  c.innerHTML = html;
+  c.querySelectorAll('[data-acc]').forEach(function(b){
+    b.addEventListener('click',function(){acceptReq(b.getAttribute('data-acc'), b.getAttribute('data-from'));});
+  });
+  c.querySelectorAll('[data-dec]').forEach(function(b){
+    b.addEventListener('click',function(){declineReq(b.getAttribute('data-dec'));});
+  });
+}
+
+// ══ FRIEND REQUESTS ══
+function searchUsers() {
+  var q = document.getElementById('search-inp').value.trim();
+  if(!q) { showToast('⚠️ Enter a name or username'); return; }
+  var res = document.getElementById('search-results');
+  res.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:.82rem">Searching...</div>';
+
+  // FIX: gerichte prefix-zoekopdrachten met limiet i.p.v. de complete users-collectie downloaden
+  var variants = [];
+  var ql = q.toLowerCase();
+  var qc = q.charAt(0).toUpperCase() + q.slice(1).toLowerCase();
+  [q, ql, qc].forEach(function(v){ if(variants.indexOf(v) < 0) variants.push(v); });
+
+  var queries = [];
+  variants.forEach(function(v){
+    queries.push(db.collection('users').where('displayName','>=',v).where('displayName','<=',v+'\uf8ff').limit(10).get());
+    queries.push(db.collection('users').where('username','>=',v).where('username','<=',v+'\uf8ff').limit(10).get());
+  });
+
+  Promise.all(queries).then(function(snaps) {
+    var seen = {};
+    var users = [];
+    snaps.forEach(function(snap){
+      snap.docs.forEach(function(d) {
+        if(d.id === me.uid || seen[d.id]) return;
+        seen[d.id] = true;
+        users.push(Object.assign({uid: d.id}, d.data()));
+      });
+    });
+
+    if(!users.length) { res.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted)">No users found</div>'; return; }
+
+    var html = '';
+    users.forEach(function(u) {
+      var isFriend = friends.some(function(f) { return f.uid === u.uid; });
+      var bg = getColor(u.avatarColor);
+      var ini = (u.displayName || u.username || 'U').substring(0,2).toUpperCase();
+      html += '<div style="display:flex;align-items:center;gap:.75rem;padding:.85rem 0;border-bottom:1px solid var(--border)">';
+      html += '<div class="av" style="background:' + bg + '">' + esc(ini) + '</div>';
+      html += '<div style="flex:1"><div style="font-weight:600;font-size:.9rem">' + esc(u.displayName || u.username || 'User') + '</div>';
+      html += '<div style="font-size:.72rem;color:var(--muted)">@' + esc(u.username || '') + '</div></div>';
+      if(isFriend) {
+        html += '<span style="font-size:.75rem;color:#10B981;font-weight:600">✓ Friends</span>';
+      } else {
+        html += '<button class="btn bp bsm" data-req="' + esc(u.uid) + '" data-name="' + esc(u.displayName||u.username||'User') + '">+ Add</button>';
+      }
+      html += '</div>';
+    });
+    res.innerHTML = html;
+    res.querySelectorAll('[data-req]').forEach(function(b){
+      b.addEventListener('click',function(){sendReq(b.getAttribute('data-req'), b.getAttribute('data-name'));});
+    });
+  }).catch(function() { res.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted)">Search failed</div>'; });
+}
+
+function sendReq(toUid, toName) {
+  if(!me) { showToast('🔒 Login required'); return; }
+  db.collection('friend_requests').add({
+    from: me.uid,
+    to: toUid,
+    senderName: myP && (myP.displayName || myP.username) || (me.email||'').split('@')[0] || 'User',
+    senderColor: myP && myP.avatarColor || 0,
+    ts: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function() { showToast('✅ Request sent to ' + toName + '!'); })
+    .catch(function() { showToast('❌ Failed to send request'); });
+}
+
+function acceptReq(reqId, fromUid) {
+  if(!me) return;
+  var batch = db.batch();
+  // Maak vriendschap aan voor beide kanten
+  batch.set(db.collection('friendships').doc(me.uid + '_' + fromUid), {
+    from: me.uid, to: fromUid, ts: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  batch.set(db.collection('friendships').doc(fromUid + '_' + me.uid), {
+    from: fromUid, to: me.uid, ts: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  // Verwijder request
+  batch.delete(db.collection('friend_requests').doc(reqId));
+  batch.commit().then(function() { showToast('✅ Friend added!'); })
+    .catch(function() { showToast('❌ Failed'); });
+}
+
+function declineReq(reqId) {
+  db.collection('friend_requests').doc(reqId).delete()
+    .then(function() { showToast('Declined'); })
+    .catch(function() { showToast('❌ Failed'); });
+}
+
+function removeFriend(uid) {
+  if(!me) return;
+  var batch = db.batch();
+  batch.delete(db.collection('friendships').doc(me.uid + '_' + uid));
+  batch.delete(db.collection('friendships').doc(uid + '_' + me.uid));
+  batch.commit().then(function() { showToast('👋 Friend removed'); })
+    .catch(function() { showToast('❌ Failed'); });
+}
+
+// ══ CHAT ══
+function openChat(friendId) {
+  var f = friends.find(function(x) { return x.uid === friendId; });
+  if(!f) return;
+  activeFriendId = friendId;
+  activeChatId = getChatId(me.uid, friendId);
+
+  // Reset unread
+  unreadCounts[friendId] = 0;
+  try {
+    var lr = JSON.parse(localStorage.getItem('tf_dm_read') || '{}');
+    lr[friendId] = Math.floor(Date.now() / 1000);
+    localStorage.setItem('tf_dm_read', JSON.stringify(lr));
+  } catch(e) {}
+  sendBadgeToParent();
+
+  var bg = getColor(f.avatarColor);
+  var ini = (f.displayName || f.username || 'U').substring(0,2).toUpperCase();
+  document.getElementById('chat-name').textContent = f.displayName || f.username || 'User';
+  document.getElementById('chat-av').style.background = bg;
+  document.getElementById('chat-av').textContent = ini;
+  document.getElementById('chat-status').textContent = 'Friend';
+
+  goPage('p-chat');
+  loadMsgs(activeChatId, friendId);
+}
+
+function loadMsgs(chatId, friendId) {
+  if(msgUnsub) { msgUnsub(); msgUnsub = null; }
+  var wrap = document.getElementById('chat-msgs');
+  wrap.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem">Loading...</div>';
+
+  msgUnsub = db.collection('dms').doc(chatId).collection('messages')
+    .orderBy('ts','asc').limitToLast(50)
+    .onSnapshot(function(snap) {
+      if(snap.empty) {
+        wrap.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.82rem">No messages yet 👋<br><span style="font-size:.7rem">Say hello!</span></div>';
+        return;
+      }
+      var html = '';
+      snap.docs.forEach(function(d) {
+        var m = d.data();
+        var isMe = m.uid === me.uid;
+        var bg = getColor(m.avatarColor);
+        var ini = (m.displayName || 'U').substring(0,2).toUpperCase();
+        var time = '';
+        if(m.ts) { var dt = m.ts.toDate ? m.ts.toDate() : new Date(m.ts); time = dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+        html += '<div class="m ' + (isMe?'me':'them') + '">';
+        if(!isMe) html += '<div class="mav" style="background:' + bg + '">' + esc(ini) + '</div>';
+        html += '<div>';
+        html += '<div class="bb ' + (isMe?'me':'them') + '">' + esc(m.text) + '</div>';
+        html += '<div class="mt">' + time + '</div>';
+        html += '</div></div>';
+      });
+      wrap.innerHTML = html;
+      wrap.scrollTop = wrap.scrollHeight;
+    }, function(err) {
+      wrap.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted)">❌ Could not load</div>';
+    });
+}
+
+function sendMsg() {
+  var inp = document.getElementById('chat-inp');
+  var text = (inp.value || '').trim();
+  if(!text || !me || !activeChatId) return;
+  inp.value = '';
+  db.collection('dms').doc(activeChatId).collection('messages').add({
+    uid: me.uid,
+    displayName: (myP && (myP.displayName || myP.username)) || (me.email||'').split('@')[0] || 'User',
+    avatarColor: (myP && myP.avatarColor) || 0,
+    text: text,
+    ts: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function() { showToast('❌ Failed to send'); inp.value = text; });
+}
+
+// ══ UNREAD TRACKING ══
+var unreadUnsubs = [];
+function listenUnread() {
+  if(!me || me.isAnonymous) return;
+  // FIX: oude luisteraars eerst afsluiten — anders stapelen ze op (dubbele reads = kosten)
+  unreadUnsubs.forEach(function(u){ try{u();}catch(e){} });
+  unreadUnsubs = [];
+  // Tellers opruimen van ex-vrienden
+  var friendIds = {};
+  friends.forEach(function(f){ friendIds[f.uid] = true; });
+  Object.keys(unreadCounts).forEach(function(k){ if(!friendIds[k]) delete unreadCounts[k]; });
+  updateBadges();
+
+  friends.forEach(function(f) {
+    var chatId = getChatId(me.uid, f.uid);
+    var unsub = db.collection('dms').doc(chatId).collection('messages')
+      .orderBy('ts','desc').limit(20)
+      .onSnapshot(function(snap) {
+        // FIX: lastRead ALTIJD vers uit localStorage lezen — anders springt de badge terug na het lezen
+        var lastRead = {};
+        try { lastRead = JSON.parse(localStorage.getItem('tf_dm_read') || '{}'); } catch(e) {}
+        var readTs = lastRead[f.uid] || 0;
+        var count = 0;
+        var lastMsg = '';
+        var lastTs = 0;
+        snap.docs.forEach(function(d) {
+          var m = d.data();
+          var ts = m.ts && m.ts.seconds ? m.ts.seconds : 0;
+          if(ts > lastTs) { lastTs = ts; lastMsg = m.text || ''; }
+          if(ts > readTs && m.uid !== me.uid) count++;
+        });
+        unreadCounts[f.uid] = count;
+        chats[f.uid] = { lastMsg: lastMsg, lastTs: lastTs, unread: count };
+        updateBadges();
+        if(document.getElementById('p-main').classList.contains('on') && tab === 'chats') renderChats();
+      }, function() {});
+    unreadUnsubs.push(unsub);
+  });
+}
+
+function updateBadges() {
+  var total = Object.keys(unreadCounts).reduce(function(a,k) { return a + (unreadCounts[k]||0); }, 0);
+  var badge = document.getElementById('chats-badge');
+  if(badge) {
+    badge.textContent = total > 0 ? (total > 99 ? '99+' : total) : '';
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+  sendBadgeToParent();
+}
+
+function sendBadgeToParent() {
+  var total = Object.keys(unreadCounts).reduce(function(a,k) { return a + (unreadCounts[k]||0); }, 0);
+  try { if(window.parent && window.parent !== window) window.parent.postMessage({type:'friends-badge', count: total}, '*'); } catch(e) {}
+}
+
+// ══ LOAD DATA ══
+var friendsUnsub = null;
+var reqUnsub = null;
+function loadFriends() {
+  if(!me) return;
+  // FIX: bestaande luisteraars eerst afsluiten (onAuthStateChanged kan vaker vuren)
+  if(friendsUnsub){ try{friendsUnsub();}catch(e){} friendsUnsub = null; }
+  if(reqUnsub){ try{reqUnsub();}catch(e){} reqUnsub = null; }
+  // Laad vriendschappen
+  friendsUnsub = db.collection('friendships')
+    .where('from','==',me.uid)
+    .onSnapshot(function(snap) {
+      var uids = snap.docs.map(function(d) { return d.data().to; });
+      if(!uids.length) { friends = []; renderTab(); return; }
+      // Laad friend profielen
+      Promise.all(uids.map(function(uid) {
+        return db.collection('users').doc(uid).get().then(function(d) {
+          return d.exists ? Object.assign({uid: d.id}, d.data()) : null;
+        });
+      })).then(function(results) {
+        friends = results.filter(function(f) { return f !== null; });
+        listenUnread();
+        renderTab();
+      });
+    });
+
+  // Laad inkomende verzoeken
+  reqUnsub = db.collection('friend_requests')
+    .where('to','==',me.uid)
+    .onSnapshot(function(snap) {
+      requests = snap.docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
+      var reqBadge = document.getElementById('req-badge');
+      if(reqBadge) {
+        reqBadge.textContent = requests.length > 0 ? requests.length : '';
+        reqBadge.style.display = requests.length > 0 ? 'flex' : 'none';
+      }
+      // Stuur ook naar parent
+      try { if(window.parent && window.parent !== window) window.parent.postMessage({type:'req-badge', count: requests.length}, '*'); } catch(e) {}
+      if(tab === 'requests') renderRequests();
+    });
+}
+
+// ══ INIT ══
+auth.onAuthStateChanged(function(user) {
+  me = user;
+  if(user && !user.isAnonymous) {
+    db.collection('users').doc(user.uid).get().then(function(doc) {
+      if(doc.exists) myP = doc.data();
+      loadFriends();
+    }).catch(function() { loadFriends(); });
+  } else {
+    renderTab();
+  }
+});
+</script>
+</body>
+</html>
