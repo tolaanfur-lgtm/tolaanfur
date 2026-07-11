@@ -1,5 +1,7 @@
 // Tolaanfur Service Worker
-const CACHE = 'tolaanfur-v1';
+// v2: friends.html toegevoegd, alleen GET + eigen domein wordt gecachet,
+//     oude cache (met daarin verouderde API-antwoorden) wordt opgeruimd.
+const CACHE = 'tolaanfur-v2';
 const FILES = [
   '/',
   '/index.html',
@@ -9,6 +11,7 @@ const FILES = [
   '/prayer.html',
   '/media.html',
   '/community.html',
+  '/friends.html',
   '/calendar.html',
   '/notifications.html',
   '/icon.png',
@@ -40,25 +43,35 @@ self.addEventListener('activate', function(e) {
 
 // Fetch - network first, dan cache
 self.addEventListener('fetch', function(e) {
-  // Alleen HTML/JS/CSS cachen, geen Firebase calls
+  // FIX: alleen GET-verzoeken afhandelen (cache.put crasht op POST e.d.)
+  if(e.request.method !== 'GET') return;
+
+  // Geen Firebase calls cachen
   if(e.request.url.indexOf('firestore') >= 0 ||
      e.request.url.indexOf('firebase') >= 0 ||
      e.request.url.indexOf('googleapis') >= 0) {
     return;
   }
-  
+
+  // FIX: alleen bestanden van ons eigen domein in de cache bewaren.
+  // Externe API's (gebedstijden, locatie, azan-audio) worden dus nooit
+  // als "vers" uit de cache geserveerd wanneer je offline bent.
+  var sameOrigin = false;
+  try { sameOrigin = new URL(e.request.url).origin === self.location.origin; } catch(err) {}
+
   e.respondWith(
     fetch(e.request)
       .then(function(response) {
-        // Update cache met nieuwe versie
-        var clone = response.clone();
-        caches.open(CACHE).then(function(cache) {
-          cache.put(e.request, clone);
-        });
+        if(sameOrigin && response && response.ok) {
+          var clone = response.clone();
+          caches.open(CACHE).then(function(cache) {
+            cache.put(e.request, clone);
+          });
+        }
         return response;
       })
       .catch(function() {
-        // Offline: gebruik cache
+        // Offline: gebruik cache (alleen eigen bestanden staan erin)
         return caches.match(e.request);
       })
   );
