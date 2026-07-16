@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Videos — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4)}
+body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.nav{background:rgba(6,8,24,.98);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ttl{font-family:'Fredoka One',cursive;font-size:1rem}
+.sub{font-size:.62rem;color:var(--muted)}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 1rem 2rem}
+.btn{border:none;border-radius:.75rem;padding:.65rem 1rem;font-family:'Fredoka One',cursive;font-size:.85rem;cursor:pointer}
+.btn:active{opacity:.8}
+.btn:disabled{opacity:.5}
+.bp{background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff}
+
+/* Uploader */
+.uploader{background:var(--card);border:1px solid var(--border);border-radius:1.1rem;padding:.9rem;margin:.85rem 0}
+.pick{border:2px dashed var(--border);border-radius:.85rem;padding:1.1rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer}
+.pick:active{background:rgba(255,255,255,.04)}
+.pick-hint{font-size:.65rem;color:var(--muted);margin-top:.35rem}
+.preview-wrap{position:relative;border-radius:.85rem;overflow:hidden;margin-bottom:.6rem;background:#000}
+.preview-wrap video{width:100%;display:block;border-radius:.85rem;max-height:320px}
+.preview-x{position:absolute;top:.5rem;right:.5rem;width:2rem;height:2rem;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:1rem;cursor:pointer;z-index:2}
+.uploader input[type=text]{width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:.75rem;padding:.65rem .9rem;font-size:.9rem;color:var(--text);font-family:Inter,sans-serif;outline:none;margin:.6rem 0}
+.uploader input[type=text]:focus{border-color:#9B6FFF}
+.upload-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:.5rem;display:none}
+.upload-fill{height:100%;width:0%;background:linear-gradient(90deg,#6B3FFF,#9B6FFF);border-radius:2px;transition:width .2s}
+
+/* Video-kaart */
+.vid{background:var(--card);border:1px solid var(--border);border-radius:1.1rem;margin-bottom:.9rem;overflow:hidden}
+.v-top{display:flex;align-items:center;gap:.6rem;padding:.7rem .85rem}
+.v-av{width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,#6B3FFF,#2563EB);color:#fff}
+.v-naam{font-weight:700;font-size:.85rem}
+.v-tijd{font-size:.62rem;color:var(--muted)}
+.v-player{width:100%;display:block;background:#000;max-height:70vh}
+.v-bar{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem}
+.v-like{background:none;border:none;font-size:1rem;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:.35rem;font-family:Inter,sans-serif;font-weight:600;padding:.2rem .3rem}
+.v-like.aan{color:#F43F5E}
+.v-del{margin-left:auto;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:.6rem;color:#F43F5E;font-size:.7rem;padding:.3rem .6rem;cursor:pointer}
+.v-caption{padding:0 .85rem .8rem;font-size:.85rem;line-height:1.5;word-break:break-word}
+.v-caption b{font-weight:700}
+
+.v-cm-btn{background:none;border:none;font-size:.85rem;cursor:pointer;color:var(--text);font-family:Inter,sans-serif;font-weight:600;padding:.2rem .3rem}
+.v-share{background:none;border:none;font-size:.95rem;cursor:pointer;color:var(--text);padding:.2rem .3rem}
+.cm-panel{border-top:1px solid var(--border);padding:.6rem .85rem;display:none}
+.cm-panel.open{display:block}
+.cm-item{display:flex;gap:.5rem;margin-bottom:.55rem;align-items:flex-start}
+.cm-naam{font-weight:700;font-size:.78rem}
+.cm-tekst{font-size:.82rem;line-height:1.45;word-break:break-word}
+.cm-tijd{font-size:.6rem;color:var(--muted)}
+.cm-del{background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:0 .2rem;margin-left:auto}
+.cm-row{display:flex;gap:.5rem;margin-top:.4rem}
+.cm-row input{flex:1;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:2rem;padding:.5rem .85rem;font-size:.85rem;color:var(--text);font-family:Inter,sans-serif;outline:none}
+.cm-send{width:2.3rem;height:2.3rem;border-radius:50%;border:none;background:linear-gradient(135deg,#2563EB,#00BFFF);color:#fff;font-size:.95rem;cursor:pointer;flex-shrink:0}
+.leeg{text-align:center;padding:3rem 1rem;color:var(--muted)}
+#toast{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="back" onclick="terug()">←</div>
+  <div style="flex:1">
+    <div class="ttl">🎬 Videos</div>
+    <div class="sub">Short Islamic videos and lectures</div>
+  </div>
+</div>
+
+<div class="scroll">
+  <div id="uploaderWrap"></div>
+  <div id="feed"><div class="leeg">Loading...</div></div>
+</div>
+
+<input type="file" id="fileInput" accept="video/*" style="display:none"/>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+var storage = fbApp.storage();
+
+var me = null;
+var myP = null;
+var videos = [];
+var gekozenFile = null;    // het gekozen videobestand
+var gekozenURL = null;     // lokale preview-URL
+
+var MAX_CAPTION = 200;
+var MAX_VIDEO_MB = 25;     // kostenbewaker: max 25MB per video (± 1 minuut)
+
+// Beveiliging: alle gebruikersinvoer escapen voordat het in innerHTML gaat (XSS)
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function terug(){
+  try{
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'navigate',screen:'media'},'*');
+    }
+  }catch(e){}
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+function getTs(v){
+  if(v&&v.ts&&v.ts.seconds) return v.ts.seconds*1000;
+  if(v&&typeof v.ts==='number') return v.ts;
+  return 0;
+}
+
+function tijd(ms){
+  var diff=Date.now()-ms;
+  var min=Math.floor(diff/60000), uur=Math.floor(diff/3600000), dag=Math.floor(diff/86400000);
+  if(min<1) return 'Just now';
+  if(min<60) return min+'m ago';
+  if(uur<24) return uur+'h ago';
+  if(dag<7) return dag+'d ago';
+  return new Date(ms).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+// ══ VIDEO KIEZEN ══
+function kiesVideo(file){
+  if(!file)return;
+  if(!/^video\//.test(file.type)){showToast('⚠️ Choose a video file');return;}
+  if(file.size > MAX_VIDEO_MB*1024*1024){
+    showToast('⚠️ Max '+MAX_VIDEO_MB+'MB — record shorter or in lower quality');
+    return;
+  }
+  gekozenFile=file;
+  if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}}
+  gekozenURL=URL.createObjectURL(file);
+  renderUploader();
+}
+
+// ══ UPLOADER ══
+function renderUploader(){
+  var w=document.getElementById('uploaderWrap');
+  if(!me||me.isAnonymous){
+    w.innerHTML='<div class="uploader" style="text-align:center;color:var(--muted);font-size:.85rem">🔒 Log in to view and like videos</div>';
+    return;
+  }
+  if(!(myP&&myP.canUpload===true)){
+    // Alleen door de beheerder goedgekeurde makers mogen uploaden.
+    // De beveiligingsregels dwingen dit ook echt af — dit is alleen de nette weergave.
+    w.innerHTML='';
+    return;
+  }
+  if(!gekozenFile){
+    w.innerHTML='<div class="uploader"><div class="pick" id="pickBtn">🎬 Tap to choose a video<div class="pick-hint">Max '+MAX_VIDEO_MB+'MB (± 1 minute)</div></div></div>';
+    document.getElementById('pickBtn').addEventListener('click',function(){
+      document.getElementById('fileInput').click();
+    });
+    return;
+  }
+  w.innerHTML='<div class="uploader">'
+    +'<div class="preview-wrap"><video src="'+gekozenURL+'" controls playsinline></video><button class="preview-x" id="previewX">✕</button></div>'
+    +'<input type="text" id="captionInp" maxlength="'+MAX_CAPTION+'" placeholder="Write a caption... (optional)"/>'
+    +'<button class="btn bp" id="deelBtn" style="width:100%">📤 Share video</button>'
+    +'<div class="upload-bar" id="upBar"><div class="upload-fill" id="upFill"></div></div>'
+    +'</div>';
+  document.getElementById('previewX').addEventListener('click',function(){
+    gekozenFile=null;
+    if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}gekozenURL=null;}
+    renderUploader();
+  });
+  document.getElementById('deelBtn').addEventListener('click',plaatsVideo);
+}
+
+function plaatsVideo(){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  if(!gekozenFile){showToast('⚠️ Choose a video first');return;}
+  var caption=(document.getElementById('captionInp').value||'').trim().substring(0,MAX_CAPTION);
+  var btn=document.getElementById('deelBtn');
+  var bar=document.getElementById('upBar'), fill=document.getElementById('upFill');
+  btn.disabled=true;btn.textContent='Uploading... 0%';
+  bar.style.display='block';
+
+  // Bestandsextensie afleiden van het type (mp4/mov/webm)
+  var ext=(gekozenFile.type.split('/')[1]||'mp4').replace('quicktime','mov');
+  var pad='videos/'+me.uid+'/'+Date.now()+'.'+ext;
+  var task=storage.ref(pad).put(gekozenFile,{contentType:gekozenFile.type});
+
+  task.on('state_changed',function(snap){
+    var pct=Math.round(snap.bytesTransferred/snap.totalBytes*100);
+    btn.textContent='Uploading... '+pct+'%';
+    fill.style.width=pct+'%';
+  },function(err){
+    btn.disabled=false;btn.textContent='📤 Share video';bar.style.display='none';
+    showToast('❌ Upload failed');
+    console.log('Video error:',err&&err.code);
+  },function(){
+    task.snapshot.ref.getDownloadURL().then(function(url){
+      return db.collection('videos').add({
+        uid:me.uid,
+        displayName:(myP&&(myP.displayName||myP.username))||(me.email||'').split('@')[0]||'User',
+        avatarColor:(myP&&myP.avatarColor)||0,
+        type:'video',
+        caption:caption,
+        url:url,
+        path:pad,
+        size:gekozenFile.size,
+        likes:{},
+        ts:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }).then(function(){
+      gekozenFile=null;
+      if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}gekozenURL=null;}
+      renderUploader();
+      showToast('✅ Video shared!');
+    }).catch(function(err){
+      btn.disabled=false;btn.textContent='📤 Share video';bar.style.display='none';
+      showToast('❌ Saving failed');
+      console.log('Video meta error:',err&&err.code);
+    });
+  });
+}
+
+// ══ FEED ══
+function renderFeed(){
+  var f=document.getElementById('feed');
+  if(!videos.length){
+    f.innerHTML='<div class="leeg"><div style="font-size:2.5rem">🎬</div><div style="font-family:Fredoka One,cursive;font-size:1rem;color:var(--text);margin-top:.5rem">No videos yet</div><div style="font-size:.8rem;margin-top:.25rem">Be the first to share one!</div></div>';
+    return;
+  }
+  var html='';
+  videos.forEach(function(v){
+    var ini=(v.displayName||'U').substring(0,2).toUpperCase();
+    var eigen=me&&v.uid===me.uid;
+    var mijnAdmin=myP&&myP.isAdmin===true;
+    var likes=v.likes||{};
+    var aantal=Object.keys(likes).length;
+    var ikLike=me&&!!likes[me.uid];
+    html+='<div class="vid">';
+    html+='<div class="v-top"><div class="v-av">'+esc(ini)+'</div>';
+    html+='<div style="flex:1"><div class="v-naam">'+esc(v.displayName||'User')+'</div>';
+    html+='<div class="v-tijd">'+tijd(getTs(v))+'</div></div></div>';
+    html+='<video class="v-player" src="'+esc(v.url||'')+'" controls playsinline preload="metadata"></video>';
+    html+='<div class="v-bar">';
+    html+='<button class="v-like'+(ikLike?' aan':'')+'" data-like="'+esc(v.id)+'">'+(ikLike?'❤️':'🤍')+' '+aantal+'</button>';
+    html+='<button class="v-cm-btn" data-cm="'+esc(v.id)+'">💬 Comments</button>';
+    html+='<button class="v-share" data-share="'+esc(v.caption||'')+'">↗️</button>';
+    if(eigen||mijnAdmin) html+='<button class="v-del" data-del="'+esc(v.id)+'">🗑 Delete</button>';
+    html+='</div>';
+    if(v.caption) html+='<div class="v-caption"><b>'+esc(v.displayName||'User')+'</b> '+esc(v.caption)+'</div>';
+    html+='<div class="cm-panel'+(openPanels[v.id]?' open':'')+'" id="cm-'+esc(v.id)+'">'
+      +'<div id="cmlist-'+esc(v.id)+'"></div>'
+      +(me&&!me.isAnonymous?'<div class="cm-row"><input id="cminp-'+esc(v.id)+'" maxlength="300" placeholder="Write a comment..."/><button class="cm-send" data-cmsend="'+esc(v.id)+'">➤</button></div>':'')
+      +'</div>';
+    html+='</div>';
+  });
+  f.innerHTML=html;
+  f.querySelectorAll('[data-like]').forEach(function(b){
+    b.addEventListener('click',function(){toggleLike(b.getAttribute('data-like'));});
+  });
+  f.querySelectorAll('[data-cm]').forEach(function(b){
+    b.addEventListener('click',function(){toggleComments(b.getAttribute('data-cm'));});
+  });
+  f.querySelectorAll('[data-share]').forEach(function(b){
+    b.addEventListener('click',function(){deelMedia(b.getAttribute('data-share'));});
+  });
+  f.querySelectorAll('[data-cmsend]').forEach(function(b){
+    b.addEventListener('click',function(){plaatsComment(b.getAttribute('data-cmsend'));});
+  });
+  Object.keys(openPanels).forEach(function(id){if(openPanels[id])renderComments(id);});
+  f.querySelectorAll('[data-del]').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(confirm('Delete this video?')) verwijderVideo(b.getAttribute('data-del'));
+    });
+  });
+}
+
+function toggleLike(id){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  var vid=null;
+  videos.forEach(function(v){if(v.id===id)vid=v;});
+  if(!vid)return;
+  var upd={}, ikLikeNu=false;
+  if(vid.likes&&vid.likes[me.uid]){
+    upd['likes.'+me.uid]=firebase.firestore.FieldValue.delete();
+  } else {
+    upd['likes.'+me.uid]=true;
+    ikLikeNu=true;
+  }
+  db.collection('videos').doc(id).update(upd).then(function(){
+    if(ikLikeNu) stuurMelding(vid.uid,'like',mijnNaam()+' liked your video');
+  }).catch(function(err){
+    showToast('❌ Like failed');
+    console.log('Like error:',err&&err.code);
+  });
+}
+
+function verwijderVideo(id){
+  var vid=null;
+  videos.forEach(function(v){if(v.id===id)vid=v;});
+  db.collection('videos').doc(id).delete()
+    .then(function(){
+      if(vid&&vid.path){storage.ref(vid.path).delete().catch(function(){});}
+      showToast('🗑 Deleted');
+    })
+    .catch(function(){showToast('❌ Delete failed');});
+}
+
+
+// ══ MELDINGEN ══
+function mijnNaam(){return (myP&&(myP.displayName||myP.username))||'Someone';}
+function stuurMelding(toUid,type,message){
+  if(!me||toUid===me.uid)return;
+  db.collection('notifications').add({
+    to:toUid, fromUid:me.uid, fromName:mijnNaam(),
+    type:type, message:message, read:false,
+    ts:Date.now(),
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+// ══ REACTIES ══
+var openPanels={};      // {mediaId:true} — welke reactiepanelen open staan
+var commentCache={};    // {mediaId:[reacties]}
+var MAX_COMMENT=300;
+
+function toggleComments(id){
+  openPanels[id]=!openPanels[id];
+  var p=document.getElementById('cm-'+id);
+  if(!p)return;
+  p.classList.toggle('open',!!openPanels[id]);
+  if(openPanels[id]) laadComments(id);
+}
+
+function laadComments(id){
+  db.collection('videos').doc(id).collection('comments')
+    .orderBy('ts','asc').limit(50).get()
+    .then(function(snap){
+      commentCache[id]=snap.docs.map(function(d){return Object.assign({cid:d.id},d.data());});
+      renderComments(id);
+    }).catch(function(err){console.log('Comments error:',err&&err.code);});
+}
+
+function renderComments(id){
+  var box=document.getElementById('cmlist-'+id);
+  if(!box)return;
+  var lijst=commentCache[id]||[];
+  var mijnAdmin=myP&&myP.isAdmin===true;
+  var html='';
+  if(!lijst.length) html='<div style="font-size:.75rem;color:var(--muted);padding:.2rem 0">No comments yet — be the first!</div>';
+  lijst.forEach(function(c){
+    var mag=me&&(c.uid===me.uid||mijnAdmin);
+    html+='<div class="cm-item"><div style="flex:1">'
+      +'<span class="cm-naam">'+esc(c.displayName||'User')+'</span> '
+      +'<span class="cm-tekst">'+esc(c.text||'')+'</span>'
+      +'<div class="cm-tijd">'+tijd(getTs(c))+'</div></div>'
+      +(mag?'<button class="cm-del" data-cmdel="'+esc(id)+'|'+esc(c.cid)+'">✕</button>':'')
+      +'</div>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('[data-cmdel]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var d=b.getAttribute('data-cmdel').split('|');
+      verwijderComment(d[0],d[1]);
+    });
+  });
+}
+
+function plaatsComment(id){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  var inp=document.getElementById('cminp-'+id);
+  var tekst=(inp.value||'').trim().substring(0,MAX_COMMENT);
+  if(!tekst)return;
+  inp.value='';
+  db.collection('videos').doc(id).collection('comments').add({
+    uid:me.uid,
+    displayName:(myP&&(myP.displayName||myP.username))||'User',
+    text:tekst,
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    laadComments(id);
+    var eig=null;
+    videos.forEach(function(v){if(v.id===id)eig=v;});
+    if(eig) stuurMelding(eig.uid,'comment',mijnNaam()+' commented on your video');
+  }).catch(function(){showToast('❌ Comment failed');});
+}
+
+function verwijderComment(id,cid){
+  db.collection('videos').doc(id).collection('comments').doc(cid).delete()
+    .then(function(){laadComments(id);})
+    .catch(function(){showToast('❌ Delete failed');});
+}
+
+// ══ DELEN ══
+function deelMedia(caption){
+  var data={title:'Tolaanfur',text:(caption?caption+' — ':'')+'Shared via Tolaanfur',url:'https://tolaanfur-sigma.vercel.app/'};
+  if(navigator.share){navigator.share(data).catch(function(){});}
+  else if(navigator.clipboard){
+    navigator.clipboard.writeText(data.text+' '+data.url).then(function(){showToast('🔗 Link copied!');});
+  }
+}
+
+// ══ DATA ══
+var feedUnsub=null;
+function luisterFeed(){
+  if(feedUnsub){try{feedUnsub();}catch(e){}feedUnsub=null;}
+  feedUnsub=db.collection('videos')
+    .orderBy('ts','desc')
+    .limit(20)
+    .onSnapshot(function(snap){
+      videos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderFeed();
+    },function(err){
+      document.getElementById('feed').innerHTML='<div class="leeg">❌ Could not load videos</div>';
+      console.log('Feed error:',err&&err.code);
+    });
+}
+
+document.getElementById('fileInput').addEventListener('change',function(e){
+  kiesVideo(e.target.files&&e.target.files[0]);
+  e.target.value='';
+});
+
+auth.onAuthStateChanged(function(user){
+  me=user;
+  if(user&&!user.isAnonymous){
+    db.collection('users').doc(user.uid).get().then(function(doc){
+      if(doc.exists)myP=doc.data();
+      renderUploader();
+      renderFeed();
+    }).catch(function(){renderUploader();});
+  } else {
+    renderUploader();
+  }
+  luisterFeed();
+});
+</script>
+</body>
+</html>
