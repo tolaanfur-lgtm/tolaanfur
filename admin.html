@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Admin — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4);--gr:#10B981;--rd:#F43F5E}
+body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.nav{background:rgba(6,8,24,.98);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ttl{font-family:'Fredoka One',cursive;font-size:1rem}
+.sub{font-size:.62rem;color:var(--muted)}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 1rem 2rem}
+
+.stats{display:flex;gap:.6rem;margin:.85rem 0}
+.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:1rem;padding:.75rem;text-align:center}
+.stat-n{font-family:'Fredoka One',cursive;font-size:1.3rem;color:#00BFFF}
+.stat-l{font-size:.6rem;color:var(--muted);margin-top:.15rem;text-transform:uppercase;letter-spacing:.04em}
+
+.zoek{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:.85rem;padding:.7rem 1rem;color:var(--text);font-size:.9rem;outline:none;font-family:Inter,sans-serif;margin-bottom:.75rem}
+.zoek:focus{border-color:#00BFFF}
+
+.u-card{background:var(--card);border:1px solid var(--border);border-radius:1rem;padding:.75rem .85rem;display:flex;align-items:center;gap:.65rem;margin-bottom:.55rem}
+.u-av{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,#2563EB,#6B3FFF);color:#fff}
+.u-naam{font-weight:700;font-size:.88rem}
+.u-info{font-size:.62rem;color:var(--muted);margin-top:.1rem}
+.u-badge{display:inline-block;border-radius:2rem;padding:.08rem .45rem;font-size:.58rem;font-weight:700;margin-left:.3rem}
+.b-admin{background:rgba(245,158,11,.15);color:#FBBF24;border:1px solid rgba(245,158,11,.3)}
+.b-maker{background:rgba(16,185,129,.15);color:var(--gr);border:1px solid rgba(16,185,129,.3)}
+.u-btn{border:none;border-radius:.65rem;font-size:.7rem;font-weight:700;padding:.45rem .7rem;cursor:pointer;flex-shrink:0;font-family:Inter,sans-serif}
+.u-btn.geef{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:var(--gr)}
+.u-btn.trek{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--rd)}
+.u-btn:disabled{opacity:.5}
+
+.leeg{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.slot{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;text-align:center;color:var(--muted)}
+#toast{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="back" onclick="terug()">←</div>
+  <div style="flex:1">
+    <div class="ttl">🛡️ Admin</div>
+    <div class="sub">Manage upload rights</div>
+  </div>
+</div>
+
+<div class="scroll" id="main">
+  <div class="leeg">Loading...</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+
+var me = null;
+var myP = null;
+var gebruikers = [];
+var filterTekst = '';
+
+// Beveiliging: alle gebruikersinvoer escapen voordat het in innerHTML gaat (XSS)
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function terug(){
+  try{
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'navigate',screen:'profile'},'*');
+    }
+  }catch(e){}
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+function datum(v){
+  if(v&&v.seconds) return new Date(v.seconds*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  return '—';
+}
+
+// ══ GEBRUIKERS LADEN ══
+function laadGebruikers(){
+  db.collection('users').limit(500).get().then(function(snap){
+    gebruikers = snap.docs.map(function(d){return Object.assign({uid:d.id},d.data());});
+    gebruikers.sort(function(a,b){
+      return String(a.displayName||'').toLowerCase().localeCompare(String(b.displayName||'').toLowerCase());
+    });
+    render();
+  }).catch(function(err){
+    document.getElementById('main').innerHTML='<div class="leeg">❌ Could not load users</div>';
+    console.log('Admin error:',err&&err.code);
+  });
+}
+
+// ══ WEERGAVE ══
+function render(){
+  var m=document.getElementById('main');
+  var makers=gebruikers.filter(function(u){return u.canUpload===true;}).length;
+  var ft=filterTekst.toLowerCase();
+  var lijst=gebruikers.filter(function(u){
+    if(!ft) return true;
+    return String(u.displayName||'').toLowerCase().indexOf(ft)>=0
+        || String(u.username||'').toLowerCase().indexOf(ft)>=0;
+  });
+
+  var html='<div class="stats">'
+    +'<div class="stat"><div class="stat-n">'+gebruikers.length+'</div><div class="stat-l">Users</div></div>'
+    +'<div class="stat"><div class="stat-n">'+makers+'</div><div class="stat-l">Creators</div></div>'
+    +'</div>'
+    +'<input class="zoek" id="zoekInp" placeholder="🔍 Search users..." value="'+esc(filterTekst)+'"/>';
+
+  if(!lijst.length){
+    html+='<div class="leeg">No users found</div>';
+  } else {
+    lijst.forEach(function(u){
+      var ini=(u.displayName||'U').substring(0,2).toUpperCase();
+      var isMaker=u.canUpload===true;
+      var isAdm=u.isAdmin===true;
+      var ikzelf=me&&u.uid===me.uid;
+      html+='<div class="u-card">'
+        +'<div class="u-av">'+esc(ini)+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div class="u-naam">'+esc(u.displayName||'User')+(ikzelf?' <span style="font-size:.65rem;color:var(--muted)">(you)</span>':'')
+        +(isAdm?'<span class="u-badge b-admin">👑 Admin</span>':'')
+        +(isMaker?'<span class="u-badge b-maker">📤 Creator</span>':'')
+        +'</div>'
+        +'<div class="u-info">Joined '+datum(u.joinedAt)+'</div>'
+        +'</div>'
+        +'<button class="u-btn '+(isMaker?'trek':'geef')+'" data-uid="'+esc(u.uid)+'" data-nu="'+(isMaker?'1':'0')+'">'
+        +(isMaker?'Revoke':'Give rights')+'</button>'
+        +'</div>';
+    });
+  }
+  m.innerHTML=html;
+
+  var z=document.getElementById('zoekInp');
+  z.addEventListener('input',function(){
+    filterTekst=z.value;
+    // Alleen de lijst opnieuw tekenen zonder focus te verliezen zou complexer zijn;
+    // simpel houden: opnieuw renderen en focus terugzetten
+    var pos=z.selectionStart;
+    render();
+    var z2=document.getElementById('zoekInp');
+    z2.focus();
+    try{z2.setSelectionRange(pos,pos);}catch(e){}
+  });
+
+  m.querySelectorAll('[data-uid]').forEach(function(b){
+    b.addEventListener('click',function(){
+      toggleRechten(b.getAttribute('data-uid'), b.getAttribute('data-nu')==='1', b);
+    });
+  });
+}
+
+// ══ RECHTEN GEVEN / INTREKKEN ══
+function toggleRechten(uid, heeftNu, btn){
+  if(!(myP&&myP.isAdmin===true)){showToast('🔒 Admin only');return;}
+  btn.disabled=true;
+  db.collection('users').doc(uid).update({canUpload: !heeftNu})
+    .then(function(){
+      gebruikers.forEach(function(u){if(u.uid===uid)u.canUpload=!heeftNu;});
+      render();
+      showToast(!heeftNu?'✅ Upload rights given':'✅ Rights revoked');
+    })
+    .catch(function(err){
+      btn.disabled=false;
+      showToast('❌ Failed');
+      console.log('Toggle error:',err&&err.code);
+    });
+}
+
+auth.onAuthStateChanged(function(user){
+  me=user;
+  if(!user||user.isAnonymous){
+    document.getElementById('main').innerHTML='<div class="slot"><div style="font-size:2.5rem">🔒</div><div style="margin-top:.5rem">Log in first</div></div>';
+    return;
+  }
+  db.collection('users').doc(user.uid).get().then(function(doc){
+    if(doc.exists)myP=doc.data();
+    if(!(myP&&myP.isAdmin===true)){
+      document.getElementById('main').innerHTML='<div class="slot"><div style="font-size:2.5rem">🔒</div><div style="font-family:Fredoka One,cursive;color:var(--text);margin-top:.5rem">Admin only</div><div style="font-size:.8rem;margin-top:.25rem">This area is for the Tolaanfur team</div></div>';
+      return;
+    }
+    laadGebruikers();
+  }).catch(function(){
+    document.getElementById('main').innerHTML='<div class="leeg">❌ Could not verify permissions</div>';
+  });
+});
+</script>
+</body>
+</html>
