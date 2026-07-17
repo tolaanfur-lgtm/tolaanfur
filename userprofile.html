@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Profile — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--text:#EEF2FF;--muted:rgba(238,242,255,.45);--border:rgba(100,140,255,.18);--card:rgba(20,30,100,.4);--b3:#00BFFF}
+body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.nav{background:rgba(6,8,24,.98);border-bottom:1px solid var(--border);padding:max(env(safe-area-inset-top),.75rem) 1rem .65rem;display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.back{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.ttl{font-family:'Fredoka One',cursive;font-size:1rem}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 1rem 2rem}
+
+.hoofd{background:var(--card);border:1px solid var(--border);border-radius:1.2rem;padding:1.4rem;text-align:center;margin:.85rem 0}
+.h-av{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#2563EB,#6B3FFF);color:#fff;margin:0 auto .6rem;border:3px solid rgba(0,191,255,.3)}
+.h-naam{font-family:'Fredoka One',cursive;font-size:1.25rem}
+.h-user{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+.h-bio{font-size:.82rem;color:var(--text);margin-top:.5rem;line-height:1.5}
+.tellers{display:flex;gap:1.5rem;justify-content:center;margin-top:.85rem}
+.teller{text-align:center}
+.teller-n{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--b3)}
+.teller-l{font-size:.6rem;color:var(--muted);margin-top:.1rem;text-transform:uppercase}
+.volg{margin-top:.9rem;border-radius:.75rem;font-family:'Fredoka One',cursive;font-size:.9rem;padding:.65rem 2rem;cursor:pointer;border:1px solid rgba(0,191,255,.4);background:rgba(0,191,255,.12);color:var(--b3)}
+.volg.aan{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.12);color:#10B981}
+
+.kop{font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--b3);margin:1rem 0 .5rem;text-transform:uppercase;letter-spacing:.05em}
+.post-card{border-radius:1rem;padding:.85rem;margin-bottom:.55rem;border:1px solid rgba(255,255,255,.12)}
+.post-tekst{font-size:.85rem;line-height:1.55;color:#fff;word-break:break-word;white-space:pre-wrap}
+.lees-meer{background:none;border:none;color:rgba(255,255,255,.75);font-size:.75rem;font-weight:700;cursor:pointer;padding:.35rem 0 0;text-decoration:underline}
+.foto-rij{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem}
+.foto-cel{border-radius:.6rem;overflow:hidden;aspect-ratio:1;background:#0D1240}
+.foto-cel img{width:100%;height:100%;object-fit:cover;display:block}
+.vid-card{background:var(--card);border:1px solid var(--border);border-radius:1rem;overflow:hidden;margin-bottom:.6rem}
+.vid-card video{width:100%;display:block;background:#000;max-height:240px}
+
+.leeg{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.82rem}
+#toast{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:#fff;padding:.45rem 1.1rem;border-radius:2rem;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="back" onclick="terug()">←</div>
+  <div class="ttl" id="navTitel">Profile</div>
+</div>
+
+<div class="scroll" id="main">
+  <div class="leeg">Loading...</div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+
+var me = null;
+var myP = null;
+var wieUid = null;      // wiens profiel we bekijken (?uid=)
+var wieP = null;
+var volgIk = false;
+
+var KLEUREN=['#1E3A8A','#4C1D95','#065F46','#7C2D12','#831843','#0E7490'];
+
+// Beveiliging: alle gebruikersinvoer escapen voordat het in innerHTML gaat (XSS)
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function terug(){
+  try{
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'navigate',screen:'__back'},'*');
+    }
+  }catch(e){}
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+function getTs(v){
+  if(v&&v.ts&&v.ts.seconds) return v.ts.seconds*1000;
+  if(v&&typeof v.ts==='number') return v.ts;
+  return 0;
+}
+
+// ══ MELDINGEN ══
+function mijnNaam(){return (myP&&(myP.displayName||myP.username))||'Someone';}
+function stuurMelding(toUid,type,message){
+  if(!me||toUid===me.uid)return;
+  db.collection('notifications').add({
+    to:toUid, fromUid:me.uid, fromName:mijnNaam(),
+    type:type, message:message, read:false,
+    ts:Date.now(),
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+// ══ TELLERS (aggregate met terugval) ══
+function telDocs(query, cb){
+  try{
+    query.count().get().then(function(s){cb(s.data().count);})
+      .catch(function(){query.get().then(function(s){cb(s.size);}).catch(function(){cb(0);});});
+  }catch(e){
+    query.get().then(function(s){cb(s.size);}).catch(function(){cb(0);});
+  }
+}
+
+// ══ PROFIEL LADEN ══
+function laad(){
+  wieUid = new URLSearchParams(location.search).get('uid') || '';
+  if(!wieUid){document.getElementById('main').innerHTML='<div class="leeg">❌ No profile selected</div>';return;}
+
+  db.collection('users').doc(wieUid).get().then(function(doc){
+    if(!doc.exists){document.getElementById('main').innerHTML='<div class="leeg">❌ Profile not found</div>';return;}
+    wieP = doc.data();
+    renderHoofd();
+    laadTellers();
+    laadContent();
+  }).catch(function(){
+    document.getElementById('main').innerHTML='<div class="leeg">❌ Could not load profile</div>';
+  });
+
+  if(me&&!me.isAnonymous){
+    db.collection('follows').doc(me.uid+'_'+wieUid).get()
+      .then(function(d){volgIk=d.exists;renderHoofd();})
+      .catch(function(){});
+  }
+}
+
+function renderHoofd(){
+  if(!wieP)return;
+  var m=document.getElementById('main');
+  var ini=(wieP.displayName||'U').substring(0,2).toUpperCase();
+  var ikzelf=me&&me.uid===wieUid;
+  document.getElementById('navTitel').textContent=wieP.displayName||'Profile';
+
+  var html='<div class="hoofd">'
+    +'<div class="h-av">'+esc(ini)+'</div>'
+    +'<div class="h-naam">'+esc(wieP.displayName||'User')+(ikzelf?' <span style="font-size:.7rem;color:var(--muted)">(you)</span>':'')+'</div>'
+    +(wieP.username?'<div class="h-user">@'+esc(wieP.username)+'</div>':'')
+    +(wieP.bio?'<div class="h-bio">'+esc(wieP.bio)+'</div>':'')
+    +'<div class="tellers">'
+    +'<div class="teller"><div class="teller-n" id="tFol">–</div><div class="teller-l">Followers</div></div>'
+    +'<div class="teller"><div class="teller-n" id="tIng">–</div><div class="teller-l">Following</div></div>'
+    +'</div>'
+    +(!ikzelf&&me&&!me.isAnonymous?'<button class="volg'+(volgIk?' aan':'')+'" id="volgBtn">'+(volgIk?'✓ Following':'+ Follow')+'</button>':'')
+    +'</div>'
+    +'<div id="inhoud"><div class="leeg">Loading content...</div></div>';
+  m.innerHTML=html;
+
+  var vb=document.getElementById('volgBtn');
+  if(vb) vb.addEventListener('click',toggleFollow);
+  // Tellers en inhoud opnieuw invullen na re-render
+  laadTellers();
+  vulInhoud();
+}
+
+function laadTellers(){
+  telDocs(db.collection('follows').where('to','==',wieUid),function(n){
+    var el=document.getElementById('tFol');if(el)el.textContent=n;
+  });
+  telDocs(db.collection('follows').where('from','==',wieUid),function(n){
+    var el=document.getElementById('tIng');if(el)el.textContent=n;
+  });
+}
+
+function toggleFollow(){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  var ref=db.collection('follows').doc(me.uid+'_'+wieUid);
+  if(volgIk){
+    ref.delete().then(function(){volgIk=false;renderHoofd();showToast('Unfollowed');})
+      .catch(function(){showToast('❌ Failed');});
+  } else {
+    ref.set({from:me.uid,to:wieUid,ts:firebase.firestore.FieldValue.serverTimestamp()})
+      .then(function(){
+        volgIk=true;renderHoofd();showToast('✓ Following');
+        stuurMelding(wieUid,'follow',mijnNaam()+' started following you');
+      }).catch(function(){showToast('❌ Failed');});
+  }
+}
+
+// ══ HUN CONTENT ══
+// Zonder orderBy in de query (dan is er geen extra database-index nodig);
+// sorteren gebeurt lokaal.
+var cache=null;
+var uitgeklapt={};   // {postId:true} — opengeklapte lange posts
+function laadContent(){
+  Promise.all([
+    db.collection('verhalen').where('uid','==',wieUid).limit(50).get(),
+    db.collection('photos').where('uid','==',wieUid).limit(30).get(),
+    db.collection('videos').where('uid','==',wieUid).limit(10).get()
+  ]).then(function(res){
+    function pak(snap){
+      var r=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      r.sort(function(a,b){return getTs(b)-getTs(a);});
+      return r;
+    }
+    cache={posts:pak(res[0]),fotos:pak(res[1]),videos:pak(res[2])};
+    vulInhoud();
+  }).catch(function(){
+    var el=document.getElementById('inhoud');
+    if(el)el.innerHTML='<div class="leeg">❌ Could not load content</div>';
+  });
+}
+
+function vulInhoud(){
+  var el=document.getElementById('inhoud');
+  if(!el||!cache)return;
+  var html='';
+  if(cache.posts.length){
+    html+='<div class="kop">📝 Posts ('+cache.posts.length+')</div>';
+    cache.posts.slice(0,10).forEach(function(p){
+      var bg=KLEUREN[p.bg||0]||KLEUREN[0];
+      var tekst=String(p.text||'');
+      var lang=tekst.length>320;
+      var toon=(lang&&!uitgeklapt[p.id])?tekst.substring(0,300)+'…':tekst;
+      html+='<div class="post-card" style="background:linear-gradient(160deg,'+bg+',rgba(6,8,24,.55)),'+bg+'">'
+        +'<div class="post-tekst">'+esc(toon)+'</div>'
+        +(lang?'<button class="lees-meer" data-meer="'+esc(p.id)+'">'+(uitgeklapt[p.id]?'Show less ▴':'Read more ▾')+'</button>':'')
+        +'</div>';
+    });
+  }
+  if(cache.fotos.length){
+    html+='<div class="kop">📸 Photos ('+cache.fotos.length+')</div><div class="foto-rij">';
+    cache.fotos.forEach(function(p){
+      html+='<div class="foto-cel"><img src="'+esc(p.img||'')+'" alt="" loading="lazy"/></div>';
+    });
+    html+='</div>';
+  }
+  if(cache.videos.length){
+    html+='<div class="kop">🎬 Videos ('+cache.videos.length+')</div>';
+    cache.videos.forEach(function(p){
+      html+='<div class="vid-card"><video src="'+esc(p.url||'')+'" controls playsinline preload="metadata"></video></div>';
+    });
+  }
+  if(!html) html='<div class="leeg">No content shared yet</div>';
+  el.innerHTML=html;
+  el.querySelectorAll('[data-meer]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var id=b.getAttribute('data-meer');
+      uitgeklapt[id]=!uitgeklapt[id];
+      vulInhoud();
+    });
+  });
+}
+
+auth.onAuthStateChanged(function(user){
+  me=user;
+  if(user&&!user.isAnonymous){
+    db.collection('users').doc(user.uid).get().then(function(doc){
+      if(doc.exists)myP=doc.data();
+      laad();
+    }).catch(function(){laad();});
+  } else {
+    laad();
+  }
+});
+</script>
+</body>
+</html>
