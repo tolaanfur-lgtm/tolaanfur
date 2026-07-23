@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-touch-fullscreen" content="yes"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#060818"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Tolaanfur"/>
+<link rel="apple-touch-icon" href="icon.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png"/>
+<link rel="manifest" href="manifest.json"/>
+<title>Tolaanfur</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060818;--bg2:#0D1240;--bg3:#111850;
+  --blue:#1E90FF;--b2:#2563EB;--b3:#00BFFF;
+  --pu:#6B3FFF;--pu2:#9B6FFF;
+  --gold:#F59E0B;--gr:#10B981;--rd:#F43F5E;
+  --sl:#4A5568;--sl2:#718096;--wh:#EEF2FF;
+  --card:rgba(20,30,100,.4);--bdr:rgba(100,140,255,.18);
+}
+html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none}
+#app{height:100vh;position:relative;overflow:hidden}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 15%,rgba(37,99,235,.22) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
+
+/* SCREEN */
+.screen{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;align-items:center;
+  padding:max(env(safe-area-inset-top),1.2rem) 1rem calc(5.5rem + env(safe-area-inset-bottom))}
+.screen.no-tab{padding-bottom:2rem}
+
+/* AUTH SCREEN */
+.auth-screen{position:absolute;inset:0;z-index:2;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem 1.5rem;background:var(--bg)}
+
+/* TABS */
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(6,8,24,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bdr);display:flex;padding:.5rem .3rem calc(.5rem + env(safe-area-inset-bottom));touch-action:manipulation}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.18rem;background:none;
+  border:none;color:var(--sl2);cursor:pointer;padding:.5rem .1rem;border-radius:.5rem;min-width:0;transition:color .2s}
+.tab.on{color:var(--b3)}
+.ti{font-size:1.25rem;line-height:1}
+.tl{font-size:.56rem;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+
+/* BUTTONS */
+.btn{border:none;border-radius:.85rem;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s,opacity .2s;display:block;text-align:center}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.bp{background:linear-gradient(135deg,var(--b2),var(--b3));color:#fff;padding:.9rem 1.5rem;font-size:.95rem;width:100%;box-shadow:0 4px 20px rgba(37,99,235,.35)}
+.bpu{background:linear-gradient(135deg,#4B0FDF,var(--pu));color:#fff;padding:.9rem 1.5rem;font-size:.95rem;width:100%}
+.bs{background:var(--card);border:1px solid var(--bdr);color:var(--wh);padding:.75rem 1.2rem;font-size:.88rem;width:100%}
+.bg2{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--gr);padding:.65rem 1rem;font-size:.85rem;font-weight:600}
+.br{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:var(--rd);padding:.65rem 1rem;font-size:.85rem;font-weight:600}
+.bsm{padding:.45rem .85rem;font-size:.78rem}
+.btn-link{background:none;border:none;color:var(--b3);font-size:.88rem;cursor:pointer;padding:.5rem;font-family:'Inter',sans-serif;font-weight:600}
+
+/* INPUTS */
+.inp{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--bdr);border-radius:.85rem;
+  padding:.85rem 1rem;color:var(--wh);font-size:.95rem;outline:none;font-family:'Inter',sans-serif;
+  -webkit-appearance:none;transition:border-color .2s}
+.inp:focus{border-color:var(--b3);background:rgba(255,255,255,.09)}
+.inp::placeholder{color:var(--sl)}
+.inp.err{border-color:var(--rd)}
+.lbl{display:block;font-size:.75rem;color:var(--sl2);font-weight:600;margin-bottom:.35rem;letter-spacing:.04em;text-transform:uppercase}
+.fld{margin-bottom:.85rem}
+.err-msg{color:var(--rd);font-size:.78rem;margin-top:.3rem;padding-left:.25rem}
+
+/* CARDS / SECTIONS */
+.sec{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:1.1rem;
+  width:100%;max-width:560px;margin-bottom:.85rem;backdrop-filter:blur(12px)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
+.st{font-family:'Fredoka One',cursive;color:var(--b3);font-size:1rem}
+
+/* NAV */
+.nav{width:100%;max-width:560px;display:flex;align-items:center;gap:.75rem;padding:.25rem 0 1rem;flex-shrink:0}
+.bk{background:var(--card);border:1px solid var(--bdr);border-radius:.65rem;color:var(--wh);
+  padding:.5rem .8rem;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:.3rem;white-space:nowrap}
+.nt{font-family:'Fredoka One',cursive;font-size:1.15rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  background:linear-gradient(90deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* LOGO */
+.lw{display:flex;flex-direction:column;align-items:center;padding:.8rem 0 .6rem}
+.tfl{width:72px;height:72px;border-radius:16px;overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,191,255,.4),0 0 40px rgba(107,63,255,.25);animation:bob 3s ease-in-out infinite}
+.tfl img{width:100%;height:100%;object-fit:cover}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.l-ar{font-family:'Tajawal',sans-serif;font-size:.85rem;direction:rtl;text-align:center;opacity:.85;margin-bottom:.2rem;margin-top:.5rem}
+.l-nm{font-family:'Fredoka One',cursive;font-size:1.9rem;letter-spacing:.06em;text-align:center;
+  background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.l-sb{color:var(--sl2);font-size:.74rem;margin-top:.2rem}
+
+/* AVATAR */
+.avatar{border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--b2),var(--pu))}
+.avatar-ring{border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--b3),var(--pu2))}
+
+/* PROFILE */
+.prof-header{display:flex;flex-direction:column;align-items:center;padding:1.5rem;
+  background:var(--card);border:1px solid var(--bdr);border-radius:1.2rem;width:100%;max-width:560px;margin-bottom:.85rem}
+.prof-avatar{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;background:linear-gradient(135deg,var(--b2),var(--pu));margin-bottom:.75rem;
+  border:3px solid rgba(0,191,255,.3);box-shadow:0 0 20px rgba(0,191,255,.2)}
+.prof-name{font-family:'Fredoka One',cursive;font-size:1.4rem;margin-bottom:.2rem}
+.prof-email{font-size:.8rem;color:var(--sl2);margin-bottom:.5rem}
+.prof-stats{display:flex;gap:1.5rem;margin-top:.75rem}
+.prof-stat{text-align:center}
+.prof-stat-val{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--b3)}
+.prof-stat-lbl{font-size:.65rem;color:var(--sl2);margin-top:.1rem}
+
+/* Kaartstijl naar het ontwerp */
+.mc2{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:.85rem .9rem;cursor:pointer;display:flex;flex-direction:column;gap:.4rem;transition:transform .12s;backdrop-filter:blur(12px)}
+.mc2:active{transform:scale(.96)}
+.mc2-ico{width:2.6rem;height:2.6rem;border-radius:.8rem;display:grid;place-items:center;color:#fff}
+.mc2-ico svg{width:1.45rem;height:1.45rem;display:block}
+.io svg,.story-av svg,.sv-av svg,#avatarPreview svg,.prof-avatar svg,.v-av svg{width:64%;height:64%;display:block;color:#fff}
+#avatarPreview svg{width:58%;height:58%}
+.io{display:grid;place-items:center}
+.story-av,.sv-av,.prof-avatar,#avatarPreview{display:grid!important;place-items:center}
+.ti svg{width:1.35rem;height:1.35rem;display:block}
+.zoek-knop svg{width:1.15rem;height:1.15rem;display:block;color:var(--wh)}
+
+/* ── Zachte beweging ── */
+@keyframes opkomst{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes zachtIn{from{opacity:0}to{opacity:1}}
+@keyframes pols{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.screen{animation:zachtIn .22s ease-out}
+.mgh .mc2{animation:opkomst .34s ease-out both}
+.mgh .mc2:nth-child(1){animation-delay:.02s}
+.mgh .mc2:nth-child(2){animation-delay:.06s}
+.mgh .mc2:nth-child(3){animation-delay:.10s}
+.mgh .mc2:nth-child(4){animation-delay:.14s}
+.mgh .mc2:nth-child(5){animation-delay:.18s}
+.mgh .mc2:nth-child(6){animation-delay:.22s}
+.mc2{transition:transform .14s ease,border-color .2s}
+.mc2:active{transform:scale(.965)}
+.story-bubble{transition:transform .14s ease}
+.story-bubble:active{transform:scale(.93)}
+.tab.on .ti{animation:pols .32s ease-out}
+#chatBadge{animation:pols 1.8s ease-in-out infinite}
+.mc2-strip img{transition:opacity .4s ease;animation:zachtIn .5s ease-out}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mc2-t{font-family:'Fredoka One',cursive;font-size:.92rem;display:flex;align-items:center;justify-content:space-between}
+.mc2-chev{color:var(--sl2);font-weight:400;font-size:1.1rem}
+.mc2-d{color:var(--sl2);font-size:.68rem;line-height:1.35}
+
+/* MENU: horizontaal scrollende kaarten (2 rijen, groeit mee) */
+.mgh{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;width:100%;max-width:560px;margin-top:.6rem;flex-shrink:0}
+.mc2-badge{align-self:flex-end;border-radius:2rem;padding:.14rem .6rem;font-size:.6rem;font-weight:700;color:#fff}
+.mc2-strip{display:flex;gap:.35rem;margin-top:.1rem}
+.mc2-strip:empty{display:none}
+.mc2-strip img{flex:1;min-width:0;height:3.3rem;border-radius:.5rem;object-fit:cover;background:#0D1240}
+
+/* MENU GRID */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;width:100%;max-width:560px}
+.mc{background:var(--card);border:1.5px solid var(--bdr);border-radius:1.2rem;padding:1.1rem;
+  cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;backdrop-filter:blur(12px);
+  display:flex;flex-direction:column;gap:.4rem}
+.mc:active{transform:scale(.96)}
+.mcg{position:absolute;inset:0;opacity:0;pointer-events:none;border-radius:inherit;transition:opacity .2s}
+.mc:active .mcg{opacity:.2}
+.mi{font-size:1.85rem;line-height:1}
+.mn{font-family:'Fredoka One',cursive;font-size:.92rem}
+.md{color:var(--sl2);font-size:.67rem;line-height:1.3}
+.mb{position:absolute;top:.6rem;right:.6rem;background:var(--pu);border-radius:2rem;padding:.15rem .5rem;font-size:.58rem;font-weight:700;color:#fff}
+
+/* AUTH FORM */
+.auth-card{background:var(--card);border:1px solid var(--bdr);border-radius:1.3rem;padding:1.75rem;
+  width:100%;max-width:420px;backdrop-filter:blur(12px)}
+.auth-title{font-family:'Fredoka One',cursive;font-size:1.6rem;text-align:center;margin-bottom:.25rem;
+  background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-sub{color:var(--sl2);font-size:.82rem;text-align:center;margin-bottom:1.5rem}
+.auth-divider{display:flex;align-items:center;gap:.75rem;margin:.75rem 0;color:var(--sl2);font-size:.78rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* BADGE */
+.badge{display:inline-block;border-radius:2rem;padding:.2rem .65rem;font-size:.65rem;font-weight:700}
+.badge-live{background:rgba(16,185,129,.15);color:var(--gr)}
+.badge-draft{background:rgba(245,158,11,.15);color:var(--gold)}
+.badge-new{background:linear-gradient(135deg,var(--b2),var(--pu));color:#fff}
+
+/* LIST */
+.li{display:flex;align-items:center;gap:.75rem;padding:.7rem 0;border-bottom:1px solid rgba(100,140,255,.07)}
+.li:last-child{border-bottom:none;padding-bottom:0}
+.lic{font-size:1.3rem;flex-shrink:0;width:2rem;text-align:center}
+.lii{flex:1;min-width:0}
+.lin{font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lis{font-size:.72rem;color:var(--sl2);margin-top:.1rem}
+.lia{display:flex;gap:.4rem;flex-shrink:0}
+
+/* COMING SOON */
+.coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1.5rem;text-align:center}
+.cs-icon{font-size:3rem;margin-bottom:.75rem;animation:bob 2s ease-in-out infinite}
+.cs-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--b3);margin-bottom:.5rem}
+.cs-text{color:var(--sl2);font-size:.85rem;line-height:1.6}
+.cs-badge{display:inline-block;background:linear-gradient(135deg,var(--b2),var(--pu));color:#fff;
+  border-radius:2rem;padding:.3rem 1rem;font-size:.78rem;font-weight:600;margin-top:.75rem}
+
+/* TOAST */
+.tw{position:fixed;top:max(1rem,env(safe-area-inset-top));right:1rem;z-index:200;
+  display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+.ts{background:var(--bg2);border:1px solid var(--b3);border-radius:.9rem;padding:.7rem 1rem;
+  display:flex;align-items:center;gap:.6rem;box-shadow:0 6px 24px rgba(0,0,0,.6);max-width:260px;
+  animation:ti .4s cubic-bezier(.34,1.56,.64,1);pointer-events:auto}
+@keyframes ti{from{transform:translateX(130%);opacity:0}to{transform:translateX(0);opacity:1}}
+.ts.out{animation:to2 .3s ease forwards}
+@keyframes to2{to{transform:translateX(130%);opacity:0}}
+.tsi{font-size:1.3rem}
+.tst3{font-family:'Fredoka One',cursive;color:var(--b3);font-size:.85rem}
+.tss{font-size:.68rem;color:var(--sl2);margin-top:.05rem}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:1rem}
+.spinner{width:2.5rem;height:2.5rem;border:3px solid rgba(0,191,255,.2);border-top-color:var(--b3);
+  border-radius:50%;animation:spin2 .8s linear infinite}
+@keyframes spin2{to{transform:rotate(360deg)}}
+
+/* MISC */
+.dv2{width:100%;text-align:center;color:var(--sl);font-size:.72rem;margin:.3rem 0;display:flex;align-items:center;gap:.5rem;max-width:560px}
+.dv2::before,.dv2::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.rdo{display:flex;align-items:center;gap:.65rem;background:rgba(255,255,255,.04);border:1.5px solid var(--bdr);border-radius:.65rem;padding:.6rem .85rem;cursor:pointer;margin-bottom:.4rem}
+.rdo.sl{border-color:var(--b3);background:rgba(0,191,255,.08)}
+.rd{width:1.1rem;height:1.1rem;border-radius:50%;border:2px solid var(--sl);flex-shrink:0;display:grid;place-items:center}
+.rdo.sl .rd{border-color:var(--b3);background:var(--b3)}
+.rd::after{content:'';width:.45rem;height:.45rem;border-radius:50%;background:#fff;display:none}
+.rdo.sl .rd::after{display:block}
+.rdtx{font-size:.85rem}
+.ig{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem;margin-top:.35rem}
+.io{background:var(--card);border:2px solid var(--bdr);border-radius:.5rem;font-size:1.2rem;padding:.3rem .1rem;cursor:pointer;text-align:center}
+.io.sl{border-color:var(--b3);background:rgba(0,191,255,.15)}
+.cr2{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.35rem}
+.cs2{width:2.1rem;height:2.1rem;border-radius:.45rem;border:2.5px solid transparent;cursor:pointer}
+.cs2.sl{border-color:#fff}
+.em{text-align:center;padding:2rem 1rem;color:var(--sl2)}
+.emi{font-size:2.5rem;margin-bottom:.5rem}
+.emt{font-size:.88rem;margin-bottom:1rem;line-height:1.5}
+.pr2{display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem}
+.pav{width:2.2rem;height:2.2rem;border-radius:50%;display:grid;place-items:center;font-size:1rem;flex-shrink:0}
+.rmb{background:none;border:none;color:var(--sl);font-size:1rem;cursor:pointer;padding:.2rem .4rem}
+.inp2{width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--bdr);border-radius:.7rem;padding:.7rem .9rem;color:var(--wh);font-size:.9rem;outline:none;font-family:'Inter',sans-serif;-webkit-appearance:none}
+.inp2:focus{border-color:var(--b3)}
+.inp2::placeholder{color:var(--sl)}
+textarea.inp2{resize:none;line-height:1.5}
+select.inp2{cursor:pointer}
+select.inp2 option{background:var(--bg2)}
+.lbl2{display:block;font-size:.72rem;color:var(--sl2);font-weight:600;margin-bottom:.3rem;letter-spacing:.04em;text-transform:uppercase}
+.fld2{margin-bottom:.85rem}
+.pb{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.pf{height:100%;border-radius:2px}
+
+.friend-card{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.friend-av{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;font-size:1.4rem;flex-shrink:0;border:2px solid rgba(0,191,255,.25)}
+.friend-nm{font-weight:700;font-size:.95rem}
+.friend-sb{font-size:.72rem;color:var(--sl2);margin-top:.08rem}
+.online-dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--gr);display:inline-block;margin-right:.3rem;box-shadow:0 0 6px var(--gr)}
+.offline-dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--sl2);display:inline-block;margin-right:.3rem}
+.req-card{background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(107,63,255,.1));border:1px solid rgba(100,140,255,.25);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.sinp{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--bdr);border-radius:.85rem;padding:.8rem 1rem .8rem 2.8rem;color:var(--wh);font-size:.92rem;outline:none;font-family:'Inter',sans-serif;-webkit-appearance:none}
+.sinp:focus{border-color:var(--b3)}
+.sinp::placeholder{color:var(--sl)}
+.sres{background:var(--bg2);border:1px solid var(--bdr);border-radius:.85rem;margin-top:.35rem;overflow:hidden}
+.sitem{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-bottom:1px solid rgba(100,140,255,.07);cursor:pointer}
+.sitem:last-child{border-bottom:none}
+.sitem:active{background:rgba(37,99,235,.1)}
+.chat-item{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;margin-bottom:.5rem}
+.chat-item:active{background:rgba(37,99,235,.1)}
+.cav{width:2.8rem;height:2.8rem;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;flex-shrink:0;position:relative}
+.cunread{position:absolute;top:-.2rem;right:-.2rem;background:var(--rd);border-radius:50%;width:1.1rem;height:1.1rem;display:grid;place-items:center;font-size:.6rem;font-weight:700;color:#fff;border:2px solid var(--bg)}
+.cscreen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;background:#060A18;overflow:hidden}
+.chdr{background:rgba(6,8,24,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:max(env(safe-area-inset-top),.75rem) 1rem .75rem;display:flex;align-items:center;gap:.75rem;flex-shrink:0}
+.cmsgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;padding:.6rem .75rem;min-height:0}
+.mw{display:flex;flex-direction:column;max-width:78%}
+.mw.me{align-self:flex-end;align-items:flex-end}
+.mw.them{align-self:flex-start;align-items:flex-start}
+.mb2{padding:.65rem .9rem;border-radius:1.1rem;font-size:.9rem;line-height:1.45;word-break:break-word}
+.mw.me .mb2{background:linear-gradient(135deg,var(--b2),var(--b3));color:#fff;border-bottom-right-radius:.3rem}
+.mw.them .mb2{background:var(--card);border:1px solid var(--bdr);color:var(--wh);border-bottom-left-radius:.3rem}
+.mt{font-size:.62rem;color:var(--sl2);margin-top:.2rem;padding:0 .2rem}
+.cinpw{background:rgba(6,8,24,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bdr);padding:.6rem 1rem calc(.6rem + env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:.5rem;flex-shrink:0}
+.cinp{flex:1;background:rgba(255,255,255,.07);border:1.5px solid var(--bdr);border-radius:1.3rem;padding:.65rem 1rem;color:var(--wh);font-size:.9rem;outline:none;font-family:'Inter',sans-serif;resize:none;max-height:100px;line-height:1.4;-webkit-appearance:none}
+.cinp:focus{border-color:var(--b3)}
+.cinp::placeholder{color:var(--sl)}
+.sbtn{width:2.6rem;height:2.6rem;border-radius:50%;background:linear-gradient(135deg,var(--b2),var(--b3));border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.sbtn:active{transform:scale(.92)}
+.ddiv{text-align:center;font-size:.7rem;color:var(--sl2);margin:.4rem 0;display:flex;align-items:center;gap:.5rem}
+.ddiv::before,.ddiv::after{content:'';flex:1;height:1px;background:var(--bdr)}
+@keyframes spin2{to{transform:rotate(360deg)}}
+
+/* ═══ STORIES ═══ */
+.stories-bar{display:flex;gap:.75rem;overflow-x:auto;padding:.5rem 0 .75rem;scrollbar-width:none;width:100%;max-width:560px;flex-shrink:0;min-height:5.6rem;align-items:flex-start}
+.stories-bar::-webkit-scrollbar{display:none}
+.story-bubble{display:flex;flex-direction:column;align-items:center;gap:.35rem;cursor:pointer;flex-shrink:0}
+.story-ring{width:3.8rem;height:3.8rem;border-radius:50%;padding:3px;background:linear-gradient(135deg,#F59E0B,#EF4444,#8B5CF6);flex-shrink:0}
+.story-ring.seen{background:rgba(100,116,139,.4)}
+.story-ring.own{background:linear-gradient(135deg,var(--b2),var(--b3))}
+.story-av{width:100%;height:100%;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-size:1.5rem;border:2.5px solid var(--bg)}
+.story-nm{font-size:.62rem;color:var(--sl2);max-width:3.8rem;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.story-add{width:3.8rem;height:3.8rem;border-radius:50%;background:var(--card);border:2px dashed var(--bdr);display:grid;place-items:center;font-size:1.4rem;cursor:pointer;flex-shrink:0}
+
+/* Story viewer (fullscreen) */
+.story-viewer{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column}
+.sv-header{position:absolute;top:0;left:0;right:0;z-index:10;padding:max(env(safe-area-inset-top),1rem) 1rem .75rem}
+.sv-progress{display:flex;gap:.25rem;margin-bottom:.75rem}
+.sv-prog-bar{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:2px;overflow:hidden}
+.sv-prog-fill{height:100%;background:#fff;border-radius:2px;transition:width linear}
+.sv-top{display:flex;align-items:center;gap:.75rem}
+.sv-av{width:2.4rem;height:2.4rem;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;flex-shrink:0}
+.sv-name{font-weight:700;font-size:.92rem;color:#fff;flex:1}
+.sv-time{font-size:.72rem;color:rgba(255,255,255,.7)}
+.sv-close{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:.25rem}
+.sv-content{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
+.sv-img{max-width:100%;max-height:100vh;object-fit:contain}
+.sv-text-story{display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:2rem;text-align:center}
+.sv-txt{font-size:1.4rem;font-weight:700;color:#fff;line-height:1.5;word-break:break-word}
+.sv-tap-left{position:absolute;left:0;top:0;bottom:0;width:40%;cursor:pointer}
+.sv-tap-right{position:absolute;right:0;top:0;bottom:0;width:40%;cursor:pointer}
+
+/* Story creator */
+.story-creator{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;padding:max(env(safe-area-inset-top),1rem) 1rem 2rem;align-items:center}
+.sc-header{width:100%;display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
+.sc-preview{width:100%;max-width:400px;height:280px;border-radius:1.2rem;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:1rem}
+.sc-img-prev{width:100%;height:100%;object-fit:cover}
+.sc-txt-prev{font-size:1.3rem;font-weight:700;color:#fff;text-align:center;padding:1.5rem;word-break:break-word;line-height:1.5}
+.sc-type-tabs{display:flex;gap:.5rem;margin-bottom:1rem;width:100%;max-width:400px}
+.sc-tab{flex:1;padding:.65rem;border-radius:.75rem;background:var(--card);border:1.5px solid var(--bdr);color:var(--sl2);font-weight:600;font-size:.85rem;cursor:pointer;text-align:center}
+.sc-tab.on{background:linear-gradient(135deg,var(--b2),var(--b3));border-color:transparent;color:#fff}
+.bg-picker{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:.75rem}
+.bg-opt{width:2.5rem;height:2.5rem;border-radius:.5rem;cursor:pointer;border:2.5px solid transparent}
+.bg-opt.on{border-color:#fff;transform:scale(1.1)}
+
+/* Meldingen */
+.notif-screen{width:100%;max-width:560px}
+.notif-item{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;cursor:pointer}
+.notif-item.unread{border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.08)}
+.notif-ico{width:2.8rem;height:2.8rem;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;flex-shrink:0}
+.notif-txt{flex:1;font-size:.85rem;line-height:1.45}
+.notif-time{font-size:.68rem;color:var(--sl2);flex-shrink:0}
+.notif-dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--b3);flex-shrink:0}
+
+/* Toggle switch */
+.sw{width:2.8rem;height:1.6rem;border-radius:2rem;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.sw.on{background:#10B981}
+.sw.off{background:rgba(255,255,255,.15)}
+.swd{position:absolute;top:.2rem;width:1.2rem;height:1.2rem;border-radius:50%;background:white;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.sw.on .swd{left:1.4rem}
+.sw.off .swd{left:.2rem}
+
+@keyframes qiblahGlow {
+  0%,100%{box-shadow:0 0 20px rgba(52,211,153,.4),0 0 40px rgba(52,211,153,.2),0 0 80px rgba(52,211,153,.1)}
+  50%{box-shadow:0 0 30px rgba(52,211,153,.7),0 0 60px rgba(52,211,153,.4),0 0 100px rgba(52,211,153,.2)}
+}
+@keyframes qiblahRingGlow {
+  0%,100%{stroke:rgba(52,211,153,.6);filter:drop-shadow(0 0 6px #34D399)}
+  50%{stroke:rgba(52,211,153,1);filter:drop-shadow(0 0 12px #34D399)}
+}
+
+/* ═══ COMMUNITY / GROEPEN ═══ */
+.rank-card{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.rank-num{font-family:'Fredoka One',cursive;font-size:1.1rem;width:1.8rem;text-align:center;flex-shrink:0}
+.rank-1{color:#FFD700}
+.rank-2{color:#C0C0C0}
+.rank-3{color:#CD7F32}
+.rank-other{color:var(--sl2)}
+.rank-av{width:2.5rem;height:2.5rem;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;flex-shrink:0}
+.rank-nm{font-weight:700;font-size:.9rem}
+.rank-pts{font-family:'Fredoka One',cursive;font-size:.95rem;color:#FBBF24;margin-left:auto;flex-shrink:0}
+.rank-badge{font-size:.7rem;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:2rem;padding:.12rem .5rem;color:#FBBF24}
+
+/* Groepen */
+.group-card{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:1rem;margin-bottom:.6rem;cursor:pointer;transition:transform .12s}
+.group-card:active{transform:scale(.98)}
+.group-ico{width:3rem;height:3rem;border-radius:.75rem;display:grid;place-items:center;font-size:1.4rem;flex-shrink:0}
+.group-nm{font-weight:700;font-size:.95rem}
+.group-sb{font-size:.72rem;color:var(--sl2);margin-top:.1rem}
+.group-cnt{font-size:.7rem;color:var(--sl3);margin-top:.15rem}
+
+/* Community tabs */
+.com-tabs{display:flex;gap:.4rem;width:100%;max-width:560px;margin-bottom:.85rem;background:rgba(255,255,255,.04);border-radius:1rem;padding:.3rem}
+.com-tab{flex:1;text-align:center;padding:.5rem .3rem;border-radius:.75rem;font-size:.78rem;font-weight:700;cursor:pointer;color:var(--sl2);transition:all .2s}
+.com-tab.on{background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff}
+
+/* Groep chat scherm */
+.gchat-screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;background:#060A18;overflow:hidden}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="app">
+  <div class="loading">
+    <div class="tfl" style="width:80px;height:80px;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
+      <img src="icon.png" alt="TF" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/>
+    </div>
+    <div class="spinner"></div>
+    <div style="color:var(--b3);font-family:'Fredoka One',cursive;font-size:1rem">Tolaanfur laden...</div>
+  </div>
+</div>
+<div class="tw" id="toasts"></div>
+
+<script>
+'use strict';
+var _OM = {
+  "Start":"Mana","Vrienden":"Hiriyoota","Community":"Hawaasa","Meldingen":"Beeksisa","Profiel":"Profaayila",
+  "Prayer Times":"Yeroo Salaataa","Qibla Direction":"Qiblah","Tasbih & Zikr":"Tasbiih fi Zikrii",
+  "Lessons & Quiz":"Barnoota fi Qormaata","Stories":"Seenaa","Chat":"Dubbii","Inloggen":"Seeni",
+  "Registreren":"Galmaai","Logout":"Bahi","Instellingen":"Qindaa ina","Ranglijst":"Sadarkaa",
+  "Groups":"Gareelee","My Groups":"Gareelee koo","Discover Groups":"Gareelee argadhu",
+  "Joinen":"Makamu","Leave":"Gadi lakkisi","members":"miseensota","No notifications":"Beeksisni hin jiru",
+  "Online":"Interneetarra","Offline":"Ala","Welcome back":"Baga deebitee",
+  "Assalamu Alaykum":"Assalamu Alaykum","Volgend gebed":"Salaata itti aanu",
+  "Refresh":"Haaromsi","Zonsopgang":"Bahaa Aduu","Azan Instellingen":"Qindaa ina Azaana",
+  "PER PRAYER":"Salaata hundaaf","ADHAN SOUND":"Sagalee Azaana","Test":"Qormaata",
+  "Admin Panel":"Bulchiinsa","Level":"Sadarkaa","Points":"Qabxii","Today":"Har a",
+  "Streak":"Itti fufinsa","Total":"Waliigala","Levels voltooid":"Sadarkaa xumurame",
+  "Tasbih streak":"Itti fufinsa Tasbiih","nodig voor niveau":"sadarkaa itti aanuuf",
+  "Send a message to start":"Ergaa ergi jalqabuuf",
+  "Type a message...":"Ergaa barreessi...","Nieuwe groep aanmaken":"Garee haaraa uumi",
+  "Learn and test yourself":"Baradhu fi of qori","Dhikr & practice":"Zikrii fi shaakala",
+  "Prayer times & Adhan":"Yeroo Salaataa fi Azaana","Richting Ka'bah":"Kallatti Kabaa",
+  "Share your moment":"Yeroo kee qoodi","Groups & Leaderboards":"Gareelee fi Sadarkaa",
+  "Edit":"Gulaali","Morning Adhkar":"Zikrii Waaree","Evening Adhkar":"Zikrii Galgala",
+  "Before Sleep":"Rafuu Dura","Quiz starten":"Qormaata jalqabi",
+  "Goed!":"Sirrii!","Fout!":"Dogoggora!","Score":"Qabxii","Volgende":"Itti aanu","Afronden":"Xumuuri",
+  "Email address":"Imeelii","Password":"Jecha darbii","Naam":"Maqaa",
+  "Nog geen account?":"Herreega hin qabdu?","Al een account?":"Herreega qabda?",
+  "Forgot password?":"Jecha darbii dagatte?","Verstuur":"Ergi","Zoeken":"Barbaadi",
+  "← Back":"Deebi i","Back":"Deebi i","Loading...":"Fe amaa...",
+  "Fajr":"Fajr","Dhuhr":"Dhuhr","Asr":"Asr","Maghrib":"Maghrib","Isha":"Isha",
+  "MWL":"MWL","ISNA":"ISNA","Mekka":"Makkaa","Karachi":"Karachi","Egypte":"Masri",
+  "📿 Tasbih":"📿 Tasbiih","🤲 Zikr":"🤲 Zikrii","📖 Dua":"📖 Dua",
+  "🎓 Quiz & XP":"🎓 Qormaata fi XP","📿 Tasbih (teller)":"📿 Tasbiih",
+  "🔥 Streak":"🔥 Itti fufinsa","Top":"Ol",
+  "Rang":"Sadarkaa","Geen vrienden nog":"Hiriyoonni hin jiran ammallee",
+  "Vriendenverzoeken":"Gaaffii hiriyummaa","Verzoek sturen":"Gaaffii ergi",
+  "Annuleren":"Haquu","Bevestigen":"Mirkaneessi",
+  "Morning Adhkar":"Zikrii Waaree",
+  "Evening Adhkar":"Zikrii Galgala", 
+  "Before Sleep":"Rafuu Dura",
+  "Ochtend":"Waaree","Avond":"Galgala","Slapen":"Rafuu",
+  "🌅 Morning Adhkar":"🌅 Zikrii Waaree",
+  "🌙 Evening Adhkar":"🌙 Zikrii Galgala",
+  "😴 Before Sleep":"😴 Rafuu Dura",
+  "Bescherming Dua":"Dua Eegumsa",
+  "Istighfar & Vergiffenis":"Istighfaar fi Araarama",
+  "Reis Dua":"Dua Imala","Moskee Dua":"Dua Masgiida",
+  "Dua bij het Eten":"Dua Nyaata",
+  "herhaling":"irra deddeebi i","herhalen":"irra deddeebi i",
+  "× herhalen":"× irra deddeebi i",
+  "Tik om te tellen":"Lakkaa i maxxansuuf tuqi",
+  "Reset":"Haaromsi","Doel bereikt!":"Galma gahame!",
+  "voltooid":"xumurame","Doel:":"Galma:",
+  "Quiz starten":"Qormaata jalqabi",
+  "Vraag":"Gaaffii","van":"kan","Goed zo!":"Gaarii!",
+  "Helaas fout":"Dogoggora",
+  "Jouw score":"Qabxii kee","Volgende les":"Barnoota itti aanu",
+  "Opnieuw":"Irra deebi i","Klaar":"Xumuure",
+  "Geen lessen beschikbaar":"Barnoota hin jiru ammallee",
+  "Vriendschapsverzoek":"Gaaffii hiriyummaa",
+  "sent you a friend request":"gaaffii hiriyummaa siif erge",
+  "sent you a message":"ergaa siif erge",
+  "heeft een story geplaatst":"seenaa maxxanse",
+  "Accept":"Fudhachuu","Decline":"Didu",
+  "Verzoek gestuurd":"Gaaffiin ergame",
+  "Al vrienden":"Hiriyoota turre","Zoek vrienden...":"Hiriyoota barbaadi...",
+  "Geen vrienden nog":"Hiriyoonni hin jiran ammallee",
+  "Top":"Ol","Jouw positie":"Bakka kee",
+  "Ranglijst":"Sadarkaa","Quiz punten":"Qabxii Qormaataa",
+  "Tasbih teller":"Lakkaa isa Tasbiih",
+  "Dagelijkse streak":"Itti fufinsa guyyaa guyyaa",
+  "Create group":"Garee uumuu","Groep verlaten":"Garee gadi lakkisuu",
+  "Beschrijving":"Ibsa","Naam":"Maqaa","Icoon":"Mallattoo",
+  "Kleur":"Halluu","Publiek":"Uummataa","Private":"Dhuunfaa",
+  "Create group ✓":"Garee uumi ✓",
+  "Wees de eerste die een bericht stuurt!":"Ergaa jalqabaa ergi!",
+  "Join de groep om berichten te sturen":"Garee makamu ergaa erguuf",
+  "Welkom":"Baga nagaan dhufte",
+  "Maak een account aan":"Herreega bani",
+  "om alles te gebruiken":"hundumaa fayyadamuuf",
+  "Account":"Herreega","Registreer":"Galmaai",
+  "Password":"Jecha darbii","Naam":"Maqaa",
+  "Bio":"Waa ee kootii","Save":"Olkaa i",
+  "Profiel bijwerken":"Profaayila haaromsi",
+  "Avatar":"Fakkii","Kleur":"Halluu",
+  "Level":"Sadarkaa","XP":"XP"
+};
+var isGuest = true;
+var friendsUnread = 0;
+var friendReqCount = 0;
+
+// ══════════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk",
+  authDomain: "tolaanfur-5b5f5.firebaseapp.com",
+  databaseURL: "https://tolaanfur-5b5f5-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tolaanfur-5b5f5",
+  storageBucket: "tolaanfur-5b5f5.firebasestorage.app",
+  messagingSenderId: "188890145767",
+  appId: "1:188890145767:web:6ec8fe6fae4ddd90891342"
+};
+
+// Init Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const rtdb = firebase.database(); // Realtime Database
+try { db.enableNetwork(); } catch(e) {}
+const storage = null;
+
+// ══════════════════════════════════════════════
+// CONSTANTEN
+// ══════════════════════════════════════════════
+const _av = p => '<svg viewBox="0 0 24 24" fill="currentColor">' + p + '</svg>';
+// Personen zijn bewust zonder gezichtstrekken getekend; daarnaast staan er
+// symbool-avatars voor wie liever geen figuur als profielbeeld gebruikt.
+const AV=[
+  // 0 · Hijab
+  _av('<path d="M12 3c-3.9 0-6.6 2.9-6.6 6.7 0 2.1.6 3.7 1.6 4.9C4.3 15.7 2.6 17.8 2.6 21h18.8c0-3.2-1.7-5.3-4.4-6.4 1-1.2 1.6-2.8 1.6-4.9C18.6 5.9 15.9 3 12 3z"/><ellipse cx="12" cy="9.9" rx="2.9" ry="3.6" fill-opacity=".33"/>'),
+  // 1 · Hijab met bloem
+  _av('<path d="M12 3c-3.9 0-6.6 2.9-6.6 6.7 0 2.1.6 3.7 1.6 4.9C4.3 15.7 2.6 17.8 2.6 21h18.8c0-3.2-1.7-5.3-4.4-6.4 1-1.2 1.6-2.8 1.6-4.9C18.6 5.9 15.9 3 12 3z"/><ellipse cx="12" cy="9.9" rx="2.9" ry="3.6" fill-opacity=".33"/><circle cx="17.4" cy="7" r="1" fill-opacity=".55"/><circle cx="19.2" cy="8.2" r=".8" fill-opacity=".55"/><circle cx="17.6" cy="9.4" r=".8" fill-opacity=".55"/>'),
+  // 2 · Hijab met gezichtssluier
+  _av('<path d="M12 3c-3.9 0-6.6 2.9-6.6 6.7 0 2.1.6 3.7 1.6 4.9C4.3 15.7 2.6 17.8 2.6 21h18.8c0-3.2-1.7-5.3-4.4-6.4 1-1.2 1.6-2.8 1.6-4.9C18.6 5.9 15.9 3 12 3z"/><rect x="9.3" y="8.9" width="5.4" height="1.7" rx=".85" fill-opacity=".33"/>'),
+  // 3 · Kufi (gebedsmutsje)
+  _av('<path d="M12 2.4c-2.5 0-4.3 1.4-4.8 3.5h9.6C16.3 3.8 14.5 2.4 12 2.4z"/><rect x="6.5" y="5.6" width="11" height="1.7" rx=".85"/><ellipse cx="12" cy="11.4" rx="4.3" ry="4.5" fill-opacity=".33"/><path d="M3.7 21c0-3.5 3.7-5.7 8.3-5.7s8.3 2.2 8.3 5.7z"/>'),
+  // 4 · Kufi met baard
+  _av('<path d="M12 2.4c-2.5 0-4.3 1.4-4.8 3.5h9.6C16.3 3.8 14.5 2.4 12 2.4z"/><rect x="6.5" y="5.6" width="11" height="1.7" rx=".85"/><ellipse cx="12" cy="11.4" rx="4.3" ry="4.5" fill-opacity=".33"/><path d="M7.7 11.5c0 3.5 1.9 5.8 4.3 5.8s4.3-2.3 4.3-5.8c0 2-1.9 2.9-4.3 2.9s-4.3-.9-4.3-2.9z"/><path d="M3.7 21c0-3.5 3.7-5.7 8.3-5.7s8.3 2.2 8.3 5.7z"/>'),
+  // 5 · Tulband (imamah)
+  _av('<path d="M5.5 8.6C5.5 5.2 8.4 3 12 3s6.5 2.2 6.5 5.6c0 1-.7 1.6-1.7 1.6H7.2c-1 0-1.7-.6-1.7-1.6z"/><path d="M6.2 10.9h11.6c.5 0 .9.4.9.9s-.4.9-.9.9H6.2c-.5 0-.9-.4-.9-.9s.4-.9.9-.9z" fill-opacity=".6"/><ellipse cx="12" cy="14.4" rx="3.5" ry="2.4" fill-opacity=".33"/><path d="M4.3 21c0-3.1 3.4-5 7.7-5s7.7 1.9 7.7 5z"/>'),
+  // 6 · Moskee
+  _av('<path d="M12 1.8l.9 1.6-.9.9-.9-.9z"/><path d="M12 4.9c-2.6 0-4.6 2-4.6 4.4 0 .8.2 1.5.6 2.1h8c.4-.6.6-1.3.6-2.1 0-2.4-2-4.4-4.6-4.4z"/><path d="M5.4 12.3h13.2V21H5.4z"/><path d="M2.6 9.2c.7 0 1.2.6 1.2 1.3V21H1.4V10.5c0-.7.5-1.3 1.2-1.3z"/><path d="M21.4 9.2c.7 0 1.2.6 1.2 1.3V21h-2.4V10.5c0-.7.5-1.3 1.2-1.3z"/><path d="M12 15.2c-1.2 0-2.1.9-2.1 2.1V21h4.2v-3.7c0-1.2-.9-2.1-2.1-2.1z" fill-opacity=".33"/>'),
+  // 7 · Ka'bah
+  _av('<path d="M4.6 6.8L12 4l7.4 2.8v11.4L12 21l-7.4-2.8z"/><path d="M4.6 10.3h14.8v2.2H4.6z" fill-opacity=".45"/><circle cx="12" cy="11.4" r="1.1" fill-opacity=".7"/>'),
+  // 8 · Lantaarn
+  _av('<path d="M12 1.6c.5 0 .9.4.9.9v1.2h-1.8V2.5c0-.5.4-.9.9-.9z"/><rect x="8.2" y="3.7" width="7.6" height="1.6" rx=".8"/><path d="M9 5.9h6l1.6 9.2c.2 1.1-.7 2.1-1.8 2.1H9.2c-1.1 0-2-1-1.8-2.1z"/><rect x="8.6" y="17.8" width="6.8" height="1.6" rx=".8"/><rect x="9.8" y="19.8" width="4.4" height="1.4" rx=".7" fill-opacity=".6"/><path d="M12 8.4c1 1 1.5 1.9 1.5 2.8 0 1-.7 1.7-1.5 1.7s-1.5-.7-1.5-1.7c0-.9.5-1.8 1.5-2.8z" fill-opacity=".4"/>'),
+  // 9 · Mushaf
+  _av('<path d="M3.4 5.2c2.6-.6 5.4-.4 7.7.9v13.4c-2.3-1.3-5.1-1.5-7.7-.9z"/><path d="M20.6 5.2c-2.6-.6-5.4-.4-7.7.9v13.4c2.3-1.3 5.1-1.5 7.7-.9z"/><path d="M12 3.4c.7.7 1.1 1.4 1.1 2.1 0 .8-.5 1.3-1.1 1.3s-1.1-.5-1.1-1.3c0-.7.4-1.4 1.1-2.1z" fill-opacity=".55"/>'),
+  // 10 · Maansikkel met ster
+  _av('<path d="M15.6 3.2A9 9 0 1015 20.7 7.4 7.4 0 0115.6 3.2z"/><path d="M18.6 8.4l.9 2.1 2.3.2-1.7 1.5.5 2.2-2-1.2-2 1.2.5-2.2-1.7-1.5 2.3-.2z" fill-opacity=".75"/>'),
+  // 11 · Tasbih
+  _av('<circle cx="12" cy="4.6" r="1.7"/><circle cx="17.2" cy="7" r="1.7"/><circle cx="19.4" cy="12.2" r="1.7"/><circle cx="17.2" cy="17.4" r="1.7"/><circle cx="12" cy="19.6" r="1.7"/><circle cx="6.8" cy="17.4" r="1.7"/><circle cx="4.6" cy="12.2" r="1.7"/><circle cx="6.8" cy="7" r="1.7"/>'),
+  // 12 · Gebedskleed
+  _av('<path d="M6.4 21V9.2c0-3.1 2.5-5.6 5.6-5.6s5.6 2.5 5.6 5.6V21z"/><path d="M12 6.6c-1.6 0-2.9 1.3-2.9 2.9v3.6h5.8V9.5c0-1.6-1.3-2.9-2.9-2.9z" fill-opacity=".33"/><rect x="5.4" y="20.4" width="13.2" height="1.6" rx=".8" fill-opacity=".6"/>'),
+  // 13 · Geometrische ster
+  _av('<path d="M12 1.8l2.6 4.2 4.8-1.4-1.4 4.8 4.2 2.6-4.2 2.6 1.4 4.8-4.8-1.4L12 22.2l-2.6-4.2-4.8 1.4 1.4-4.8L1.8 12l4.2-2.6-1.4-4.8 4.8 1.4z"/><circle cx="12" cy="12" r="3.1" fill-opacity=".35"/>'),
+  // 14 · Groene koepel
+  _av('<path d="M12 2.2l.8 1.5-.8.8-.8-.8z"/><path d="M12 5.4c-3 0-5.4 2.4-5.4 5.3 0 1.1.3 2 .9 2.8h9c.6-.8.9-1.7.9-2.8 0-2.9-2.4-5.3-5.4-5.3z"/><path d="M6.2 14.6h11.6V21H6.2z" fill-opacity=".55"/><path d="M9.4 21v-3.4c0-1.4 1.2-2.6 2.6-2.6s2.6 1.2 2.6 2.6V21z" fill-opacity=".33"/><rect x="4.8" y="20.2" width="14.4" height="1.8" rx=".9"/>')
+];
+const AC=['#2563EB','#1E90FF','#6B3FFF','#059669','#D97706','#0891B2','#BE185D','#15803D','#9333EA','#0369A1','#DC2626','#7C3AED','#0284C7','#B45309','#047857'];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let SC = 'loading';
+let CX = {};
+let currentUser = null;
+let profile = null;
+
+// ══════════════════════════════════════════════
+// FASE 2 — VRIENDEN & CHAT (Firebase)
+// ══════════════════════════════════════════════
+let myFriends=[];
+let friendRequests=[];
+let activeChat=null;
+let chatMessages=[];
+let unreadCounts={};
+let _chatUnsubscribe=null;
+let searchResults=[];
+
+function getChatId(a,b){return[a,b].sort().join('_');}
+
+function startFriendListeners(){
+  if(!currentUser||currentUser.isAnonymous)return;
+  const uid=currentUser.uid;
+  // Inkomende vriendschapsverzoeken
+  db.collection('friend_requests').where('to','==',uid).where('status','==','pending')
+    .onSnapshot(snap=>{friendRequests=snap.docs.map(d=>({id:d.id,...d.data()}));updateBadge();if(SC==='friends')render();});
+  // Vrienden
+  db.collection('friendships').where('from','==',uid)
+    .onSnapshot(async snap=>{
+      const fids=snap.docs.map(d=>d.data().to).filter(Boolean);
+      if(!fids.length){myFriends=[];if(typeof reloadStoriesForFriends==='function')reloadStoriesForFriends();if(SC==='friends'||SC==='chats')render();return;}
+      const ps=await Promise.all(fids.map(fuid=>db.collection('users').doc(fuid).get().then(d=>d.exists?{uid:fuid,...d.data()}:null)));
+      myFriends=ps.filter(Boolean);
+      if(typeof reloadStoriesForFriends==='function')reloadStoriesForFriends();
+      myFriends.forEach(f=>{
+        rtdb.ref('online/'+f.uid).on('value',s=>{
+          const fr=myFriends.find(x=>x.uid===f.uid);
+          if(fr){fr.online=s.val()?.online||false;fr.lastSeen=s.val()?.lastSeen||0;}
+          if(SC==='friends'||SC==='chats')render();
+        });
+        listenUnread(f.uid);
+      });
+      if(SC==='friends'||SC==='chats')render();
+    });
+  setOnline(true);
+}
+
+function setOnline(on){
+  if(!currentUser||currentUser.isAnonymous)return;
+  rtdb.ref('online/'+currentUser.uid).set({online:on,lastSeen:Date.now()});
+}
+
+function updateBadge(){
+  const tot=Object.values(unreadCounts).reduce((a,b)=>a+b,0)+friendRequests.length;
+  const b=document.getElementById('chatBadge');if(b)b.textContent=tot>0?tot:'';
+}
+
+function listenUnread(fuid){
+  if(!currentUser)return;
+  const cid=getChatId(currentUser.uid,fuid);
+  rtdb.ref('chats/'+cid+'/unread/'+currentUser.uid).on('value',s=>{
+    unreadCounts[fuid]=s.val()||0;updateBadge();if(SC==='chats')render();
+  });
+}
+
+async function searchUsers(q){
+  if(!q||q.length<2){searchResults=[];render();return;}
+  q=q.trim();
+  const snap=await db.collection('users').where('displayName','>=',q).where('displayName','<=',q+'').limit(8).get();
+  searchResults=snap.docs.map(d=>({uid:d.id,...d.data()})).filter(u=>u.uid!==currentUser?.uid);
+  render();
+}
+
+async function sendFriendReq(toUid,toName){
+  if(!currentUser||currentUser.isAnonymous){toast({i:'🔐',t:'Login required'});return;}
+  if(myFriends.find(f=>f.uid===toUid)){toast({i:'✅',t:'Already friends!',s:toName});return;}
+  const ex=await db.collection('friend_requests').where('from','==',currentUser.uid).where('to','==',toUid).get();
+  if(!ex.empty){toast({i:'ℹ️',t:'Already sent!'});return;}
+  await db.collection('friend_requests').add({from:currentUser.uid,fromName:profile?.displayName||'User',fromAvatar:profile?.avatar||0,fromAvatarColor:profile?.avatarColor||0,to:toUid,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  toast({i:'✅',t:'Request sent!',s:'to '+toName});
+  searchResults=[];render();
+}
+
+async function acceptReq(reqId,fromUid){
+  if(!currentUser)return;
+  try{
+  const batch=db.batch();
+  batch.update(db.collection('friend_requests').doc(reqId),{status:'accepted'});
+  batch.set(db.collection('friendships').doc(getChatId(currentUser.uid,fromUid)),{users:[currentUser.uid,fromUid],from:currentUser.uid,to:fromUid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  await batch.commit();
+  toast({i:'🤝',t:'Friends!',s:'Request accepted'});
+  }catch(e){toast({i:'❌',t:'Failed: '+e.message});}
+}
+
+async function declineReq(reqId){
+  await db.collection('friend_requests').doc(reqId).update({status:'declined'});
+  toast({i:'✓',t:'Declined'});
+}
+
+async function removeFriend(fuid,fnm){
+  if(!confirm('Remove '+fnm+' as friend?'))return;
+  await db.collection('friendships').doc(getChatId(currentUser.uid,fuid)).delete();
+  toast({i:'✓',t:'Removed'});
+}
+
+function openChat(friend){
+  activeChat = friend;
+  chatMessages = [];
+  if(_chatUnsubscribe){_chatUnsubscribe();_chatUnsubscribe=null;}
+  SC = 'chat';
+  render();
+
+  const cid = getChatId(currentUser.uid, friend.uid);
+  const ref = rtdb.ref('chats/'+cid+'/messages').orderByChild('ts').limitToLast(60);
+
+  // Gebruik on('value') - werkt op alle browsers inclusief Safari iOS
+  ref.on('value', snap=>{
+    const msgs = [];
+    snap.forEach(child=>{
+      const v = child.val();
+      if(v && v.text){ var m = Object.assign({id:child.key}, v); msgs.push(m); }
+    });
+    chatMessages = msgs;
+    const c = document.getElementById('cmsgs');
+    if(c) renderChatMsgs(c);
+  }, err=>{
+    console.log('Chat error:', err);
+    const c = document.getElementById('cmsgs');
+    if(c) c.innerHTML = '<div style="text-align:center;color:var(--rd);padding:2rem">Fout bij laden. Try again.</div>';
+  });
+
+  _chatUnsubscribe = ()=> ref.off('value');
+  rtdb.ref('chats/'+cid+'/unread/'+currentUser.uid).set(0);
+  unreadCounts[friend.uid] = 0;
+  updateBadge();
+}
+
+function renderChatMsgs(container){
+  if(!container||!currentUser)return;
+  const msgs = Array.isArray(chatMessages)?chatMessages:[];
+  if(msgs.length===0){
+    container.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.35);font-size:.82rem;padding:2rem 1rem">Send a message to start 👋</div>';
+    return;
+  }
+  let out=''; let lastDate='';
+  msgs.forEach(msg=>{
+    if(!msg||!msg.text)return;
+    const isMe=msg.from===currentUser.uid;
+    const d=new Date(typeof msg.ts==='number'?msg.ts:Date.now());
+    const ds=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    const ts=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    if(ds!==lastDate){
+      out+=`<div style="text-align:center;margin:.5rem 0;font-size:.68rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:.4rem"><div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>${ds}<div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div></div>`;
+      lastDate=ds;
+    }
+    const txt=String(msg.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if(isMe){
+      out+=`<div style="display:flex;justify-content:flex-end;margin-bottom:.3rem"><div style="max-width:75%;background:linear-gradient(135deg,#1D4ED8,#3B82F6);border-radius:.9rem .9rem .15rem .9rem;padding:.5rem .75rem"><div style="color:#fff;font-size:.87rem;line-height:1.4;word-break:break-word">${txt}</div><div style="color:rgba(255,255,255,.55);font-size:.6rem;text-align:right;margin-top:.2rem">${ts} ✓</div></div></div>`;
+    } else {
+      out+=`<div style="display:flex;justify-content:flex-start;margin-bottom:.3rem"><div style="max-width:75%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:.9rem .9rem .9rem .15rem;padding:.5rem .75rem"><div style="color:#E8EEFF;font-size:.87rem;line-height:1.4;word-break:break-word">${txt}</div><div style="color:rgba(255,255,255,.35);font-size:.6rem;margin-top:.2rem">${ts}</div></div></div>`;
+    }
+  });
+  container.innerHTML=out;
+  container.scrollTop=container.scrollHeight;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function fmtTs(ts){
+  if(!ts)return'';const d=new Date(ts),now=new Date();
+  return d.toDateString()===now.toDateString()?d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+async function sendMsg(){
+  if(!currentUser||!activeChat)return;
+  const inp = document.getElementById('cInp');
+  if(!inp)return;
+  const text = inp.value.trim();
+  if(!text)return;
+  inp.value = '';
+  
+  const cid = getChatId(currentUser.uid, activeChat.uid);
+  const msgData = {
+    text: text,
+    from: currentUser.uid,
+    fromName: profile?.displayName || 'Me',
+    ts: Date.now()
+  };
+  
+  // Stuur naar Firebase RTDB
+  rtdb.ref('chats/'+cid+'/messages').push(msgData)
+    .then(()=> console.log('Message sent'))
+    .catch(e=> {console.log('Error:',e); toast({i:'❌',t:'Message failed — check connection',s:e.message});});
+  
+  // Ongelezen teller + melding
+  rtdb.ref('chats/'+cid+'/unread/'+activeChat.uid).transaction(v=>(v||0)+1);
+  addNotification(activeChat.uid, {
+    type:'message',
+    fromUid:currentUser.uid,
+    fromName:profile?.displayName||'Someone',
+    fromAvatar:profile?.avatar||0,
+    fromAvatarColor:profile?.avatarColor||0,
+    message:_om('sent you a message'),
+    ts:Date.now()
+  });
+}
+
+
+// ══════════════════════════════════════════════
+// FASE 3 — STORIES & MELDINGEN
+// ══════════════════════════════════════════════
+let allStories = [];       // Alle actieve stories
+let myStories = [];        // Eigen stories
+let storyViewer = null;    // {stories:[], idx:0, storyIdx:0}
+let storyTimer = null;
+let storyPaused = false;       // vasthouden = pauzeren
+let _cmpH = null;              // Kompas-handler (Qibla)
+let userProfileUid = null;     // Wiens profiel open staat
+let prevSC = 'home';           // Vorige scherm (voor terugknop vanuit profielen)
+
+// ══ EIGEN GETEKENDE ICONEN (SVG, nemen de kleur van hun kaart over) ══
+const _sv = (p, vul) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+const IC = {
+  // Openliggende mushaf op een standaard
+  quran: _sv('<path d="M12 6.5v12"/><path d="M12 6.5C10.3 5.2 8.2 4.6 6 4.6c-.9 0-1.7.1-2.5.3v12c.8-.2 1.6-.3 2.5-.3 2.2 0 4.3.6 6 1.9"/><path d="M12 6.5c1.7-1.3 3.8-1.9 6-1.9.9 0 1.7.1 2.5.3v12c-.8-.2-1.6-.3-2.5-.3-2.2 0-4.3.6-6 1.9"/><path d="M5 19.5l7 2 7-2"/>'),
+  // Stapel boeken
+  'play-cats': _sv('<rect x="3.5" y="4" width="6" height="16" rx="1.2"/><rect x="9.5" y="7" width="5.5" height="13" rx="1.2"/><path d="M15.2 8.2l4 1.1a1 1 0 01.7 1.2l-2.3 8.5a1 1 0 01-1.2.7l-1.4-.4"/><path d="M5 8h3"/>'),
+  // Beker met ster
+  'sirah-quiz': _sv('<path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H5a2 2 0 000 4h2"/><path d="M17 6h2a2 2 0 010 4h-2"/><path d="M12 14v3"/><path d="M9 20h6"/><path d="M10.5 20l.6-3h1.8l.6 3"/>'),
+  // Gebedskralen in een lus
+  tasbih: _sv('<circle cx="12" cy="5.2" r="1.5"/><circle cx="17" cy="7.5" r="1.5"/><circle cx="19" cy="12.5" r="1.5"/><circle cx="17" cy="17.2" r="1.5"/><circle cx="12" cy="19.3" r="1.5"/><circle cx="7" cy="17.2" r="1.5"/><circle cx="5" cy="12.5" r="1.5"/><circle cx="7" cy="7.5" r="1.5"/>'),
+  // Moskee met koepel en minaret
+  prayer: _sv('<path d="M4 20v-7a8 8 0 0116 0v7"/><path d="M12 5c0-1.2.9-2 2-2.6C13.1 3 12 3.7 12 5z"/><path d="M8 20v-4a4 4 0 018 0v4"/><path d="M2.5 20h19"/><path d="M6 11V8"/><path d="M18 11V8"/>'),
+  // Fotolijst met bergen
+  media: _sv('<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.4"/><path d="M3.5 16.5l4.2-4a1.6 1.6 0 012.2 0l3 2.9"/><path d="M13.5 14l1.8-1.7a1.6 1.6 0 012.2 0l3 2.9"/>'),
+  // Onderste balk
+  home: _sv('<path d="M3.5 10.2L12 3.5l8.5 6.7"/><path d="M5.5 9v10.5h13V9"/><path d="M9.8 19.5v-5.2h4.4v5.2"/>'),
+  friends: _sv('<circle cx="9" cy="8" r="3.2"/><path d="M3 19.5a6 6 0 0112 0"/><path d="M16.5 5.2a3.2 3.2 0 010 6.1"/><path d="M17.5 13.6a6 6 0 013.5 5.4"/>'),
+  community: _sv('<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5a13 13 0 010 17"/><path d="M12 3.5a13 13 0 000 17"/>'),
+  notifications: _sv('<path d="M18 8.5a6 6 0 10-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5z"/><path d="M13.7 19a2 2 0 01-3.4 0"/>'),
+  profile: _sv('<circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0115 0"/>'),
+  search: _sv('<circle cx="10.8" cy="10.8" r="6.3"/><path d="M15.4 15.4L20 20"/>')
+};
+
+let pendingDL = null;          // Deep link uit de URL (?screen=...)
+try{ pendingDL = new URLSearchParams(location.search).get('screen'); }catch(e){}
+let notifications = [];    // Meldingen lijst
+let unreadNotifs = 0;
+let communityUnread = 0;
+let storyCreatorType = 'text'; // 'text' of 'photo'
+let storyBgColor = 'linear-gradient(135deg,#1E3A8A,#6B3FFF)';
+let storyText = '';
+let storyPhotoFile = null;
+let storyPhotoPreview = null;
+
+const STORY_BG_COLORS = [
+  'linear-gradient(135deg,#1E3A8A,#6B3FFF)',
+  'linear-gradient(135deg,#065F46,#10B981)',
+  'linear-gradient(135deg,#7C2D12,#F59E0B)',
+  'linear-gradient(135deg,#1E1B4B,#EC4899)',
+  'linear-gradient(135deg,#0C4A6E,#0EA5E9)',
+  'linear-gradient(135deg,#4A1942,#F43F5E)',
+  'linear-gradient(135deg,#064E3B,#34D399)',
+  'linear-gradient(135deg,#27272A,#71717A)',
+];
+
+// Laad alle stories van vrienden + eigen
+function loadStories() {
+  if(!currentUser || !rtdb) return;
+  const cutoffMs = Date.now() - 24*60*60*1000;
+
+  // Laad ALLE stories - filter client-side op vrienden
+  // Dit werkt ook als vrienden nog niet geladen zijn
+  rtdb.ref('stories').on('value', snap=>{
+    const grouped = {};
+    
+    // Bouw vrienden lijst op het moment van verwerking
+    const allUids = [currentUser.uid, ...myFriends.map(f=>f.uid)];
+    
+    snap.forEach(userSnap=>{
+      const uid = userSnap.key;
+      // Toon eigen stories + vrienden stories
+      if(!allUids.includes(uid)) return;
+      
+      userSnap.forEach(storySnap=>{
+        const s = {id:storySnap.key, ...storySnap.val()};
+        if(!s.ts || s.ts < cutoffMs) return; // ouder dan 24u
+        if(!grouped[uid]) grouped[uid] = [];
+        grouped[uid].push(s);
+      });
+    });
+
+    allStories = Object.entries(grouped).map(([uid, stories])=>{
+      const fr = myFriends.find(f=>f.uid===uid);
+      const isOwn = uid === currentUser.uid;
+      return {
+        uid,
+        isOwn,
+        displayName: isOwn ? (profile?.displayName||'Me') : (fr?.displayName||'User'),
+        avatar: isOwn ? (profile?.avatar||0) : (fr?.avatar||0),
+        avatarColor: isOwn ? (profile?.avatarColor||0) : (fr?.avatarColor||0),
+        stories: stories.sort((a,b)=>(a.ts||0)-(b.ts||0))
+      };
+    });
+    
+    // Eigen story altijd bovenaan
+    allStories.sort((a,b)=> b.isOwn - a.isOwn);
+    
+    if(SC==='home') render();
+  });
+}
+
+// Herlaad stories zodra vrienden zijn geladen
+function reloadStoriesForFriends() {
+  // Stop oude listener
+  rtdb.ref('stories').off('value');
+  // Start opnieuw met up-to-date vrienden lijst
+  loadStories();
+}
+
+// Maak een story aan
+async function createStory() {
+  if (!currentUser || currentUser.isAnonymous) {
+    toast({ i: '🔐', t: 'Login required' });
+    return;
+  }
+
+  const btn = document.getElementById('publishStoryBtn');
+  if (btn) { btn.textContent = 'Publishing...'; btn.disabled = true; }
+
+  try {
+    if (!storyText.trim()) { 
+      toast({ i: '⚠️', t: 'Enter text for your story' }); 
+      if (btn) { btn.textContent = 'Publish ✓'; btn.disabled = false; }
+      return; 
+    }
+    
+    const storyData = {
+      uid: currentUser.uid,
+      displayName: profile?.displayName || 'User',
+      avatar: profile?.avatar || 0,
+      avatarColor: profile?.avatarColor || 0,
+      type: 'text',
+      text: storyText.trim(),
+      bg: storyBgColor,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      views: [],
+      expiresAt: new Date(Date.now() + 24*60*60*1000)
+    };
+
+    // Sla story op in Realtime Database (geen index nodig)
+    const storyRef = rtdb.ref('stories/' + currentUser.uid + '/' + Date.now());
+    await storyRef.set({
+      uid: currentUser.uid,
+      displayName: profile?.displayName || 'User',
+      avatar: profile?.avatar || 0,
+      avatarColor: profile?.avatarColor || 0,
+      text: storyText.trim(),
+      bg: storyBgColor,
+      ts: Date.now(),
+      views: {}
+    });
+    console.log('Story opgeslagen in RTDB');
+
+    // Stuur melding naar vrienden
+    myFriends.forEach(f => {
+      addNotification(f.uid, {
+        type: 'story',
+        fromUid: currentUser.uid,
+        fromName: profile?.displayName || 'Iemand',
+        fromAvatar: profile?.avatar || 0,
+        fromAvatarColor: profile?.avatarColor || 0,
+        message: `${profile?.displayName || 'Someone'} posted a new story`,
+        ts: Date.now()
+      });
+    });
+
+    toast({ i: '✅', t: 'Story posted!', s: 'Visible for 24 hours' });
+    storyText = '';
+    storyPhotoFile = null;
+    storyPhotoPreview = null;
+    SC = 'home';
+    render();
+  } catch (e) {
+    toast({ i: '❌', t: 'Mislukt', s: e.message });
+    if (btn) { btn.textContent = 'Publish ✓'; btn.disabled = false; }
+  }
+}
+
+// Voeg melding toe
+async function addNotification(toUid, data) {
+  try {
+    await db.collection('notifications').add({
+      to: toUid,
+      ...data,
+      read: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {}
+}
+
+// Laad meldingen
+function loadNotifications() {
+  if (!currentUser || currentUser.isAnonymous) return;
+  db.collection('notifications')
+    .where('to', '==', currentUser.uid)
+    .limit(30)
+    .onSnapshot(snap => {
+      notifications = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      unreadNotifs = notifications.filter(n => !n.read).length;
+      updateNotifBadge();
+      loadCommunityUnread();
+      if (SC === 'notifications') render();
+    });
+}
+
+function updateNotifBadge() {
+  const b = document.getElementById('notifBadge');
+  if (b) b.textContent = unreadNotifs > 0 ? unreadNotifs : '';
+  const b2 = document.getElementById('notifBadge2');
+  if (b2) b2.style.display = unreadNotifs > 0 ? 'flex' : 'none';
+}
+
+async function markAllNotifsRead() {
+  if (!currentUser) return;
+  const batch = db.batch();
+  notifications.filter(n => !n.read).forEach(n => {
+    batch.update(db.collection('notifications').doc(n.id), { read: true });
+  });
+  await batch.commit();
+}
+
+// Story viewer openen
+function openStoryGroup(groupIdx) {
+  storyViewer = { groupIdx, storyIdx: 0 };
+  clearInterval(storyTimer);
+  SC = 'story-view';
+  render();
+  startStoryTimer();
+  // Markeer als gezien
+  const group = allStories[groupIdx];
+  if (group && group.stories[0]) {
+    markStorySeen(group.stories[0].id, group.uid);
+  }
+}
+
+function startStoryTimer() {
+  clearInterval(storyTimer);
+  const duration = 5000;
+  let elapsed = 0;
+  const interval = 50;
+  storyTimer = setInterval(() => {
+    if (storyPaused) return;
+    elapsed += interval;
+    const pct = (elapsed / duration) * 100;
+    const fill = document.getElementById('sv-fill');
+    if (fill) fill.style.width = pct + '%';
+    if (elapsed >= duration) nextStory();
+  }, interval);
+}
+
+function nextStory() {
+  if (!storyViewer) return;
+  const group = allStories[storyViewer.groupIdx];
+  if (!group) return;
+  if (storyViewer.storyIdx < group.stories.length - 1) {
+    storyViewer.storyIdx++;
+    render();
+    startStoryTimer();
+    markStorySeen(group.stories[storyViewer.storyIdx].id, group.uid);
+  } else if (storyViewer.groupIdx < allStories.length - 1) {
+    storyViewer.groupIdx++;
+    storyViewer.storyIdx = 0;
+    render();
+    startStoryTimer();
+  } else {
+    closeStoryViewer();
+  }
+}
+
+function prevStory() {
+  if (!storyViewer) return;
+  if (storyViewer.storyIdx > 0) {
+    storyViewer.storyIdx--;
+    render();
+    startStoryTimer();
+  }
+}
+
+function closeStoryViewer() {
+  clearInterval(storyTimer);
+  storyViewer = null;
+  SC = 'home';
+  render();
+}
+
+async function markStorySeen(storyId, uid) {
+  if (!currentUser || !uid) return;
+  rtdb.ref('stories/'+uid+'/'+storyId+'/views/'+currentUser.uid).set(true).catch(()=>{});
+}
+
+// Start alle Fase 3 listeners  
+function startFase3Listeners() {
+  if (!currentUser || currentUser.isAnonymous) return;
+  loadStories();
+  loadNotifications();
+  startBackgroundChatListener();
+}
+
+// Achtergrond chat listener - altijd actief voor nieuwe berichten
+function startBackgroundChatListener() {
+  if (!currentUser || currentUser.isAnonymous) return;
+  // Luister naar nieuwe berichten voor ALLE vrienden
+  myFriends.forEach(friend => {
+    const cid = getChatId(currentUser.uid, friend.uid);
+    rtdb.ref('chats/'+cid+'/unread/'+currentUser.uid).on('value', snap=>{
+      const count = snap.val() || 0;
+      unreadCounts[friend.uid] = count;
+      updateBadge();
+      // Als chat open is met deze vriend, markeer als gelezen
+      if(activeChat && activeChat.uid === friend.uid && count > 0) {
+        rtdb.ref('chats/'+cid+'/unread/'+currentUser.uid).set(0);
+        unreadCounts[friend.uid] = 0;
+      }
+      if(SC === 'chats') render();
+    });
+  });
+}
+
+
+// Lokale data
+function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+let DATA = ld('tf6_d',{categories:[]});
+let PROG = ld('tf6_p',{});
+let TB = ld('tf6_tb',{count:0,total:0,streak:0,lastDate:'',history:[],dhikr:'sb',sessions:0,tab:'tasbih'});
+let PS = ld('tf9_ps',{loc:null,city:'',country:'NL',qiblah:0,method:3,times:{},lastCalc:'',azanSound:0,azan:{fajr:true,dhuhr:false,asr:true,maghrib:true,isha:true}});
+
+function sva(){sv('tf6_d',DATA);sv('tf6_p',PROG);}
+function svt(){sv('tf6_tb',TB);}
+function svp(){sv('tf9_ps',PS);}
+
+// ══════════════════════════════════════════════
+// AUTH LISTENER
+// ══════════════════════════════════════════════
+const app2 = document.getElementById('app');
+
+// Timeout — app laadt altijd, ook zonder internet
+const _authTimeout = setTimeout(() => {
+  if(SC === 'loading') { currentUser = null; profile = null; go('login'); }
+}, 5000);
+
+auth.onAuthStateChanged(async user => {
+  clearTimeout(_authTimeout);
+  if(user) {
+    currentUser = user;
+    try {
+      const doc = await db.collection('users').doc(user.uid).get();
+      if(doc.exists) {
+        profile = doc.data();
+        // Privacy: e-mail hoort niet in het openbare profieldoc — eenmalig opruimen
+        if(profile.email !== undefined){
+          db.collection('users').doc(user.uid).update({email: firebase.firestore.FieldValue.delete()}).catch(()=>{});
+          delete profile.email;
+        }
+      } else {
+        profile = {
+          uid: user.uid,
+          displayName: user.displayName || user.email?.split('@')[0] || 'User',
+          avatar: 0, avatarColor: 0, bio: '', pts: 0, xp: 0, badges: [],
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('users').doc(user.uid).set(profile).catch(() => {});
+      }
+    } catch(e) {
+      profile = {
+        displayName: user.displayName || user.email?.split('@')[0] || 'User',
+        avatar: 0, avatarColor: 0, pts: 0, xp: 0, badges: []
+      };
+    }
+    if(pendingDL && SCREENS[pendingDL]){ go(pendingDL); pendingDL=null; }
+    else { go('home'); }
+    startFriendListeners();
+    startFase3Listeners();
+    setTimeout(startAzanChecker, 2000);
+    // Auto-laad gebedstijden bij opstarten
+    setTimeout(async()=>{
+      if(PS.loc && (!PS.times || Object.keys(PS.times).length < 3 || PS.lastCalc !== new Date().toDateString())){
+        toast({i:'⏳',t:'Prayer Times ophalen...'});
+        try {
+          const result = await fetchPrayerTimes(PS.loc.lat, PS.loc.lng, PS.country||'NL');
+          if(result){
+            PS.times=result.times;
+            PS.lastCalc=new Date().toDateString();
+            svp();
+            if(SC==='prayer')render();
+            toast({i:'✅',t:'Prayer Times loaded!'});
+          } else {
+            if(SC==='prayer')render();
+            toast({i:'⚠️',t:'Failed to load',s:'Tap Refresh'});
+          }
+        } catch(e) {
+          if(SC==='prayer')render();
+          toast({i:'❌',t:'Fout: '+e.message});
+        }
+      }
+    }, 1000);
+    // Welkomst toast (eenmalig na inloggen)
+    setTimeout(()=>toast({i:'👋',t:_om('Assalamu Alaykum')+'!',s:`${_om('Welcome back')} ${profile?.displayName||''}!`}),600);
+  } else {
+    currentUser = null;
+    profile = null;
+    go('login');
+  }
+});
+
+// ══════════════════════════════════════════════
+// ROUTER
+// ══════════════════════════════════════════════
+function go(s, d={}) {
+  if(s==='__back'){s=prevSC||'home';prevSC='home';}
+  else if(s!==SC){prevSC=SC;}
+  SC = s;
+  CX = d;
+  render();
+}
+
+function loadCommunityUnread() {
+  if(!currentUser) return;
+  var lastRead = {};
+  try { lastRead = JSON.parse(localStorage.getItem('tf_comm_read') || '{}'); } catch(e){}
+  
+  db.collection('groups').get().then(function(snap) {
+    snap.docs.forEach(function(d) {
+      var gid = d.id;
+      var gData = d.data();
+      var members = gData.members || [];
+      if(members.indexOf(currentUser.uid) < 0) return;
+      var groupName = gData.name || 'Group';
+      
+      db.collection('groups').doc(gid).collection('messages')
+        .orderBy('ts','desc').limit(1)
+        .onSnapshot(function(msgSnap) {
+          if(msgSnap.empty) return;
+          var lastMsg = msgSnap.docs[0].data();
+          var lastTs = lastMsg.ts && lastMsg.ts.seconds ? lastMsg.ts.seconds : 0;
+          var readTs = lastRead[gid] || 0;
+          if(lastTs > readTs && lastMsg.uid !== currentUser.uid) {
+            communityUnread++;
+            // Toon toast melding met groepsnaam
+            toast({i:'💬', t: groupName, s: (lastMsg.displayName || 'Someone') + ': ' + (lastMsg.text || '').substring(0, 40)});
+            // Update tabbar badge
+            var tabs = document.querySelector('.tabs');
+            if(tabs) tabs.innerHTML = rTabs().replace('<div class="tabs">', '').replace('</div>', '');
+          }
+        });
+    });
+  });
+}
+
+function updateFriendsBadge() {
+  var total = friendsUnread + friendReqCount;
+  // Update friends tab badge in tabbar
+  var tabs = document.getElementById('tabs-wrap');
+  if(tabs) {
+    var friendBadges = tabs.querySelectorAll('[data-friends-badge]');
+    friendBadges.forEach(function(b) {
+      b.textContent = total > 0 ? total : '';
+      b.style.display = total > 0 ? 'flex' : 'none';
+    });
+  }
+}
+
+function rQiblah() {
+  const qa = PS.qiblah || 0;
+  const loc = PS.loc;
+  const dist = loc ? Math.round(getDistanceToMecca(loc.lat, loc.lng)) : null;
+
+  return `<div class="screen" style="padding-top:0;background:linear-gradient(180deg,#0A0520 0%,#060818 100%)">
+
+    <!-- Header -->
+    <div style="width:100%;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;display:flex;align-items:center;gap:.75rem;max-width:560px">
+      <button class="bk" data-go="prayer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">← Back</button>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.15rem;background:linear-gradient(90deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🧭 Qibla Direction</div>
+    </div>
+
+    <!-- Kaäba info balk -->
+    <div style="width:100%;max-width:560px;padding:0 1rem;margin-bottom:1.2rem">
+      <div style="background:linear-gradient(135deg,rgba(107,63,255,.2),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.25);border-radius:1.1rem;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.85rem">
+        <div style="font-size:2.2rem">🕋</div>
+        <div style="flex:1">
+          <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#E9D5FF">Ka'bah · Makkah</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem">${loc ? esc(PS.city||'Your location') + (dist ? ' · ' + dist.toLocaleString() + ' km' : '') : 'Location not set'}</div>
+        </div>
+        <button id="glBtn" style="background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);border-radius:.65rem;color:#C4B5FD;padding:.4rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer">📍 ${loc ? 'Refresh' : 'Get Location'}</button>
+      </div>
+    </div>
+
+    <!-- Kompas -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;width:100%;padding:0 1rem">
+
+      <!-- Buitenste ring met graden -->
+      <div style="position:relative;width:300px;height:300px;flex-shrink:0">
+
+        <!-- Gloeiende achtergrond -->
+        <div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(107,63,255,.15) 0%,transparent 70%);pointer-events:none"></div>
+
+        <!-- Buiten ring decoratief - wordt groen als correct -->
+        <div id="qiblah-ring-outer" style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(139,92,246,.2);transition:all .5s"></div>
+        <div id="qiblah-ring-inner" style="position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(139,92,246,.1);transition:all .5s"></div>
+        <!-- Groene gloed ring (zichtbaar als correct gericht) -->
+        <div id="qiblah-glow-ring" style="position:absolute;inset:-4px;border-radius:50%;border:3px solid rgba(52,211,153,0);transition:all .6s;pointer-events:none"></div>
+
+        <!-- SVG kompas achtergrond -->
+        <svg width="300" height="300" viewBox="0 0 300 300" style="position:absolute;inset:0">
+          <!-- Binnenste cirkel achtergrond -->
+          <circle cx="150" cy="150" r="130" fill="rgba(6,8,24,.95)" stroke="rgba(139,92,246,.3)" stroke-width="1.5"/>
+          <circle cx="150" cy="150" r="115" fill="none" stroke="rgba(139,92,246,.1)" stroke-width="1"/>
+
+          <!-- Graden streepjes -->
+          ${Array.from({length:72},(_,i)=>{
+            const a=i*5*Math.PI/180;
+            const isMaj=i%18===0,isMed=i%9===0;
+            const r1=isMaj?105:isMed?110:115,r2=128;
+            const x1=150+r1*Math.sin(a),y1=150-r1*Math.cos(a);
+            const x2=150+r2*Math.sin(a),y2=150-r2*Math.cos(a);
+            return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${isMaj?'rgba(167,139,250,.5)':isMed?'rgba(139,92,246,.3)':'rgba(107,63,255,.15)'}" stroke-width="${isMaj?2:1}"/>`;
+          }).join('')}
+
+          <!-- N/Z/O/W labels -->
+          <text x="150" y="28" text-anchor="middle" fill="#F87171" font-family="Fredoka One" font-size="16" font-weight="bold">N</text>
+          <text x="150" y="282" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">Z</text>
+          <text x="278" y="155" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">O</text>
+          <text x="22" y="155" text-anchor="middle" fill="rgba(255,255,255,.4)" font-family="Fredoka One" font-size="14">W</text>
+
+          <!-- NW/NO/ZO/ZW -->
+          <text x="55" y="58" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">NW</text>
+          <text x="245" y="58" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">NO</text>
+          <text x="245" y="252" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">ZO</text>
+          <text x="55" y="252" text-anchor="middle" fill="rgba(255,255,255,.2)" font-family="Fredoka One" font-size="11">ZW</text>
+        </svg>
+
+        <!-- Draaiende naald (richting qiblah) -->
+        <div id="cmp-needle" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${qa}deg);transition:transform .4s cubic-bezier(.34,1.2,.64,1)">
+          <svg width="40" height="260" viewBox="0 0 40 260" style="overflow:visible">
+            <!-- Groene pijl naar Ka'bah -->
+            <defs>
+              <filter id="glow2"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+              <linearGradient id="needleGreen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#34D399"/>
+                <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+              <linearGradient id="needleGray" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6B7280"/>
+                <stop offset="100%" stop-color="#374151"/>
+              </linearGradient>
+            </defs>
+            <!-- Bovenste helft (towards Ka'bah - groen) -->
+            <polygon points="20,8 28,130 20,118 12,130" fill="url(#needleGreen)" filter="url(#glow2)"/>
+            <!-- Onderste helft (grijs) -->
+            <polygon points="20,252 28,130 20,142 12,130" fill="url(#needleGray)" opacity=".6"/>
+            <!-- Middelpunt -->
+            <circle cx="20" cy="130" r="7" fill="#A78BFA" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="130" r="3" fill="#fff"/>
+          </svg>
+        </div>
+
+        <!-- Ka'bah icoon in midden -->
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;margin-top:25px">
+          <span style="font-size:1.6rem;filter:drop-shadow(0 0 12px rgba(167,139,250,.8))">🕋</span>
+        </div>
+      </div>
+
+      <!-- Graden + info -->
+      ${loc ? `
+      <div style="text-align:center">
+        <div style="font-family:'Fredoka One',cursive;font-size:2.5rem;background:linear-gradient(135deg,#A78BFA,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="qib-deg">${Math.round(qa)}°</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:.2rem">Direction of Ka'bah from ${esc(PS.city||'your location')}</div>
+      </div>
+
+      <!-- Instructie kaart -->
+      <div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:1rem;padding:.85rem 1rem;width:100%;max-width:420px;text-align:center">
+        <div style="font-size:.88rem;color:#E9D5FF;line-height:1.6">
+          🟢 Rotate your phone until the <strong style="color:#34D399">green arrow</strong> points up<br/>
+          You are now facing the Ka'bah 🕋
+        </div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.4rem">
+          💡 Move your phone in a ∞ figure-8 motion to calibrate
+        </div>
+      </div>
+
+      <!-- iOS vereist een tik om kompasgegevens vrij te geven -->
+      <button id="cmpEnableBtn" style="background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:2rem;color:#fff;padding:.8rem 1.6rem;font-size:.92rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(16,185,129,.4)">🧭 Start Compass</button>
+
+      <!-- Afstand info -->
+      ${dist ? `
+      <div style="display:flex;gap:.65rem;width:100%;max-width:420px">
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#A78BFA">${dist.toLocaleString()}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">km to Makkah</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#60A5FA">${Math.round(qa)}°</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">direction (°)</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.85rem;padding:.75rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#34D399">${Math.round(dist/80)}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.4)">flight hours</div>
+        </div>
+      </div>` : ''}
+      ` : `
+      <div style="text-align:center;padding:1rem">
+        <div style="font-size:.88rem;color:rgba(255,255,255,.4);margin-bottom:1rem">Tap "Get Location" to calculate the Qibla direction</div>
+        <button id="glBtn2" style="background:linear-gradient(135deg,#6B3FFF,#8B5CF6);border:none;border-radius:.85rem;color:#fff;padding:.85rem 1.5rem;font-size:.92rem;font-weight:700;cursor:pointer">📍 Get Location</button>
+      </div>`}
+    </div>
+  </div>`;
+}
+function startCompass(){
+  if(_cmpH) window.removeEventListener('deviceorientation', _cmpH, true);
+  clearTimeout(window._cmpNoData);
+  let gotEvent = false;
+
+  _cmpH = function(e){
+    let h;
+    if(typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;
+    else if(e.alpha !== null) h = (360 - e.alpha) % 360;
+    else return;
+    if(!gotEvent){ gotEvent = true; clearTimeout(window._cmpNoData); }
+    const rot = (PS.qiblah||0) - h;
+    const n = document.getElementById('cmp-needle');
+    if(n) n.style.transform = `rotate(${rot}deg)`;
+    const normRot = ((rot % 360) + 360) % 360;
+    updateQiblahGlow(normRot < 10 || normRot > 350);
+    const degEl = document.getElementById('qib-deg');
+    if(degEl) degEl.textContent = Math.round((PS.qiblah||0)) + '°';
+  };
+
+  function activate(){
+    window.addEventListener('deviceorientation', _cmpH, true);
+    const eb=document.getElementById('cmpEnableBtn');
+    if(eb) eb.style.display='none';
+    toast({i:'🧭', t:'Compass active'});
+    window._cmpNoData = setTimeout(function(){
+      if(!gotEvent) toast({i:'⚠️', t:'No compass data', s:'This device may not support it'});
+    }, 3000);
+  }
+
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission()
+      .then(function(p){
+        if(p === 'granted') activate();
+        else toast({i:'🚫', t:'Compass denied', s:'Settings → Safari → Motion & Orientation'});
+      })
+      .catch(function(err){
+        toast({i:'❌', t:'Compass error', s:err && err.message ? err.message : 'Tap the button again'});
+      });
+  } else {
+    activate();
+  }
+}
+// ── Follow-tellers (volgsysteem, fase E) ──
+function vulMediaStrip(){
+  try{
+    if(!db||!currentUser)return;
+    db.collection('photos').orderBy('ts','desc').limit(3).get().then(snap=>{
+      const el=document.getElementById('strip-media');
+      if(!el||!snap.docs.length)return;
+      el.innerHTML=snap.docs.map(d=>`<img src="${esc(d.data().img||'')}" loading="lazy" onerror="this.style.display='none'"/>`).join('');
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+function loadFollowStats(){
+  if(!currentUser || currentUser.isAnonymous) return;
+  const setVal = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  const col = db.collection('follows');
+  const doCount = (q, id) => {
+    try {
+      q.count().get().then(s => setVal(id, s.data().count))
+        .catch(() => q.get().then(s => setVal(id, s.size)).catch(()=>{}));
+    } catch(e) {
+      q.get().then(s => setVal(id, s.size)).catch(()=>{});
+    }
+  };
+  doCount(col.where('to','==',currentUser.uid), 'folCount');
+  doCount(col.where('from','==',currentUser.uid), 'ingCount');
+}
+
+function getDistanceToMecca(lat, lng) {
+  const R = 6371; // km
+  const mLat = 21.4225, mLng = 39.8262;
+  const dLat = (mLat-lat)*Math.PI/180;
+  const dLng = (mLng-lng)*Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat*Math.PI/180)*Math.cos(mLat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function render() {
+  try {
+    const map = {
+      loading: rLoading,
+      login: rLogin,
+      register: rRegister,
+      'forgot-pw': rForgotPw,
+      home: rHome,
+      profile: rProfile,
+      'edit-profile': rEditProfile,
+      'play-cats': function(){ return rIframe('lessons.html'); },
+      tasbih: rTasbih,
+      prayer: function(){ return rIframe('prayer.html'); },
+      qiblah: rQiblah,
+      comingsoon: rComingSoon,
+      'hijri-cal': function(){ return rIframe('calendar.html'); },
+      'sirah-quiz': function(){ return rIframe('sirah_quiz.html'); },
+      media: function(){ return rIframe('media.html'); },
+      verhalen: function(){ return rIframe('verhalen.html'); },
+      photos: function(){ return rIframe('photos.html'); },
+      videos: function(){ return rIframe('videos.html'); },
+      announcements: function(){ return rIframe('announcements.html'); },
+      admin: function(){ return rIframe('admin.html'); },
+      search: function(){ return rIframe('search.html'); },
+      quran: function(){ return rIframe('quran.html'); },
+      userprofile: function(){ return rIframe('userprofile.html?uid='+encodeURIComponent(userProfileUid||'')); },
+      community: function(){ return rIframe('community.html'); },
+      'create-group': function(){ return rIframe('community.html'); },
+      'group-chat': function(){ return rIframe('community.html'); },
+      friends: function(){ return rIframe('friends.html'); },
+      chats: function(){ return rIframe('friends.html'); },
+      chat: function(){ return rIframe('friends.html'); },
+      'story-view': rStoryView,
+      'story-create': rStoryCreate,
+      notifications: function(){ return rIframe('notifications.html'); },
+    };
+    const fn = map[SC] || rHome;
+    const screenHtml = fn();
+    const tabsHtml = needsTabs() ? rTabs() : '';
+    app2.innerHTML = '<div id="screen-wrap" style="position:absolute;inset:0;">' + screenHtml + '</div>' + '<div id="tabs-wrap" style="position:fixed;bottom:0;left:0;right:0;z-index:100">' + tabsHtml + '</div>';
+    bind();
+    if(SC === 'profile') loadFollowStats();
+  if(SC === 'home') vulMediaStrip();
+    if(SC === 'prayer') {
+      setTimeout(()=>{if(SC==='prayer')render();}, 60000);
+      // Auto-laad tijden als locatie bekend maar tijden leeg
+      if(PS.loc && (!PS.times || Object.keys(PS.times).length < 3)) {
+        setTimeout(async()=>{
+          const result = await fetchPrayerTimes(PS.loc.lat, PS.loc.lng, PS.country||'NL');
+          if(result){PS.times=result.times;PS.lastCalc=new Date().toDateString();svp();if(SC==='prayer')render();}
+        }, 500);
+      }
+    }
+  } catch(e) {
+    app2.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;padding:2rem;text-align:center">
+      <div style="font-size:2rem">⚠️</div>
+      <div style="color:#1BAAFF;font-weight:600">Tolaanfur</div>
+      <div style="color:#718096;font-size:.82rem">${e.message}</div>
+      <button onclick="location.reload()" style="background:#2563EB;color:white;border:none;padding:.85rem 2rem;border-radius:.85rem;font-size:1rem;cursor:pointer;margin-top:1rem;font-weight:600">🔄 Opnieuw</button>
+    </div>`;
+  }
+}
+
+function needsTabs() {
+  const noTab = ['loading','login','register','forgot-pw','qiblah','chat','story-view','story-create','group-chat','tasbih','sirah-quiz','media','hijri-cal'];
+  return !noTab.includes(SC);
+}
+
+function rTabs() {
+  if(!needsTabs())return'';
+  const noChat=['login','register','forgot-pw','chat'];
+  const tot=Object.values(unreadCounts).reduce((a,b)=>a+b,0)+friendRequests.length;
+  const chatBadge = Object.values(unreadCounts).reduce((a,b)=>a+b,0);
+  const reqBadge = friendRequests.length;
+  const omLabels={home:'Mana',friends:'Hiriyoota',community:'Hawaasa',notif:'Beeksisa',profile:'Profaayila'};
+  const isOm=localStorage.getItem('tf_ln')==='om';
+  const tabs=[
+    {id:'home',i:IC.home,l:isOm?omLabels.home:'Home'},
+    {id:'friends',i:IC.friends,l:isOm?omLabels.friends:'Friends',badge:reqBadge},
+    {id:'community',i:IC.community,l:isOm?omLabels.community:'Community',badge:communityUnread},
+    {id:'notifications',i:IC.notifications,l:isOm?omLabels.notif:'Notifications',badge:unreadNotifs},
+    {id:'profile',i:IC.profile,l:isOm?omLabels.profile:'Profile'}
+  ];
+  return`<div class="tabs">${tabs.map(t=>`<button class="tab${SC===t.id?' on':''}" data-go="${t.id}"><span class="ti" style="position:relative">${t.i}${t.badge?`<span id="chatBadge" style="position:absolute;top:-.2rem;right:-.4rem;background:var(--rd);border-radius:50%;min-width:.9rem;height:.9rem;font-size:.52rem;font-weight:700;color:#fff;display:grid;place-items:center;padding:0 .15rem">${t.badge}</span>`:''}</span><span class="tl">${t.l}</span></button>`).join('')}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// LOADING
+// ══════════════════════════════════════════════
+function rLoading() {
+  return `<div class="loading">
+    <div class="tfl" style="width:80px;height:80px;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(0,191,255,.4)">
+      <img src="icon.png" alt="TF" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/>
+    </div>
+    <div class="spinner"></div>
+    <div style="color:var(--b3);font-family:'Fredoka One',cursive;font-size:1rem">Loading...</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// AUTH — LOGIN
+// ══════════════════════════════════════════════
+function rLogin() {
+  return `<div class="auth-screen">
+    <div class="lw" style="margin-bottom:1.5rem">
+      <div class="tfl"><img src="icon.png" alt="TF" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/></div>
+      <div class="l-ar">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
+      <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-top:.15rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
+      <div class="l-nm">TOLAANFUR</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-title">Welcome back 👋</div>
+      <div class="auth-sub">Sign in to your account</div>
+      <div class="fld">
+        <label class="lbl">Email address</label>
+        <input class="inp" id="loginEmail" type="email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Password</label>
+        <input class="inp" id="loginPw" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        <div id="loginErr" class="err-msg" style="display:none"></div>
+      </div>
+      <button class="btn bp" id="loginBtn" style="margin-top:.5rem">Login →</button>
+      <div class="auth-divider">or</div>
+      <button class="btn bg" id="googleBtn" style="display:flex;align-items:center;justify-content:center;gap:.6rem;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:.85rem;padding:.75rem 1rem;width:100%;font-size:.95rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>Continue with Google</button>
+      <div style="display:flex;justify-content:space-between;margin-top:1rem">
+        <button class="btn-link" id="toRegister">Register →</button>
+        <button class="btn-link" id="toForgot">Forgot password?</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// AUTH — REGISTREREN
+// ══════════════════════════════════════════════
+function rRegister() {
+  return `<div class="auth-screen">
+    <div class="lw" style="margin-bottom:1.2rem">
+      <div class="tfl"><img src="icon.png" alt="TF" onerror="this.parentNode.style.background='linear-gradient(135deg,#2563EB,#6B3FFF)';this.style.display='none'"/></div>
+      <div class="l-nm">TOLAANFUR</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-title">Create account ✨</div>
+      <div class="auth-sub">Create a free account</div>
+      <div class="fld">
+        <label class="lbl">Name</label>
+        <input class="inp" id="regName" type="text" placeholder="Your name" maxlength="30" autocomplete="name"/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Email address</label>
+        <input class="inp" id="regEmail" type="email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Password (min. 6 characters)</label>
+        <input class="inp" id="regPw" type="password" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <div class="fld">
+        <label class="lbl">Password bevestigen</label>
+        <input class="inp" id="regPw2" type="password" placeholder="••••••••" autocomplete="new-password"/>
+        <div id="regErr" class="err-msg" style="display:none"></div>
+      </div>
+      <button class="btn bp" id="regBtn" style="margin-top:.5rem">Create Account →</button>
+      <div style="text-align:center;margin-top:1rem">
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// AUTH — WACHTWOORD VERGETEN
+// ══════════════════════════════════════════════
+function rForgotPw() {
+  return `<div class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-title">Password herstel 🔑</div>
+      <div class="auth-sub">Voer je e-mail in — we sturen een herstellink</div>
+      <div class="fld">
+        <label class="lbl">Email address</label>
+        <input class="inp" id="fwEmail" type="email" placeholder="your@email.com"/>
+        <div id="fwMsg" class="err-msg" style="display:none"></div>
+      </div>
+      <button class="btn bp" id="fwBtn">Herstelmail versturen →</button>
+      <div style="text-align:center;margin-top:1rem">
+        <button class="btn-link" id="toLogin">← Back naar inloggen</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+function rHome() {
+  const dt = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const name = profile?.displayName || currentUser?.email?.split('@')[0] || 'Guest';
+  const isGuest = !currentUser || currentUser.isAnonymous;
+
+  const items = [
+    {id:'quran',i:IC.quran,n:'Quran',d:'Read the Mushaf',c:'#1D8348'},
+    {id:'play-cats',i:IC['play-cats'],n:'Lessons',d:'Islamic knowledge',c:'#2563EB'},
+    {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Prophet Muhammad ﷺ',c:'#7C3AED'},
+    {id:'tasbih',i:IC.tasbih,n:_om('Tasbih & Zikr'),d:_om('Dhikr & practice'),c:'#6B3FFF'},
+    {id:'prayer',i:IC.prayer,n:_om('Prayer Times'),d:_om('Prayer times & Adhan'),c:'#059669'},
+    {id:'media',i:IC.media,n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
+  ];
+
+  const av = AV[(profile?.avatar||0)%AV.length];
+  const ac = AC[(profile?.avatarColor||0)%AC.length];
+
+  const BDG = {quran:'604 pages','play-cats':'24+','sirah-quiz':'30 Levels',tasbih:'Zikr',media:'New',prayer:'5 Times',qiblah:'Live',calendar:'Hijri'};
+  return `<div class="screen" style="padding-top:0">
+    <!-- Vaste bovenbalk: naam links, zoeken rechts -->
+    <div style="position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;width:calc(100% + 2rem);margin:0 -1rem;padding:max(env(safe-area-inset-top),.6rem) 1rem .5rem;background:rgba(6,8,24,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(100,140,255,.08)">
+      <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Tolaanfur</div>
+      <div data-go="search" style="width:2.35rem;height:2.35rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;font-size:1.05rem;cursor:pointer" class="zoek-knop">${IC.search}</div>
+    </div>
+
+    <!-- HEADER met logo + stories cirkel eromheen -->
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center;padding:max(env(safe-area-inset-top),.75rem) 1rem .5rem;width:100%">
+
+      <!-- Begroeting -->
+      <div style="width:100%;max-width:560px;text-align:left;margin-top:.35rem">
+        <div style="font-size:1.1rem;font-weight:700">Assalaamu alaikum 👋</div>
+        <div style="font-size:.78rem;color:var(--sl2);margin-top:.15rem">Welcome back, ${esc(name)}!</div>
+      </div>
+
+      <!-- Dua + datum-kaart -->
+      <div style="width:100%;max-width:560px;background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;margin-top:.7rem;display:flex;align-items:center;gap:.75rem;backdrop-filter:blur(12px)">
+        <div style="flex:1;min-width:0">
+          <div class="l-ar" style="margin:0;text-align:left;font-size:1.02rem">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-top:.2rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:.82rem;font-weight:700">${esc(dt)}</div>
+          <div id="home-hijri" style="font-size:.68rem;color:var(--gold2);margin-top:.2rem"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stories balk (cirkels van vrienden) -->
+    ${!isGuest ? `<div style="width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-top:.8rem"><div style="font-family:'Fredoka One',cursive;font-size:1.05rem">› Stories</div></div>` : ''}
+    ${!isGuest ? rStoriesBar() : ''}
+
+    <!-- Menu: originele kaarten, horizontaal scrollbaar (groeit mee met nieuwe items) -->
+    <div class="mgh">
+      ${items.map(m=>`<div class="mc2 cursor-pointer" data-go="${m.id}">
+        <div style="display:flex;align-items:flex-start;gap:.6rem">
+          <div class="mc2-ico" style="background:${m.c}30;border:1px solid ${ha(m.c,.45)}">${m.i}</div>
+          <div style="flex:1;min-width:0">
+            <div class="mc2-t">${m.n}<span class="mc2-chev">›</span></div>
+            <div class="mc2-d">${m.d}</div>
+          </div>
+        </div>
+        ${BDG[m.id]?`<div class="mc2-badge" style="background:${m.c}45;border:1px solid ${ha(m.c,.55)}">${BDG[m.id]}</div>`:''}
+        <div class="mc2-strip" id="strip-${m.id}">${m.id==='quran'?[1,2,3].map(nn=>`<img src="quran/images/page_00${nn}.webp" loading="lazy" onerror="this.style.display='none'"/>`).join(''):m.id==='media'?'':[1,2,3].map(nn=>`<img src="img/home/${m.id}_${nn}.jpg" loading="lazy" onerror="this.style.display='none'"/>`).join('')}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Kennis-quote (authentieke hadith) -->
+    <div style="width:100%;max-width:560px;background:linear-gradient(135deg,rgba(107,63,255,.18),var(--card));border:1px solid rgba(155,111,255,.35);border-radius:1.1rem;padding:1.1rem;margin-top:.85rem">
+      <div style="font-size:1.7rem;color:var(--pu2);line-height:1;font-family:Georgia,serif">“</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1rem;line-height:1.55;margin:.2rem 0 .45rem">Whoever follows a path in pursuit of knowledge, Allah makes easy for him a path to Paradise.</div>
+      <div style="font-size:.7rem;color:var(--sl2)">— Prophet Muhammad ﷺ · Sahih Muslim</div>
+    </div>
+
+    ${isGuest ? `<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:.85rem;padding:.75rem 1rem;width:100%;max-width:560px;margin-top:.75rem;display:flex;align-items:center;gap:.65rem">
+      <span>⚠️</span><div style="flex:1;font-size:.8rem;color:var(--gold2)">Create an account to use everything</div>
+      <button class="btn bt bsm" data-go="register">Account</button>
+    </div>` : ''}
+  </div>`;
+}
+
+
+function rProfile() {
+  const isGuest = !currentUser || currentUser.isAnonymous;
+  const name = profile?.displayName || currentUser?.email?.split('@')[0] || 'Guest';
+  const email = currentUser?.email || 'Guest account';
+  const avatar = AV[(profile?.avatar||0)%AV.length];
+  const avatarColor = AC[(profile?.avatarColor||0)%AC.length];
+  const pts = profile?.pts || 0;
+  const xp = profile?.xp || 0;
+  const lvl = Math.floor(xp/500)+1;
+  const xpPct = Math.round(((xp%500)/500)*100);
+  
+  // Statistieken
+  const totalDone = Object.values(PROG).reduce((a,p)=>a+Object.keys(p.cp||{}).length,0);
+  
+  return `<div class="screen">
+    <div class="nav" style="padding-top:.75rem">
+      <div class="nt">👤 Profile</div>
+      <button onclick="var l=localStorage.getItem('tf_ln');localStorage.setItem('tf_ln',l==='om'?'nl':'om');render();toast({i:'🌍',t:l==='om'?'English':'Afaan Oromoo'})" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;color:var(--sl2);padding:.35rem .65rem;font-size:.8rem;cursor:pointer">${localStorage.getItem('tf_ln')==='om'?'🇬🇧':'🇪🇹'}</button>
+      ${!isGuest?`<button class="btn bs bsm" data-go="edit-profile">✏️ Edit</button>`:''}
+    </div>
+    
+    <!-- Profiel header -->
+    <div class="prof-header">
+      <div class="prof-avatar" style="background:${avatarColor}">${avatar}</div>
+      <div class="prof-name">${esc(name)}</div>
+      <div class="prof-email">${esc(email)}</div>
+      ${isGuest ? `<span class="badge badge-draft">👤 Guest</span>` : `<span class="badge badge-live">✅ Account</span>`}
+      <div class="prof-stats">
+        <div class="prof-stat"><div class="prof-stat-val" id="folCount">–</div><div class="prof-stat-lbl">Followers</div></div>
+        <div class="prof-stat"><div class="prof-stat-val" id="ingCount">–</div><div class="prof-stat-lbl">Following</div></div>
+        <div class="prof-stat"><div class="prof-stat-val">${totalDone}</div><div class="prof-stat-lbl">Levels completed</div></div>
+        <div class="prof-stat"><div class="prof-stat-val">${TB.streak}🔥</div><div class="prof-stat-lbl">Tasbih streak</div></div>
+        <div class="prof-stat"><div class="prof-stat-val">${pts.toLocaleString()}</div><div class="prof-stat-lbl">Points</div></div>
+      </div>
+    </div>
+    
+    <!-- XP voortgang -->
+    ${!isGuest ? `<div class="sec">
+      <div class="sh"><div class="st">⭐ Level ${lvl}</div><div style="font-size:.8rem;color:var(--sl2)">${xp%500}/500 XP</div></div>
+      <div class="pb" style="height:8px"><div class="pf" style="width:${xpPct}%;background:linear-gradient(90deg,var(--b2),var(--pu))"></div></div>
+      <div style="font-size:.72rem;color:var(--sl2);margin-top:.4rem">${500-(xp%500)} XP needed for Level ${lvl+1}</div>
+    </div>` : ''}
+    ${!isGuest ? rG9Block() : ''}
+    
+    <!-- Gast — aanmaken prompt -->
+    ${isGuest ? `<div class="sec" style="text-align:center">
+      <div style="font-size:2rem;margin-bottom:.6rem">🔐</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--b3);margin-bottom:.4rem">Create a free account</div>
+      <div style="font-size:.82rem;color:var(--sl2);margin-bottom:1rem;line-height:1.5">Sla je voortgang op, synchroniseer tussen apparaten en maak gebruik van alle functies.</div>
+      <button class="btn bp" id="toRegisterProf">Create Account →</button>
+      <div style="margin-top:.75rem"><button class="btn-link" id="toLoginProf">Already have an account? Sign in</button></div>
+    </div>` : ''}
+    
+    <!-- Tasbih statistieken -->
+    <div class="sec">
+      <div class="sh"><div class="st">📿 Tasbih</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem">
+        <div style="background:rgba(255,255,255,.04);border-radius:.75rem;padding:.75rem .5rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--b3)">${TB.count}</div>
+          <div style="font-size:.65rem;color:var(--sl2)">${_om('Today')}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:.75rem;padding:.75rem .5rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--gold)">${TB.streak}🔥</div>
+          <div style="font-size:.65rem;color:var(--sl2)">${_om('Streak')}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:.75rem;padding:.75rem .5rem;text-align:center">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--pu2)">${TB.total.toLocaleString()}</div>
+          <div style="font-size:.65rem;color:var(--sl2)">${_om('Total')}</div>
+        </div>
+      </div>
+    </div>
+    
+    ${profile?.isAdmin===true ? `<div class="sec">
+      <div class="sh"><div class="st">🛡️ Admin</div></div>
+      <button class="btn bs" data-go="admin">🛡️ Open admin panel</button>
+    </div>` : ''}
+
+    <!-- Instellingen -->
+    ${!isGuest ? `<div class="sec">
+      <div class="sh"><div class="st">⚙️ Account</div></div>
+      <div style="font-size:.72rem;color:var(--sl2);margin-bottom:.4rem">🌐 Language (home screen & menus)</div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.75rem">
+        <button class="btn bs" id="lnEn" style="${localStorage.getItem('tf_ln')==='om'?'':'border-color:var(--b3);color:var(--b3)'}">English</button>
+        <button class="btn bs" id="lnOm" style="${localStorage.getItem('tf_ln')==='om'?'border-color:var(--b3);color:var(--b3)':''}">Afaan Oromoo</button>
+      </div>
+      <button class="btn bs" id="logoutBtn" style="color:var(--rd);border-color:rgba(244,63,94,.25)">🚪 Logout</button>
+    </div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// PROFIEL BEWERKEN
+// ══════════════════════════════════════════════
+function rEditProfile() {
+  const name = profile?.displayName || '';
+  const bio = profile?.bio || '';
+  const curAvatar = profile?.avatar || 0;
+  const curColor = profile?.avatarColor || 0;
+  const d = CX.dr || {name, bio, avatar: curAvatar, avatarColor: curColor};
+  
+  return `<div class="screen">
+    <div class="nav"><button class="bk" data-go="profile">← Back</button><div class="nt">Edit profile</div></div>
+    
+    <div class="sec">
+      <!-- Avatar preview -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:1.25rem">
+        <div style="width:80px;height:80px;border-radius:50%;background:${AC[(d.avatarColor||0)%AC.length]};display:grid;place-items:center;font-size:2.2rem;border:3px solid rgba(0,191,255,.3);box-shadow:0 0 20px rgba(0,191,255,.2)" id="avatarPreview">${AV[(d.avatar||0)%AV.length]}</div>
+      </div>
+      
+      <div class="fld2"><label class="lbl2">Choose your avatar</label>
+        <div class="ig">${AV.map((av,i)=>`<div class="io${(d.avatar||0)===i?' sl':''}" data-av="${i}" style="font-size:1.3rem">${av}</div>`).join('')}</div>
+      </div>
+      <div class="fld2"><label class="lbl2">Avatar colour</label>
+        <div class="cr2">${AC.map((c,i)=>`<div class="cs2${(d.avatarColor||0)===i?' sl':''}" data-avc="${i}" style="background:${c}"></div>`).join('')}</div>
+      </div>
+      <div class="fld2"><label class="lbl2">Name</label>
+        <input class="inp2" id="epName" value="${esc(d.name)}" placeholder="Your name" maxlength="30"/>
+      </div>
+      <div class="fld2"><label class="lbl2">Bio (optional)</label>
+        <textarea class="inp2" id="epBio" rows="2" placeholder="Tell us a bit about yourself...">${esc(d.bio)}</textarea>
+      </div>
+      <button class="btn bp" id="saveProfileBtn" style="margin-top:.5rem">Save ✓</button>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// COMING SOON
+// ══════════════════════════════════════════════
+
+function rIframe(src) {
+  const h = needsTabs() ? 'calc(100vh - 6rem - env(safe-area-inset-bottom) - env(safe-area-inset-top))' : 'calc(100vh - env(safe-area-inset-top))';
+  return '<div class="screen" style="padding:0;overflow:hidden"><iframe src="' + src + '" style="width:100%;height:' + h + ';border:none;display:block" allow="geolocation; gyroscope; accelerometer; deviceorientation"></iframe></div>';
+}
+
+
+function rComingSoon() {
+  const phases = [
+    {fase:'Phase 2',items:['💬 Private chat','👥 Add friends','🤝 Friend requests'],color:'#1E90FF'},
+    {fase:'Phase 3',items:['📸 Stories (24h)','🔔 Notifications','📱 Push notifications'],color:'#6B3FFF'},
+    {fase:'Phase 4',items:['📿 Improved Tasbih','🕌 Advanced Prayer Times','🧭 Qiblah with map'],color:'#059669'},
+    {fase:'Phase 5',items:['👥 '+_om('Groups'),'🌐 Community','🏆 Leaderboards'],color:'#D97706'},
+  ];
+  return `<div class="screen">
+    <div class="nav" style="padding-top:.75rem"><div class="nt">🚀 Roadmap</div></div>
+    <div style="width:100%;max-width:560px;text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🛠️</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--b3)">In ontwikkeling</div>
+      <div style="font-size:.85rem;color:var(--sl2);margin-top:.35rem;line-height:1.5">Tolaanfur wordt stap voor stap uitgebreid. Hier is wat er komt!</div>
+    </div>
+    ${phases.map(p=>`<div class="sec">
+      <div class="sh"><div class="st" style="color:${p.color}">${p.fase}</div><span class="badge badge-draft">Binnenkort</span></div>
+      ${p.items.map(item=>`<div style="display:flex;align-items:center;gap:.65rem;padding:.45rem 0;border-bottom:1px solid var(--bdr)">
+        <span style="font-size:1rem">${item.split(' ')[0]}</span>
+        <span style="font-size:.85rem">${item.substring(item.indexOf(' ')+1)}</span>
+      </div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// TASBIH
+// ══════════════════════════════════════════════
+const DH=[
+  {id:'sb',ar:'سُبْحَانَ اللهِ',nl:'Soebhaan Allah',t:33},
+  {id:'al',ar:'الْحَمْدُ لِلَّهِ',nl:'Alhamdulillah',t:33},
+  {id:'ak',ar:'اللهُ أَكْبَرُ',nl:'Allahoe Akbar',t:33},
+  {id:'la',ar:'لَا إِلَٰهَ إِلَّا اللهُ',nl:'Laa ilaaha ill-Allah',t:100},
+  {id:'as',ar:'أَسْتَغْفِرُ اللهَ',nl:'Astaghfiroellah',t:100},
+  {id:'sw',ar:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ',nl:'Salawat op de Profeet',t:100}
+];
+
+function rTasbih(){
+  return `<div style="position:fixed;inset:0;z-index:10;background:#04060F;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:.75rem;padding:max(env(safe-area-inset-top),.75rem) 1rem .6rem;background:rgba(4,6,15,.9);flex-shrink:0">
+      <button onclick="SC='home';render()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:.65rem;color:rgba(255,255,255,.6);padding:.4rem .85rem;font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif">← Back</button>
+      <div style="font-family:'Amiri',serif;font-size:1.1rem;color:#E8C97A;flex:1;text-align:center">التسبيح</div>
+    </div>
+    <iframe src="tasbih_game.html" style="flex:1;border:none;width:100%;height:100%" allow="vibrate"></iframe>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// STORIES — SCHERMEN
+// ══════════════════════════════════════════════
+function rStoriesBar() {
+  const bubbles = allStories.map((g, idx) => {
+    const seen = g.stories.every(s => s.views && currentUser && s.views[currentUser.uid]);
+    return `<div class="story-bubble" onclick="openStoryGroup(${idx})">
+      <div class="story-ring${g.isOwn ? ' own' : seen ? ' seen' : ''}">
+        <div class="story-av" style="background:${AC[(g.avatarColor||0)%AC.length]}">${AV[(g.avatar||0)%AV.length]}</div>
+      </div>
+      <div class="story-nm">${g.isOwn ? 'You' : esc(g.displayName)}</div>
+    </div>`;
+  }).join('');
+  return `<div class="stories-bar">
+    <div class="story-bubble" onclick="SC='story-create';storyCreatorType='text';storyText='';render()">
+      <div class="story-add">➕</div>
+      <div class="story-nm">Story</div>
+    </div>
+    ${bubbles}
+  </div>`;
+}
+
+function rStoryView() {
+  if (!storyViewer) { SC = 'home'; return rHome(); }
+  const group = allStories[storyViewer.groupIdx];
+  if (!group || !group.stories.length) { SC = 'home'; return rHome(); }
+  const idx = Math.min(storyViewer.storyIdx, group.stories.length - 1);
+  const s = group.stories[idx];
+  const bars = group.stories.map((x, i) =>
+    `<div class="sv-prog-bar"><div class="sv-prog-fill" ${i === idx ? 'id="sv-fill"' : ''} style="width:${i < idx ? '100%' : '0%'}"></div></div>`
+  ).join('');
+  const mins = Math.max(1, Math.round((Date.now() - (s.ts || Date.now())) / 60000));
+  const ago = mins < 60 ? mins + 'm' : Math.round(mins / 60) + 'u';
+  return `<div class="story-viewer">
+    <div class="sv-content" id="sv-content">
+      <div class="sv-text-story" style="background:${s.bg || STORY_BG_COLORS[0]}"><div class="sv-txt">${esc(s.text || '')}</div></div>
+      <div class="sv-tap-left"></div>
+      <div class="sv-tap-right"></div>
+    </div>
+    <div class="sv-header">
+      <div class="sv-progress">${bars}</div>
+      <div class="sv-top">
+        <div class="sv-av" style="background:${AC[(group.avatarColor||0)%AC.length]}">${AV[(group.avatar||0)%AV.length]}</div>
+        <div class="sv-name">${group.isOwn ? 'Ik' : esc(group.displayName)}</div>
+        <div class="sv-time">${ago}</div>
+        <button class="sv-close" onclick="closeStoryViewer()">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function rStoryCreate() {
+  return `<div class="story-creator">
+    <div class="sc-header">
+      <button class="bk" data-go="home">← Back</button>
+      <div class="nt">✨ Nieuwe story</div>
+    </div>
+    <div class="sc-preview" style="background:${storyBgColor}">
+      <div class="sc-txt-prev" id="scPrev">${esc(storyText) || 'Type your text...'}</div>
+    </div>
+    <div class="bg-picker">
+      ${STORY_BG_COLORS.map((c, i) => `<div class="bg-opt${c === storyBgColor ? ' on' : ''}" data-bg="${i}" style="background:${c}"></div>`).join('')}
+    </div>
+    <div style="width:100%;max-width:400px">
+      <textarea class="inp2" id="storyTextInput" rows="3" maxlength="200" placeholder="Deel je moment... (max 200 tekens)">${esc(storyText)}</textarea>
+      <button class="btn bp" id="publishStoryBtn" style="margin-top:.75rem">Publish ✓</button>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// LOCATIE & GEBEDSTIJDEN
+// ══════════════════════════════════════════════
+async function getLoc(){
+  if(!navigator.geolocation){toast({i:'❌',t:'GPS not available'});return;}
+  toast({i:'📍',t:'Getting location...'});
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lt=pos.coords.latitude, lg=pos.coords.longitude;
+    PS.loc={lat:lt,lng:lg};
+
+    // Qiblah-richting berekenen (gedeeld met prayer.html via localStorage)
+    const kl=21.4225,kl2=39.8262,dL=(kl2-lg)*Math.PI/180;
+    PS.qiblah=((Math.atan2(Math.sin(dL)*Math.cos(kl*Math.PI/180),Math.cos(lt*Math.PI/180)*Math.sin(kl*Math.PI/180)-Math.sin(lt*Math.PI/180)*Math.cos(kl*Math.PI/180)*Math.cos(dL)))*180/Math.PI+360)%360;
+
+    // Stad + land
+    let cc='NL';
+    try{
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lt+'&lon='+lg+'&accept-language=nl');
+      const d=await r.json();
+      PS.city=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||'Your location';
+      cc=(d.address?.country_code||'nl').toUpperCase();
+      PS.country=cc;
+    }catch(e){PS.city='Your location';}
+
+    svp();render();
+    toast({i:'⏳',t:'Loading Prayer Times...'});
+
+    const result = await fetchPrayerTimes(lt, lg, cc);
+    if(result){
+      PS.times=result.times;
+      PS.lastCalc=new Date().toDateString();
+      svp();render();
+      toast({i:'✅',t:'Updated!',s:PS.city+' · '+result.methodName});
+    } else {
+      svp();render();
+      toast({i:'⚠️',t:'API unavailable',s:'Please try again'});
+    }
+  }, e=>toast({i:'❌',t:'Location failed',s:e.message}));
+}
+
+async function fetchPrayerTimes(lat, lng, countryCode) {
+  const METHODS = {'NL':3,'BE':3,'DE':3,'FR':3,'GB':3,'SE':3,'NO':3,'DK':3,'FI':3,'IT':3,'ES':3,'PT':3,'AT':3,'CH':3,'US':2,'CA':2,'SA':4,'AE':4,'KW':4,'BH':4,'QA':4,'PK':5,'IN':5,'BD':5,'EG':1};
+  const method = PS.method || METHODS[countryCode] || 3;
+  PS.method = method;
+  const d = new Date();
+  const ds = d.getDate()+'-'+(d.getMonth()+1)+'-'+d.getFullYear();
+  const url = 'https://api.aladhan.com/v1/timings/'+ds+'?latitude='+lat+'&longitude='+lng+'&method='+method+'&school=0';
+  const methodNames = {1:'Egypt',2:'ISNA',3:'MWL — Europe',4:'Makkah',5:'Karachi',8:'Gulf'};
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(()=>ctrl.abort(), 10000);
+    const r = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(tid);
+    const json = await r.json();
+    if(json.code===200 && json.data && json.data.timings) {
+      const raw = json.data.timings;
+      const t = {
+        fajr:    (raw.Fajr    ||'--:--').substring(0,5),
+        sunrise: (raw.Sunrise ||'--:--').substring(0,5),
+        dhuhr:   (raw.Dhuhr   ||'--:--').substring(0,5),
+        asr:     (raw.Asr     ||'--:--').substring(0,5),
+        maghrib: (raw.Maghrib ||'--:--').substring(0,5),
+        isha:    (raw.Isha    ||'--:--').substring(0,5),
+        imsak:   (raw.Imsak   ||'--:--').substring(0,5),
+      };
+      return {times: t, method, methodName: methodNames[method]||'MWL'};
+    }
+  } catch(e) {
+    console.log('AlAdhan fout:', e.message);
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════
+// QIBLA — groene gloed bij juiste richting
+// ══════════════════════════════════════════════
+function updateQiblahGlow(correct){
+  const outer=document.getElementById('qiblah-ring-outer');
+  const inner=document.getElementById('qiblah-ring-inner');
+  const glow=document.getElementById('qiblah-glow-ring');
+  if(!outer||!inner||!glow)return;
+  if(correct){
+    outer.style.borderColor='rgba(52,211,153,.7)';
+    inner.style.borderColor='rgba(52,211,153,.35)';
+    glow.style.borderColor='rgba(52,211,153,.8)';
+    glow.style.animation='qiblahGlow 1.5s ease-in-out infinite';
+  } else {
+    outer.style.borderColor='rgba(139,92,246,.2)';
+    inner.style.borderColor='rgba(139,92,246,.1)';
+    glow.style.borderColor='rgba(52,211,153,0)';
+    glow.style.animation='none';
+  }
+}
+
+// ══════════════════════════════════════════════
+// AZAN — automatisch afspelen op gebedstijd
+// ══════════════════════════════════════════════
+const AZAN_URLS=[
+  'https://www.islamcan.com/audio/adhan/azan1.mp3',
+  'https://www.islamcan.com/audio/adhan/azan2.mp3',
+  'https://www.islamcan.com/audio/adhan/azan8.mp3'
+];
+let azanAudio=null, azanCheckInterval=null, azanPlayed={};
+
+function startAzanChecker(){
+  clearInterval(azanCheckInterval);
+  azanCheckInterval=setInterval(checkAzanTime,30000);
+  checkAzanTime();
+}
+
+function checkAzanTime(){
+  if(!PS.times||!PS.azan)return;
+  const now=new Date();
+  const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const today=now.toDateString();
+  ['fajr','dhuhr','asr','maghrib','isha'].forEach(p=>{
+    if(PS.azan[p]===false)return;
+    if(PS.times[p]!==hm)return;
+    const key=today+'_'+p;
+    if(azanPlayed[key])return;
+    azanPlayed[key]=true;
+    speelAzan(p);
+  });
+}
+
+function speelAzan(p){
+  try{
+    stopAzan();
+    azanAudio=new Audio(AZAN_URLS[PS.azanSound||0]);
+    azanAudio.play().catch(()=>{});
+    toast({i:'🕌',t:'Adhan — '+p.charAt(0).toUpperCase()+p.slice(1),s:PS.times[p]||''});
+  }catch(e){}
+}
+
+function stopAzan(){
+  if(azanAudio){try{azanAudio.pause();}catch(e){} azanAudio=null;}
+}
+
+// ══════════════════════════════════════════════
+// HIJRI-DATUM (home-scherm)
+// ══════════════════════════════════════════════
+const HIJRI_MONTHS=['Muharram','Safar','Rabi al-Awwal','Rabi al-Thani','Jumada al-Awwal','Jumada al-Thani','Rajab','Sha\'ban','Ramadan','Shawwal','Dhul-Qi\'dah','Dhul-Hijjah'];
+
+function gregorianToHijri(date){
+  const day=date.getDate(), month=date.getMonth(), year=date.getFullYear();
+  let m=month+1, y=year;
+  if(m<3){y-=1;m+=12;}
+  let a=Math.floor(y/100), b=2-a+Math.floor(a/4);
+  if(y<1583)b=0;
+  const jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+day+b-1524;
+  const l1=jd-1948440+10632, n=Math.floor((l1-1)/10631);
+  let l2=l1-10631*n+354;
+  const j=(Math.floor((10985-l2)/5316))*(Math.floor((50*l2)/17719))+(Math.floor(l2/5670))*(Math.floor((43*l2)/15238));
+  l2=l2-(Math.floor((30-j)/15))*(Math.floor((17719*j)/50))-(Math.floor(j/16))*(Math.floor((15238*j)/43))+29;
+  const hm=Math.floor((24*l2)/709), hd=l2-Math.floor((709*hm)/24), hy=30*n+j-30;
+  return {day:hd, month:hm, year:hy};
+}
+
+function setHomeHijri(){
+  const el=document.getElementById('home-hijri');
+  if(!el)return;
+  try{
+    const h=gregorianToHijri(new Date());
+    el.textContent='🌙 '+h.day+' '+HIJRI_MONTHS[((h.month-1)%12+12)%12]+' '+h.year+' AH';
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════════
+// G9 — STREAK & BADGES (profiel)
+// ══════════════════════════════════════════════
+const G9_BADGES=[
+  {id:'first',   i:'🌱', n:'Eerste dag',      need:1},
+  {id:'streak3', i:'🔥', n:'3 dagen streak',  need:3},
+  {id:'streak7', i:'⚡', n:'7 dagen streak',  need:7},
+  {id:'streak30',i:'🏆', n:'30 dagen streak', need:30},
+];
+
+function g9Get(){ return ld('tf_g9',{xp:0,streak:0,lastDay:'',badges:[]}); }
+function g9Save(g){ sv('tf_g9',g); }
+
+function g9Streak(){
+  const g=g9Get();
+  const today=new Date().toDateString();
+  if(g.lastDay===today)return;
+  const yest=new Date(Date.now()-86400000).toDateString();
+  g.streak = g.lastDay===yest ? (g.streak||0)+1 : 1;
+  g.lastDay=today;
+  if(!Array.isArray(g.badges))g.badges=[];
+  G9_BADGES.forEach(b=>{ if(g.streak>=b.need && !g.badges.includes(b.id)) g.badges.push(b.id); });
+  g9Save(g);
+  if(g.streak>1) toast({i:'🔥',t:g.streak+' dagen streak!',s:"Masha'Allah — blijf zo doorgaan"});
+}
+
+function rG9Block(){
+  const g=g9Get();
+  const badges=Array.isArray(g.badges)?g.badges:[];
+  return `<div class="sec">
+    <div class="sh"><div class="st">🎖️ Badges</div><div style="font-size:.8rem;color:var(--gold)">🔥 ${g.streak||0} dagen</div></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      ${G9_BADGES.map(b=>{
+        const has=badges.includes(b.id);
+        return `<div style="flex:1;min-width:70px;text-align:center;background:rgba(255,255,255,.04);border:1px solid ${has?'rgba(245,158,11,.4)':'var(--bdr)'};border-radius:.75rem;padding:.6rem .3rem;opacity:${has?'1':'.35'}">
+          <div style="font-size:1.3rem">${b.i}</div>
+          <div style="font-size:.58rem;color:var(--sl2);margin-top:.2rem">${b.n}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function ha(hex,a){
+  const h=String(hex||'#2563EB').replace('#','');
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+function toast(o){
+  const w=document.getElementById('toasts');
+  if(!w)return;
+  if(typeof o==='string')o={i:'',t:o};
+  const el=document.createElement('div');
+  el.className='ts';
+  el.innerHTML='<div class="tsi">'+(o.i||'')+'</div><div><div class="tst3">'+esc(o.t||'')+'</div>'+(o.s?'<div class="tss">'+esc(o.s)+'</div>':'')+'</div>';
+  w.appendChild(el);
+  setTimeout(function(){el.classList.add('out');setTimeout(function(){el.remove();},300);},2800);
+}
+
+function _om(t){
+  if(localStorage.getItem('tf_ln')==='om' && _OM[t]) return _OM[t];
+  return t;
+}
+
+// ══════════════════════════════════════════════
+// BIND — alle knoppen & invoervelden
+// ══════════════════════════════════════════════
+function bind(){
+  const $=function(id){return document.getElementById(id);};
+  const tap=function(el,fn){
+    if(!el)return;
+    // Tik = korte aanraking zonder verplaatsing. Sleep/scroll opent dus niets.
+    let sx=0, sy=0, st=0, geldig=false;
+    el.addEventListener('touchstart',function(e){
+      const t=e.changedTouches[0];
+      sx=t.clientX; sy=t.clientY; st=Date.now(); geldig=true;
+    },{passive:true});
+    el.addEventListener('touchmove',function(e){
+      const t=e.changedTouches[0];
+      if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10) geldig=false;
+    },{passive:true});
+    el.addEventListener('touchend',function(e){
+      if(!geldig) return;                        // er is gesleept: niets doen
+      if(Date.now()-st>700) return;              // lang ingedrukt: niets doen
+      const t=e.changedTouches[0];
+      if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10) return;
+      e.preventDefault();
+      fn(e);
+    },{passive:false});
+    el.addEventListener('click',fn);
+  };
+
+  // Navigatie
+  document.querySelectorAll('[data-go]').forEach(function(el){
+    tap(el,function(){go(el.dataset.go);});
+  });
+
+  // ── Inloggen ──
+  tap($('loginBtn'), async function(){
+    const em=$('loginEmail')?$('loginEmail').value.trim():'';
+    const pw=$('loginPw')?$('loginPw').value:'';
+    const err=$('loginErr');
+    if(!em||!pw){ if(err){err.textContent='Vul e-mail en wachtwoord in';err.style.display='block';} return; }
+    const btn=$('loginBtn');
+    try{ btn.disabled=true; await auth.signInWithEmailAndPassword(em,pw); }
+    catch(e){ if(err){err.textContent=e.message;err.style.display='block';} btn.disabled=false; }
+  });
+
+  tap($('googleBtn'), async function(){
+    const p=new firebase.auth.GoogleAuthProvider();
+    try{ await auth.signInWithPopup(p); }
+    catch(e){
+      try{ await auth.signInWithRedirect(p); }
+      catch(e2){ toast({i:'❌',t:'Google sign-in failed',s:e2.message}); }
+    }
+  });
+
+  tap($('toRegister'),function(){go('register');});
+  tap($('toForgot'),function(){go('forgot-pw');});
+  tap($('toLogin'),function(){go('login');});
+  tap($('toRegisterProf'),function(){go('register');});
+  tap($('toLoginProf'),function(){go('login');});
+
+  // ── Registreren ──
+  tap($('regBtn'), async function(){
+    const nm=$('regName')?$('regName').value.trim():'';
+    const em=$('regEmail')?$('regEmail').value.trim():'';
+    const pw=$('regPw')?$('regPw').value:'';
+    const pw2=$('regPw2')?$('regPw2').value:'';
+    const err=$('regErr');
+    const show=function(m){ if(err){err.textContent=m;err.style.display='block';} };
+    if(!nm){show('Enter your name');return;}
+    if(!em){show('Enter your email');return;}
+    if(!pw||pw.length<6){show('Password: minimum 6 characters');return;}
+    if(pw!==pw2){show('Passwords do not match');return;}
+    const btn=$('regBtn');
+    try{
+      btn.disabled=true;
+      const cred=await auth.createUserWithEmailAndPassword(em,pw);
+      await cred.user.updateProfile({displayName:nm}).catch(function(){});
+      await db.collection('users').doc(cred.user.uid).set({
+        uid:cred.user.uid, displayName:nm,
+        avatar:0, avatarColor:0, bio:'', pts:0, xp:0, badges:[],
+        joinedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(function(){});
+    }catch(e){ show(e.message); btn.disabled=false; }
+  });
+
+  // ── Forgot password ──
+  tap($('fwBtn'), async function(){
+    const em=$('fwEmail')?$('fwEmail').value.trim():'';
+    const msg=$('fwMsg');
+    if(!em){ if(msg){msg.textContent='Enter your email';msg.style.display='block';} return; }
+    try{
+      await auth.sendPasswordResetEmail(em);
+      if(msg){msg.textContent='✅ Herstelmail verstuurd — check je inbox';msg.style.color='var(--gr)';msg.style.display='block';}
+    }catch(e){ if(msg){msg.textContent=e.message;msg.style.display='block';} }
+  });
+
+  // ── Uitloggen ──
+  tap($('lnEn'), function(){localStorage.removeItem('tf_ln');location.reload();});
+  tap($('lnOm'), function(){localStorage.setItem('tf_ln','om');location.reload();});
+  tap($('logoutBtn'), async function(){
+    try{setOnline(false);}catch(e){}
+    auth.signOut();
+  });
+
+  // ── Profiel bewerken ──
+  const draft=function(){
+    if(!CX.dr)CX.dr={name:profile&&profile.displayName||'',bio:profile&&profile.bio||'',avatar:profile&&profile.avatar||0,avatarColor:profile&&profile.avatarColor||0};
+    const n=$('epName'),b=$('epBio');
+    if(n)CX.dr.name=n.value;
+    if(b)CX.dr.bio=b.value;
+    return CX.dr;
+  };
+  document.querySelectorAll('[data-av]').forEach(function(el){
+    tap(el,function(){const d=draft();d.avatar=+el.dataset.av;render();});
+  });
+  document.querySelectorAll('[data-avc]').forEach(function(el){
+    tap(el,function(){const d=draft();d.avatarColor=+el.dataset.avc;render();});
+  });
+  tap($('saveProfileBtn'), async function(){
+    const d=draft();
+    if(!d.name.trim()){toast({i:'⚠️',t:'Enter a name'});return;}
+    try{
+      await db.collection('users').doc(currentUser.uid).update({displayName:d.name.trim(),bio:d.bio,avatar:d.avatar,avatarColor:d.avatarColor});
+      profile=Object.assign({},profile,{displayName:d.name.trim(),bio:d.bio,avatar:d.avatar,avatarColor:d.avatarColor});
+      CX={};
+      toast({i:'✅',t:'Profile saved'});
+      go('profile');
+    }catch(e){toast({i:'❌',t:'Saving failed',s:e.message});}
+  });
+
+  // ── Locatie (Qibla-scherm) ──
+  tap($('glBtn'),getLoc);
+  tap($('glBtn2'),getLoc);
+  tap($('cmpEnableBtn'),startCompass);
+
+  // ── Story-weergave: tik links/rechts = vorige/volgende, vasthouden = pauzeren ──
+  (function(){
+    const L=document.querySelector('.sv-tap-left');
+    const R=document.querySelector('.sv-tap-right');
+    if(!L&&!R) return;
+    let holdT=null, held=false;
+    const startHold=function(){
+      held=false;
+      clearTimeout(holdT);
+      holdT=setTimeout(function(){ held=true; storyPaused=true; },200);
+    };
+    const cancelHold=function(){
+      clearTimeout(holdT);
+      if(held){ held=false; storyPaused=false; }
+    };
+    const endHold=function(fn){
+      clearTimeout(holdT);
+      if(held){ held=false; storyPaused=false; return; } // loslaten na vasthouden: alleen verdergaan
+      fn(); // korte tik: navigeren
+    };
+    [[L,prevStory],[R,nextStory]].forEach(function(p){
+      const el=p[0], fn=p[1];
+      if(!el) return;
+      el.addEventListener('touchstart',function(e){e.preventDefault();startHold();},{passive:false});
+      el.addEventListener('touchend',function(e){e.preventDefault();endHold(fn);},{passive:false});
+      el.addEventListener('touchcancel',cancelHold);
+      el.addEventListener('mousedown',startHold);
+      el.addEventListener('mouseup',function(){endHold(fn);});
+      el.addEventListener('mouseleave',cancelHold);
+    });
+  })();
+
+  // ── Create Story ──
+  const sti=$('storyTextInput');
+  if(sti){
+    sti.addEventListener('input',function(){
+      storyText=sti.value;
+      const p=$('scPrev');
+      if(p)p.textContent=storyText||'Type your text...';
+    });
+  }
+  document.querySelectorAll('[data-bg]').forEach(function(el){
+    tap(el,function(){storyBgColor=STORY_BG_COLORS[+el.dataset.bg]||STORY_BG_COLORS[0];render();});
+  });
+  tap($('publishStoryBtn'),createStory);
+
+  // Hijri-datum op home invullen
+  setHomeHijri();
+}
+
+// ══════════════════════════════════════════════
+// GOOGLE REDIRECT-TERUGKEER
+// ══════════════════════════════════════════════
+auth.getRedirectResult().catch(function(e){
+  if(e && e.code!=='auth/no-auth-event' && e.code!=='auth/redirect-cancelled-by-user'){
+    toast({i:'❌',t:'Google sign-in failed',s:e.message});
+  }
+});
+
+// ══════════════════════════════════════════════
+// BERICHTEN UIT IFRAMES (lessons/prayer/friends/community/media/notifications)
+// ══════════════════════════════════════════════
+window.addEventListener('message', function(ev){
+  const d=ev.data;
+  if(d==='go-home'){go('home');return;}
+  if(!d||typeof d!=='object')return;
+  if(d.type==='navigate'&&d.screen){
+    if(d.screen==='userprofile'&&d.param){userProfileUid=String(d.param);}
+    go(d.screen);return;
+  }
+  let badgeUpdate=false;
+  if(d.type==='comm-badge'){communityUnread=d.count||0;badgeUpdate=true;}
+  else if(d.type==='friends-badge'){friendsUnread=d.count||0;badgeUpdate=true;}
+  else if(d.type==='req-badge'){friendReqCount=d.count||0;badgeUpdate=true;}
+  else if(d.type==='notif-badge'){unreadNotifs=d.count||0;badgeUpdate=true;}
+  if(!badgeUpdate)return;
+  const tw=document.getElementById('tabs-wrap');
+  if(tw&&needsTabs()){
+    tw.innerHTML=rTabs();
+    tw.querySelectorAll('[data-go]').forEach(function(el){
+      const f=function(){go(el.dataset.go);};
+      el.addEventListener('click',f);
+      el.addEventListener('touchend',function(e){e.preventDefault();f();},{passive:false});
+    });
+  }
+});
+
+// ══════════════════════════════════════════════
+// OPSTARTEN + SERVICE WORKER
+// ══════════════════════════════════════════════
+window.addEventListener('load', function(){
+  // Veiligheidsnet: als app na 7 seconden nog laadt, ga naar login
+  setTimeout(function(){ if(SC==='loading') go('login'); }, 7000);
+
+  // Dagelijkse streak bijwerken (na login zichtbaar op profiel)
+  setTimeout(g9Streak, 1500);
+
+  // Service worker (/sw.js) — network-first cache voor offline gebruik
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        const nw=reg.installing;
+        if(!nw)return;
+        nw.addEventListener('statechange', function(){
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            window.location.reload();
+          }
+        });
+      });
+    }).catch(function(){});
+  }
+});
+</script>
+</body>
+</html>
