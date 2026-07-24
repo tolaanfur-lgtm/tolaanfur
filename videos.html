@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Videos — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--text:#fff;--muted:rgba(255,255,255,.6);--border:rgba(255,255,255,.16);--b3:#00BFFF;--rd:#F43F5E;--gr:#10B981}
+html,body{height:100%;overflow:hidden;background:#000}
+body{color:var(--text);font-family:Inter,sans-serif}
+
+/* ══ FEED: één video per scherm, verticaal swipen ══ */
+#feed{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#feed::-webkit-scrollbar{display:none}
+.slide{position:relative;width:100%;height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.slide video{width:100%;height:100%;object-fit:cover;display:block;background:transparent;position:relative;z-index:1}
+.slide video.pas-in{object-fit:contain}
+
+/* Zachte vulling achter liggende video's: geen kale zwarte vlakken */
+.vulling{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(30px) brightness(.4);transform:scale(1.2);z-index:0}
+
+/* YouTube */
+.yt-poster{width:100%;height:100%;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;cursor:pointer}
+.yt-speel{width:4.6rem;height:4.6rem;border-radius:50%;background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;font-size:1.5rem;backdrop-filter:blur(6px)}
+.yt-laag{width:100%;aspect-ratio:16/9;max-height:100%;position:relative;z-index:1}
+.yt-laag iframe{width:100%;height:100%;border:0;display:block}
+.yt-knop{position:absolute;top:calc(env(safe-area-inset-top) + 3.5rem);right:.85rem;z-index:6;display:flex;align-items:center;gap:.3rem;
+  background:rgba(0,0,0,.55);border:1px solid var(--border);border-radius:2rem;padding:.32rem .72rem;font-size:.68rem;font-weight:600;
+  color:#fff;text-decoration:none;backdrop-filter:blur(8px)}
+.yt-knop b{color:#FF4458;font-weight:800}
+
+/* Verlopen boven en onder voor leesbaarheid */
+.verloop-top{position:absolute;top:0;left:0;right:0;height:20%;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);z-index:2;pointer-events:none}
+.verloop-bot{position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.25) 55%,transparent);z-index:2;pointer-events:none}
+
+/* ══ BOVENBALK ══ */
+.top{position:fixed;top:0;left:0;right:0;z-index:8;display:flex;align-items:center;gap:.6rem;padding:max(env(safe-area-inset-top),.6rem) .85rem .6rem}
+.rond{width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid var(--border);display:grid;place-items:center;
+  font-size:1rem;cursor:pointer;backdrop-filter:blur(8px);flex-shrink:0}
+.top-titel{font-family:'Fredoka One',cursive;font-size:1rem;text-shadow:0 1px 6px rgba(0,0,0,.75)}
+
+/* ══ ACTIES RECHTS ══ */
+.acties{position:absolute;right:.6rem;bottom:6.5rem;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.act{display:flex;flex-direction:column;align-items:center;gap:.15rem;cursor:pointer;background:none;border:none;color:#fff;font-family:Inter,sans-serif;padding:0}
+.act-ico{font-size:1.6rem;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.65))}
+.act-tel{font-size:.68rem;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.maker{position:relative;margin-bottom:.4rem;cursor:pointer}
+.maker-av{width:2.85rem;height:2.85rem;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:.82rem;font-weight:700;
+  background:linear-gradient(135deg,#2563EB,#6B3FFF)}
+.volg-plus{position:absolute;bottom:-.45rem;left:50%;transform:translateX(-50%);width:1.3rem;height:1.3rem;border-radius:50%;
+  background:var(--rd);border:2px solid #000;display:grid;place-items:center;font-size:.68rem;font-weight:700;line-height:1}
+.volg-plus.aan{background:var(--gr)}
+
+/* ══ INFO LINKSONDER ══ */
+.info{position:absolute;left:.9rem;right:4.6rem;bottom:1.5rem;z-index:5}
+.info-naam{font-weight:700;font-size:.92rem;cursor:pointer;text-shadow:0 1px 5px rgba(0,0,0,.85)}
+.info-tijd{font-size:.66rem;color:var(--muted);margin-top:.05rem}
+.info-cap{font-size:.85rem;line-height:1.45;margin-top:.45rem;text-shadow:0 1px 5px rgba(0,0,0,.85);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.info-cap.uit{-webkit-line-clamp:unset;overflow:visible}
+.meer-link{font-size:.72rem;color:var(--muted);font-weight:700;cursor:pointer;margin-top:.1rem;display:inline-block}
+
+/* ══ PANELEN ══ */
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.62);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.sheet-in{width:100%;max-width:560px;max-height:80vh;background:#0D1240;border:1px solid var(--border);border-radius:1.2rem 1.2rem 0 0;
+  padding:.9rem .95rem max(env(safe-area-inset-bottom),.9rem);display:flex;flex-direction:column;animation:omhoog .22s ease-out}
+@keyframes omhoog{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.sheet-kop{font-family:'Fredoka One',cursive;font-size:.92rem;text-align:center}
+.sheet-sub{font-size:.7rem;color:var(--muted);text-align:center;margin:.15rem 0 .7rem}
+.sheet-lijst{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+
+.cm-item{display:flex;gap:.55rem;margin-bottom:.7rem;align-items:flex-start}
+.cm-av{width:2rem;height:2rem;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#2563EB,#6B3FFF);display:grid;place-items:center;font-size:.68rem;font-weight:700}
+.cm-naam{font-weight:700;font-size:.78rem}
+.cm-tekst{font-size:.83rem;line-height:1.45;word-break:break-word}
+.cm-tijd{font-size:.6rem;color:var(--muted);margin-top:.1rem}
+.cm-del{background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;margin-left:auto;padding:0 .2rem}
+.cm-rij{display:flex;gap:.5rem;margin-top:.5rem;flex-shrink:0}
+.cm-rij input{flex:1;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:2rem;padding:.6rem .9rem;font-size:.85rem;color:#fff;font-family:Inter,sans-serif;outline:none}
+.cm-rij input:focus{border-color:var(--b3)}
+.cm-send{width:2.4rem;height:2.4rem;border-radius:50%;border:none;background:linear-gradient(135deg,#2563EB,#00BFFF);color:#fff;font-size:.95rem;cursor:pointer;flex-shrink:0}
+
+.knop{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:.75rem;color:#fff;
+  font-family:Inter,sans-serif;font-size:.85rem;font-weight:600;padding:.7rem;margin-bottom:.45rem;cursor:pointer;text-align:left}
+.knop:active{background:rgba(255,255,255,.12)}
+.knop.rood{color:#FDA4AF;border-color:rgba(244,63,94,.32);background:rgba(244,63,94,.08)}
+.knop.annuleer{text-align:center;color:var(--muted);background:none;border:none;font-weight:700;margin-bottom:0}
+
+.tabkeuze{display:flex;gap:.5rem;margin-bottom:.7rem}
+.tabk{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:.7rem;color:var(--muted);
+  font-family:Inter,sans-serif;font-size:.8rem;font-weight:700;padding:.55rem;cursor:pointer}
+.tabk.on{background:rgba(107,63,255,.2);border-color:rgba(155,111,255,.5);color:#C4B5FD}
+.kies{border:2px dashed var(--border);border-radius:.85rem;padding:1.4rem 1rem;text-align:center;color:var(--muted);font-size:.85rem;cursor:pointer}
+.hint{font-size:.65rem;color:var(--muted);margin-top:.35rem}
+.veld{width:100%;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:.75rem;padding:.65rem .9rem;
+  font-size:.88rem;color:#fff;font-family:Inter,sans-serif;outline:none;margin-bottom:.5rem}
+.veld:focus{border-color:var(--b3)}
+.hoofdknop{width:100%;border:none;border-radius:.75rem;padding:.75rem;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;
+  background:linear-gradient(135deg,#6B3FFF,#9B6FFF);color:#fff}
+.hoofdknop:disabled{opacity:.55}
+.balk{height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;margin-top:.55rem;display:none}
+.vul{height:100%;width:0;background:linear-gradient(90deg,#6B3FFF,#00BFFF);transition:width .2s}
+.prev{width:100%;max-height:210px;border-radius:.75rem;background:#000;margin-bottom:.5rem;display:block}
+
+.midden{position:fixed;inset:0;display:grid;place-items:center;text-align:center;padding:2rem;color:var(--muted);z-index:3}
+.midden img{width:150px;border-radius:1rem;margin:0 auto .7rem;display:block}
+#toast{position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);color:#fff;padding:.5rem 1.15rem;
+  border-radius:2rem;font-size:.82rem;font-weight:700;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;border:1px solid var(--border)}
+#toast.show{opacity:1}
+.speel-teken{position:absolute;inset:0;display:grid;place-items:center;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s}
+.speel-teken.zien{opacity:1}
+.speel-teken div{width:4.2rem;height:4.2rem;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;font-size:1.4rem}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="rond" onclick="terug()">←</div>
+  <div style="flex:1"><div class="top-titel">Videos</div></div>
+  <div class="rond" id="plusBtn" style="display:none" onclick="openUpload()">＋</div>
+</div>
+
+<div id="feed"></div>
+<div class="midden" id="statusVak">Loading...</div>
+
+<div class="sheet" id="cmSheet">
+  <div class="sheet-in">
+    <div class="sheet-kop">Comments</div>
+    <div class="sheet-sub" id="cmAantal">&nbsp;</div>
+    <div class="sheet-lijst" id="cmLijst"></div>
+    <div class="cm-rij" id="cmRij">
+      <input id="cmInput" maxlength="300" placeholder="Write a comment..."/>
+      <button class="cm-send" onclick="plaatsComment()">➤</button>
+    </div>
+    <button class="knop annuleer" onclick="sluitSheet('cmSheet')">Close</button>
+  </div>
+</div>
+
+<div class="sheet" id="meldSheet">
+  <div class="sheet-in">
+    <div class="sheet-kop" id="meldTitel">Report this video</div>
+    <div class="sheet-sub">Why are you reporting this?</div>
+    <div class="sheet-lijst">
+      <button class="knop" onclick="meldAan('Spam or scam')">Spam or scam</button>
+      <button class="knop" onclick="meldAan('Inappropriate content')">Inappropriate content</button>
+      <button class="knop" onclick="meldAan('Harassment or bullying')">Harassment or bullying</button>
+      <button class="knop" onclick="meldAan('False information')">False information</button>
+      <button class="knop" onclick="meldAan('Other')">Something else</button>
+      <button class="knop rood" id="blokKnop" onclick="blokkeerNu()">🚫 Block this user</button>
+      <button class="knop rood" id="delKnop" style="display:none" onclick="verwijderVideo()">🗑 Delete this video</button>
+    </div>
+    <button class="knop annuleer" onclick="sluitSheet('meldSheet')">Cancel</button>
+  </div>
+</div>
+
+<div class="sheet" id="upSheet">
+  <div class="sheet-in">
+    <div class="sheet-kop">New video</div>
+    <div class="sheet-sub">Share a clip or add a YouTube link</div>
+    <div class="sheet-lijst">
+      <div class="tabkeuze">
+        <button class="tabk on" id="tabClip" onclick="wisselUpload(false)">📤 Upload clip</button>
+        <button class="tabk" id="tabYt" onclick="wisselUpload(true)">▶️ YouTube link</button>
+      </div>
+      <div id="upInhoud"></div>
+    </div>
+    <button class="knop annuleer" onclick="sluitSheet('upSheet')">Cancel</button>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="video/*" style="display:none"/>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+var CFG={
+  apiKey:'AIzaSyD4o7SprtOMn7F4iFjVmPB37C1Tf7mICDk',
+  authDomain:'tolaanfur-5b5f5.firebaseapp.com',
+  projectId:'tolaanfur-5b5f5',
+  storageBucket:'tolaanfur-5b5f5.firebasestorage.app',
+  messagingSenderId:'188890145767',
+  appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
+};
+var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var db = fbApp.firestore();
+var auth = fbApp.auth();
+var storage = fbApp.storage();
+
+var me=null, myP=null;
+var videos=[];
+var geblokkeerd={};
+var mijnFollows={};
+var doelId=null;
+var commentCache={};
+var telCache={};
+var gekozenFile=null, gekozenURL=null, ytKeuze=false;
+var waarnemer=null;
+
+var MAX_CAPTION=200;
+var MAX_VIDEO_MB=100;
+var FEED_LIMIET=20;
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function vidVan(id){var r=null;videos.forEach(function(v){if(v.id===id)r=v;});return r;}
+
+function terug(){
+  volScherm(false);
+  try{ if(window.parent&&window.parent!==window) window.parent.postMessage({type:'navigate',screen:'media'},'*'); }catch(e){}
+}
+
+// De app verbergt zijn menubalk zolang de videofeed open staat
+function volScherm(aan){
+  try{ if(window.parent&&window.parent!==window) window.parent.postMessage({type:'immersive',on:!!aan},'*'); }catch(e){}
+}
+
+function showToast(m){
+  var t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('show');},2400);
+}
+
+function getTs(v){ if(v&&v.ts&&v.ts.seconds)return v.ts.seconds*1000; if(v&&typeof v.ts==='number')return v.ts; return 0; }
+function tijd(ms){
+  var d=Date.now()-ms, min=Math.floor(d/60000), uur=Math.floor(d/3600000), dag=Math.floor(d/86400000);
+  if(min<1)return 'Just now'; if(min<60)return min+'m ago'; if(uur<24)return uur+'h ago'; if(dag<7)return dag+'d ago';
+  return new Date(ms).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function ytIdUit(url){
+  var m=String(url||'').trim().match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+
+function mijnNaam(){return (myP&&(myP.displayName||myP.username))||'Someone';}
+function stuurMelding(toUid,type,bericht){
+  if(!me||!toUid||toUid===me.uid)return;
+  db.collection('notifications').add({
+    to:toUid,fromUid:me.uid,fromName:mijnNaam(),type:type,message:bericht,read:false,
+    ts:Date.now(),createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(){});
+}
+
+// ══ FEED ══
+function renderFeed(){
+  var f=document.getElementById('feed');
+  var st=document.getElementById('statusVak');
+  var lijst=videos.filter(function(v){return !geblokkeerd[v.uid];});
+
+  if(!lijst.length){
+    f.innerHTML='';
+    st.style.display='grid';
+    st.innerHTML='<div><img src="img/illus/leeg-videos.jpg" alt="" onerror="this.style.display=\'none\'"/>'
+      +'<div style="font-family:Fredoka One,cursive;font-size:1rem;color:#fff">No videos yet</div>'
+      +'<div style="font-size:.8rem;margin-top:.25rem">Be the first to share one!</div></div>';
+    return;
+  }
+  st.style.display='none';
+
+  var html='';
+  lijst.forEach(function(v){
+    var eigen=me&&v.uid===me.uid;
+    var likes=v.likes||{};
+    var ikLike=me&&!!likes[me.uid];
+    var ini=(v.displayName||'U').substring(0,2).toUpperCase();
+    var volgIk=!!mijnFollows[v.uid];
+    var isYt=v.type==='youtube'&&v.ytId;
+    var poster=isYt?('https://i.ytimg.com/vi/'+esc(v.ytId)+'/hqdefault.jpg'):'';
+
+    html+='<div class="slide" data-slide="'+esc(v.id)+'">';
+
+    if(isYt){
+      html+='<div class="vulling" style="background-image:url('+poster+')"></div>'
+        +'<div class="yt-poster" data-ytstart="'+esc(v.id)+'" style="background-image:url('+poster+')"><div class="yt-speel">▶</div></div>'
+        +'<a class="yt-knop" href="https://www.youtube.com/watch?v='+esc(v.ytId)+'" target="_blank" rel="noopener">Watch on <b>YouTube</b></a>';
+    } else {
+      html+='<div class="vulling" data-vul="'+esc(v.id)+'" style="background:#0a0a14"></div>'
+        +'<video data-video="'+esc(v.id)+'" src="'+esc(v.url||'')+'" playsinline webkit-playsinline loop preload="metadata"></video>'
+        +'<div class="speel-teken" id="pt-'+esc(v.id)+'"><div>▶</div></div>';
+    }
+
+    html+='<div class="verloop-top"></div><div class="verloop-bot"></div>';
+
+    html+='<div class="acties">'
+      +'<div class="maker" data-profiel="'+esc(v.uid||'')+'">'
+        +'<div class="maker-av">'+esc(ini)+'</div>'
+        +(!eigen&&me?'<div class="volg-plus'+(volgIk?' aan':'')+'" data-volg="'+esc(v.uid||'')+'">'+(volgIk?'✓':'+')+'</div>':'')
+      +'</div>'
+      +'<button class="act" data-like="'+esc(v.id)+'"><span class="act-ico">'+(ikLike?'❤️':'🤍')+'</span>'
+        +'<span class="act-tel">'+Object.keys(likes).length+'</span></button>'
+      +'<button class="act" data-cm="'+esc(v.id)+'"><span class="act-ico">💬</span>'
+        +'<span class="act-tel" id="ct-'+esc(v.id)+'">'+(telCache[v.id]!=null?telCache[v.id]:'')+'</span></button>'
+      +'<button class="act" data-deel="'+esc(v.id)+'"><span class="act-ico">↗️</span><span class="act-tel">Share</span></button>'
+      +'<button class="act" data-menu="'+esc(v.id)+'"><span class="act-ico">⋯</span></button>'
+      +'</div>';
+
+    html+='<div class="info">'
+      +'<div class="info-naam" data-profiel="'+esc(v.uid||'')+'">'+esc(v.displayName||'User')+'</div>'
+      +'<div class="info-tijd">'+tijd(getTs(v))+'</div>'
+      +(v.caption?'<div class="info-cap" id="cap-'+esc(v.id)+'">'+esc(v.caption)+'</div>'
+        +(String(v.caption).length>90?'<span class="meer-link" data-cap="'+esc(v.id)+'">more</span>':''):'')
+      +'</div></div>';
+  });
+
+  f.innerHTML=html;
+  koppelFeed();
+  startWaarneming();
+}
+
+function koppelFeed(){
+  var f=document.getElementById('feed');
+  f.querySelectorAll('[data-like]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();toggleLike(b.getAttribute('data-like'));});
+  });
+  f.querySelectorAll('[data-cm]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();openComments(b.getAttribute('data-cm'));});
+  });
+  f.querySelectorAll('[data-deel]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();deelVideo(b.getAttribute('data-deel'));});
+  });
+  f.querySelectorAll('[data-menu]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();openMenu(b.getAttribute('data-menu'));});
+  });
+  f.querySelectorAll('[data-profiel]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();openProfiel(b.getAttribute('data-profiel'));});
+  });
+  f.querySelectorAll('[data-volg]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();toggleFollow(b.getAttribute('data-volg'),b);});
+  });
+  f.querySelectorAll('[data-cap]').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      var c=document.getElementById('cap-'+b.getAttribute('data-cap'));
+      if(c){c.classList.toggle('uit');b.textContent=c.classList.contains('uit')?'less':'more';}
+    });
+  });
+  // YouTube laadt pas na een tik: zo verschijnen er vooraf geen aanbevelingen
+  f.querySelectorAll('[data-ytstart]').forEach(function(p){
+    p.addEventListener('click',function(){
+      var v=vidVan(p.getAttribute('data-ytstart'));
+      if(!v)return;
+      var l=document.createElement('div');
+      l.className='yt-laag';
+      l.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+esc(v.ytId)
+        +'?autoplay=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3" '
+        +'title="video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+      p.parentNode.replaceChild(l,p);
+    });
+  });
+  f.querySelectorAll('[data-video]').forEach(function(el){
+    el.addEventListener('loadedmetadata',function(){
+      if(el.videoWidth>el.videoHeight) el.classList.add('pas-in');
+    });
+    el.addEventListener('click',function(){
+      var t=document.getElementById('pt-'+el.getAttribute('data-video'));
+      if(el.paused){ el.play().catch(function(){}); if(t)t.classList.remove('zien'); }
+      else { el.pause(); if(t)t.classList.add('zien'); }
+    });
+  });
+}
+
+// Alleen de video in beeld speelt
+function startWaarneming(){
+  if(waarnemer) waarnemer.disconnect();
+  waarnemer=new IntersectionObserver(function(items){
+    items.forEach(function(it){
+      var el=it.target;
+      var v=el.querySelector('video');
+      if(it.isIntersecting&&it.intersectionRatio>0.6){
+        if(v) v.play().catch(function(){});
+        laadCommentTel(el.getAttribute('data-slide'));
+      } else {
+        if(v) v.pause();
+        var f=el.querySelector('.yt-laag iframe');
+        if(f) f.src=f.src;   // stopt een YouTube-video die uit beeld gaat
+      }
+    });
+  },{threshold:[0,0.6,1]});
+  document.querySelectorAll('.slide').forEach(function(s){waarnemer.observe(s);});
+}
+
+// ══ ACTIES ══
+function toggleLike(id){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  var v=vidVan(id); if(!v)return;
+  var upd={}, likeNu=false;
+  if(v.likes&&v.likes[me.uid]){ upd['likes.'+me.uid]=firebase.firestore.FieldValue.delete(); }
+  else { upd['likes.'+me.uid]=true; likeNu=true; }
+  db.collection('videos').doc(id).update(upd).then(function(){
+    if(likeNu) stuurMelding(v.uid,'like',mijnNaam()+' liked your video');
+  }).catch(function(){showToast('❌ Like failed');});
+}
+
+function toggleFollow(uid,btn){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  if(!uid||uid===me.uid)return;
+  var ref=db.collection('follows').doc(me.uid+'_'+uid);
+  if(mijnFollows[uid]){
+    ref.delete().then(function(){delete mijnFollows[uid];btn.classList.remove('aan');btn.textContent='+';showToast('Unfollowed');})
+      .catch(function(){showToast('❌ Failed');});
+  } else {
+    ref.set({from:me.uid,to:uid,ts:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+      mijnFollows[uid]=true;btn.classList.add('aan');btn.textContent='✓';showToast('✓ Following');
+      stuurMelding(uid,'follow',mijnNaam()+' started following you');
+    }).catch(function(){showToast('❌ Failed');});
+  }
+}
+
+function openProfiel(uid){
+  if(!uid)return;
+  volScherm(false);
+  try{ if(window.parent&&window.parent!==window) window.parent.postMessage({type:'navigate',screen:'userprofile',param:uid},'*'); }catch(e){}
+}
+
+function deelVideo(id){
+  var v=vidVan(id); if(!v)return;
+  var data={title:'Tolaanfur',text:(v.caption?v.caption+' — ':'')+'Shared via Tolaanfur',
+            url:'https://tolaanfur-sigma.vercel.app/?screen=videos'};
+  if(navigator.share){ navigator.share(data).catch(function(){}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(data.text+' '+data.url).then(function(){showToast('🔗 Link copied!');}); }
+}
+
+// ══ PANELEN ══
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function sluitSheet(id){document.getElementById(id).classList.remove('open');}
+
+function openComments(id){
+  doelId=id;
+  document.getElementById('cmRij').style.display=(me&&!me.isAnonymous)?'flex':'none';
+  document.getElementById('cmLijst').innerHTML='<div style="color:rgba(255,255,255,.6);font-size:.8rem;padding:.5rem 0">Loading...</div>';
+  openSheet('cmSheet');
+  laadComments(id);
+}
+
+function laadComments(id){
+  db.collection('videos').doc(id).collection('comments').orderBy('ts','asc').limit(100).get()
+    .then(function(snap){
+      commentCache[id]=snap.docs.map(function(d){return Object.assign({cid:d.id},d.data());});
+      telCache[id]=commentCache[id].length;
+      var t=document.getElementById('ct-'+id); if(t)t.textContent=telCache[id];
+      renderComments(id);
+    }).catch(function(){
+      document.getElementById('cmLijst').innerHTML='<div style="color:rgba(255,255,255,.6);font-size:.8rem">Could not load comments</div>';
+    });
+}
+
+function laadCommentTel(id){
+  if(!id||telCache[id]!=null)return;
+  db.collection('videos').doc(id).collection('comments').limit(100).get().then(function(snap){
+    telCache[id]=snap.size;
+    var t=document.getElementById('ct-'+id); if(t)t.textContent=snap.size;
+  }).catch(function(){});
+}
+
+function renderComments(id){
+  var box=document.getElementById('cmLijst');
+  var lijst=commentCache[id]||[];
+  document.getElementById('cmAantal').textContent=lijst.length+(lijst.length===1?' comment':' comments');
+  if(!lijst.length){
+    box.innerHTML='<div style="color:rgba(255,255,255,.6);font-size:.8rem;padding:.5rem 0">No comments yet — be the first!</div>';
+    return;
+  }
+  var mijnAdmin=myP&&myP.isAdmin===true;
+  var html='';
+  lijst.forEach(function(c){
+    var mag=me&&(c.uid===me.uid||mijnAdmin);
+    var ini=(c.displayName||'U').substring(0,2).toUpperCase();
+    html+='<div class="cm-item"><div class="cm-av">'+esc(ini)+'</div>'
+      +'<div style="flex:1"><div class="cm-naam">'+esc(c.displayName||'User')+'</div>'
+      +'<div class="cm-tekst">'+esc(c.text||'')+'</div>'
+      +'<div class="cm-tijd">'+tijd(getTs(c))+'</div></div>'
+      +(mag?'<button class="cm-del" data-cmdel="'+esc(c.cid)+'">✕</button>':'')+'</div>';
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('[data-cmdel]').forEach(function(b){
+    b.addEventListener('click',function(){verwijderComment(id,b.getAttribute('data-cmdel'));});
+  });
+}
+
+function plaatsComment(){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  var inp=document.getElementById('cmInput');
+  var tekst=(inp.value||'').trim().substring(0,300);
+  if(!tekst||!doelId)return;
+  inp.value='';
+  var v=vidVan(doelId);
+  db.collection('videos').doc(doelId).collection('comments').add({
+    uid:me.uid, displayName:mijnNaam(), text:tekst, ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    laadComments(doelId);
+    if(v) stuurMelding(v.uid,'comment',mijnNaam()+' commented on your video');
+  }).catch(function(){showToast('❌ Comment failed');});
+}
+
+function verwijderComment(id,cid){
+  db.collection('videos').doc(id).collection('comments').doc(cid).delete()
+    .then(function(){laadComments(id);}).catch(function(){showToast('❌ Delete failed');});
+}
+
+// ══ MELDEN / BLOKKEREN / VERWIJDEREN ══
+function openMenu(id){
+  if(!me||me.isAnonymous){showToast('🔒 Login required');return;}
+  doelId=id;
+  var v=vidVan(id);
+  var eigen=v&&v.uid===me.uid;
+  var mijnAdmin=myP&&myP.isAdmin===true;
+  document.getElementById('meldTitel').textContent=(v&&v.displayName&&!eigen)?('Report or block '+v.displayName):'Video options';
+  document.getElementById('delKnop').style.display=(eigen||mijnAdmin)?'block':'none';
+  document.getElementById('blokKnop').style.display=eigen?'none':'block';
+  openSheet('meldSheet');
+}
+
+function meldAan(reden){
+  var v=vidVan(doelId); if(!v||!me)return;
+  db.collection('reports').add({
+    reporter:me.uid, reporterName:mijnNaam(), targetType:'videos', targetId:v.id,
+    targetUid:v.uid||'', targetName:v.displayName||'', reason:reden, status:'open',
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){sluitSheet('meldSheet');showToast('🚩 Reported — thank you');})
+   .catch(function(){showToast('❌ Could not send report');});
+}
+
+function blokkeerNu(){
+  var v=vidVan(doelId); if(!v||!me||!v.uid||v.uid===me.uid)return;
+  if(!confirm('Block '+(v.displayName||'this user')+'?\n\nYou will no longer see their posts, photos and videos.'))return;
+  db.collection('blocks').doc(me.uid+'_'+v.uid)
+    .set({from:me.uid,to:v.uid,ts:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(function(){sluitSheet('meldSheet');showToast('🚫 Blocked');})
+    .catch(function(){showToast('❌ Could not block');});
+}
+
+function verwijderVideo(){
+  var v=vidVan(doelId); if(!v)return;
+  if(!confirm('Delete this video?'))return;
+  db.collection('videos').doc(v.id).delete().then(function(){
+    if(v.path&&v.type!=='youtube') storage.ref(v.path).delete().catch(function(){});
+    sluitSheet('meldSheet');
+    showToast('🗑 Deleted');
+  }).catch(function(){showToast('❌ Delete failed');});
+}
+
+// ══ UPLOADEN ══
+function openUpload(){ renderUpload(); openSheet('upSheet'); }
+function wisselUpload(yt){ ytKeuze=yt; renderUpload(); }
+
+function renderUpload(){
+  document.getElementById('tabClip').classList.toggle('on',!ytKeuze);
+  document.getElementById('tabYt').classList.toggle('on',ytKeuze);
+  var w=document.getElementById('upInhoud');
+  if(ytKeuze){
+    w.innerHTML='<input class="veld" id="ytUrl" placeholder="Paste a YouTube link..."/>'
+      +'<input class="veld" id="ytCap" maxlength="'+MAX_CAPTION+'" placeholder="Write a caption... (optional)"/>'
+      +'<button class="hoofdknop" id="ytBtn">▶️ Add video</button>'
+      +'<div class="hint" style="text-align:center">For long videos and lectures — no size limit</div>';
+    document.getElementById('ytBtn').addEventListener('click',plaatsYouTube);
+    return;
+  }
+  if(!gekozenFile){
+    w.innerHTML='<div class="kies" id="kiesBtn">🎬 Tap to choose a video'
+      +'<div class="hint">Max '+MAX_VIDEO_MB+'MB — for longer videos use a YouTube link</div></div>';
+    document.getElementById('kiesBtn').addEventListener('click',function(){document.getElementById('fileInput').click();});
+    return;
+  }
+  w.innerHTML='<video class="prev" src="'+gekozenURL+'" controls playsinline></video>'
+    +'<input class="veld" id="upCap" maxlength="'+MAX_CAPTION+'" placeholder="Write a caption... (optional)"/>'
+    +'<button class="hoofdknop" id="upBtn">📤 Share video</button>'
+    +'<button class="knop annuleer" id="upWeg">Choose another</button>'
+    +'<div class="balk" id="upBalk"><div class="vul" id="upVul"></div></div>';
+  document.getElementById('upBtn').addEventListener('click',plaatsVideo);
+  document.getElementById('upWeg').addEventListener('click',function(){
+    gekozenFile=null;
+    if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}gekozenURL=null;}
+    renderUpload();
+  });
+}
+
+document.getElementById('fileInput').addEventListener('change',function(e){
+  var file=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(!file)return;
+  if(!/^video\//.test(file.type)){showToast('⚠️ Choose a video file');return;}
+  if(file.size>MAX_VIDEO_MB*1024*1024){showToast('⚠️ Max '+MAX_VIDEO_MB+'MB — use a YouTube link for long videos');return;}
+  gekozenFile=file;
+  if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}}
+  gekozenURL=URL.createObjectURL(file);
+  renderUpload();
+});
+
+function plaatsVideo(){
+  if(!me||!(myP&&myP.canUpload===true)){showToast('🔒 Not allowed');return;}
+  if(!gekozenFile)return;
+  var caption=(document.getElementById('upCap').value||'').trim().substring(0,MAX_CAPTION);
+  var btn=document.getElementById('upBtn'), balk=document.getElementById('upBalk'), vul=document.getElementById('upVul');
+  btn.disabled=true;btn.textContent='Uploading... 0%';balk.style.display='block';
+  var ext=(gekozenFile.type.split('/')[1]||'mp4').replace('quicktime','mov');
+  var pad='videos/'+me.uid+'/'+Date.now()+'.'+ext;
+  var taak=storage.ref(pad).put(gekozenFile,{contentType:gekozenFile.type});
+  taak.on('state_changed',function(s){
+    var p=Math.round(s.bytesTransferred/s.totalBytes*100);
+    btn.textContent='Uploading... '+p+'%'; vul.style.width=p+'%';
+  },function(){
+    btn.disabled=false;btn.textContent='📤 Share video';balk.style.display='none';
+    showToast('❌ Upload failed');
+  },function(){
+    taak.snapshot.ref.getDownloadURL().then(function(url){
+      return db.collection('videos').add({
+        uid:me.uid, displayName:mijnNaam(), avatarColor:(myP&&myP.avatarColor)||0,
+        type:'video', caption:caption, url:url, path:pad, size:gekozenFile.size,
+        likes:{}, ts:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }).then(function(){
+      gekozenFile=null;
+      if(gekozenURL){try{URL.revokeObjectURL(gekozenURL);}catch(e){}gekozenURL=null;}
+      sluitSheet('upSheet'); renderUpload(); showToast('✅ Video shared!');
+    }).catch(function(){
+      btn.disabled=false;btn.textContent='📤 Share video';balk.style.display='none';
+      showToast('❌ Saving failed');
+    });
+  });
+}
+
+function plaatsYouTube(){
+  if(!me||!(myP&&myP.canUpload===true)){showToast('🔒 Not allowed');return;}
+  var id=ytIdUit(document.getElementById('ytUrl').value);
+  if(!id){showToast('⚠️ That is not a valid YouTube link');return;}
+  var caption=(document.getElementById('ytCap').value||'').trim().substring(0,MAX_CAPTION);
+  var btn=document.getElementById('ytBtn');
+  btn.disabled=true;btn.textContent='Adding...';
+  db.collection('videos').add({
+    uid:me.uid, displayName:mijnNaam(), avatarColor:(myP&&myP.avatarColor)||0,
+    type:'youtube', ytId:id, caption:caption, likes:{},
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    sluitSheet('upSheet'); showToast('✅ Video added!');
+  }).catch(function(){
+    btn.disabled=false;btn.textContent='▶️ Add video';
+    showToast('❌ Could not add video');
+  });
+}
+
+// ══ GEGEVENS ══
+function luisterBlocks(){
+  if(!me||me.isAnonymous)return;
+  db.collection('blocks').where('from','==',me.uid).onSnapshot(function(snap){
+    geblokkeerd={};
+    snap.docs.forEach(function(d){var b=d.data();if(b.to)geblokkeerd[b.to]=true;});
+    renderFeed();
+  },function(){});
+}
+
+function laadFollows(){
+  if(!me||me.isAnonymous)return;
+  db.collection('follows').where('from','==',me.uid).get().then(function(snap){
+    mijnFollows={};
+    snap.docs.forEach(function(d){var v=d.data();if(v.to)mijnFollows[v.to]=true;});
+    renderFeed();
+  }).catch(function(){});
+}
+
+function luisterFeed(){
+  db.collection('videos').orderBy('ts','desc').limit(FEED_LIMIET)
+    .onSnapshot(function(snap){
+      videos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderFeed();
+    },function(){
+      document.getElementById('statusVak').innerHTML='<div>❌ Could not load videos</div>';
+    });
+}
+
+auth.onAuthStateChanged(function(user){
+  me=user;
+  if(user&&!user.isAnonymous){
+    db.collection('users').doc(user.uid).get().then(function(doc){
+      if(doc.exists)myP=doc.data();
+      document.getElementById('plusBtn').style.display=(myP&&myP.canUpload===true)?'grid':'none';
+      renderFeed();
+    }).catch(function(){});
+    luisterBlocks();
+    laadFollows();
+  }
+  luisterFeed();
+});
+
+volScherm(true);
+window.addEventListener('pagehide',function(){volScherm(false);});
+</script>
+</body>
+</html>
