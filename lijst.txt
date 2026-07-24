@@ -1,0 +1,7 @@
+# Audiofragmenten voor stories
+# Eén regel per fragment:   bestandsnaam.mp3 | Titel zoals gebruikers hem zien
+# Regels die met # beginnen worden overgeslagen.
+# Voorbeeld (verwijder het #-teken zodra je het bestand hebt geüpload):
+#
+# nasheed1.mp3 | Nasheed 1
+# dua_ochtend.mp3 | Dua van de ochtend
