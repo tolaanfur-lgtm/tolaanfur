@@ -244,6 +244,49 @@ select.inp2 option{background:var(--bg2)}
 @keyframes spin2{to{transform:rotate(360deg)}}
 
 /* ═══ MEDIA-DASHBOARD ═══ */
+/* Nieuwe media-indeling */
+.m-top{width:100%;max-width:560px;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;padding-top:.5rem}
+.m-titel{font-family:'Fredoka One',cursive;font-size:1.7rem;background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.m-sub{font-size:.78rem;color:var(--sl2);margin-top:.1rem}
+.m-zoek{width:2.6rem;height:2.6rem;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--bdr);display:grid;place-items:center;font-size:1.05rem;cursor:pointer;flex-shrink:0}
+.m-stories-kop{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.m-stories-t{font-family:'Fredoka One',cursive;font-size:1.05rem}
+.m-seeall{font-size:.75rem;color:var(--b3);font-weight:700;cursor:pointer}
+.m-stories{width:100%;max-width:560px;display:flex;gap:.7rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:.3rem;margin-bottom:1.1rem}
+.m-stories::-webkit-scrollbar{display:none}
+.m-story-add,.m-story-item{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex-shrink:0;cursor:pointer;width:4rem}
+.m-add-cirkel{width:3.6rem;height:3.6rem;border-radius:50%;border:2px dashed var(--bdr);display:grid;place-items:center;font-size:1.5rem;color:var(--sl2)}
+.m-story-ring{width:3.6rem;height:3.6rem;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--b3),var(--pu2))}
+.m-story-ring.seen{background:var(--bdr)}
+.m-story-av{width:100%;height:100%;border-radius:50%;border:2px solid var(--bg);display:grid;place-items:center;font-size:1.1rem;overflow:hidden;background:#0D1240}
+.m-story-av img{width:100%;height:100%;object-fit:cover}
+.m-story-nm{font-size:.62rem;color:var(--sl2);max-width:4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.m-grid{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.1rem}
+.m-kaart{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:.85rem;cursor:pointer;transition:transform .12s;backdrop-filter:blur(12px);display:flex;flex-direction:column;min-height:9.5rem}
+.m-kaart:active{transform:scale(.97)}
+.m-kaart-kop{display:flex;align-items:flex-start;justify-content:space-between}
+.m-ico{width:2.5rem;height:2.5rem;border-radius:.75rem;display:grid;place-items:center;font-size:1.2rem}
+.m-pijl{color:var(--sl2);font-size:1.1rem;font-weight:700}
+.m-kaart-t{font-family:'Fredoka One',cursive;font-size:1rem;margin-top:.5rem}
+.m-kaart-d{font-size:.68rem;color:var(--sl2);margin-top:.1rem;line-height:1.3}
+.m-thumbs{display:flex;gap:.3rem;margin-top:auto;padding-top:.5rem}
+.m-thumbs img,.m-thumbs .vplak{width:2.5rem;height:2.5rem;border-radius:.45rem;object-fit:cover;background:#0D1240;flex:1}
+.m-thumbs .vplak{display:grid;place-items:center;font-size:.8rem;color:var(--sl2)}
+.m-preview{margin-top:auto;padding-top:.5rem}
+.m-preview .hub-mini{font-size:.66rem;color:var(--sl2);background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:.5rem;padding:.4rem .5rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.m-badge{font-size:.62rem;color:var(--sl2);font-weight:700;margin-top:.4rem}
+.m-latest-kop{width:100%;max-width:560px;margin-bottom:.6rem}
+.m-latest-t{font-family:'Fredoka One',cursive;font-size:1.05rem}
+.m-filters{width:100%;max-width:560px;display:flex;gap:.45rem;overflow-x:auto;scrollbar-width:none;margin-bottom:.7rem}
+.m-filters::-webkit-scrollbar{display:none}
+.m-filter{background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:2rem;color:var(--sl2);font-family:Inter,sans-serif;font-size:.72rem;font-weight:700;padding:.4rem .8rem;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.m-filter.on{background:rgba(107,63,255,.2);border-color:rgba(155,111,255,.5);color:#C4B5FD}
+.m-latest{width:100%;max-width:560px;display:flex;gap:.55rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:.3rem;min-height:9rem}
+.m-latest::-webkit-scrollbar{display:none}
+.m-tegel{width:7rem;height:9rem;border-radius:.8rem;overflow:hidden;flex-shrink:0;position:relative;background:#0D1240;cursor:pointer}
+.m-tegel img{width:100%;height:100%;object-fit:cover}
+.m-tegel .m-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2.2rem;height:2.2rem;border-radius:50%;background:rgba(0,0,0,.5);border:1.5px solid rgba(255,255,255,.8);display:grid;place-items:center;font-size:.75rem;color:#fff}
+.m-tegel-post{padding:.6rem;font-size:.7rem;color:var(--wh);line-height:1.4;display:flex;align-items:center;background:linear-gradient(160deg,rgba(107,63,255,.3),rgba(20,30,100,.5))}
 .hub-kaart{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:.85rem;cursor:pointer;transition:transform .12s;backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:.3rem}
 .hub-kaart:active{transform:scale(.97)}
 .hub-ico{width:2.5rem;height:2.5rem;border-radius:.75rem;display:grid;place-items:center;font-size:1.25rem}
@@ -456,76 +499,85 @@ function openStoryCreator(){
 
 function rMedia(){
   return `<div class="screen">
-    <div class="nav" style="padding-top:.75rem">
-      <button onclick="goBack()" class="btn bs" style="position:absolute;left:1rem;padding:.35rem .75rem;font-size:.8rem">←</button>
-      <div class="nt">📱 Media</div>
-    </div>
-    <!-- Kop met zoeken en meldingen -->
-    <div style="width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-      <div style="font-family:'Fredoka One',cursive;font-size:1.5rem">Media</div>
-      <div style="display:flex;gap:.5rem">
-        <div onclick="navScherm('search')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;font-size:1rem;cursor:pointer">🔍</div>
-        <div onclick="navScherm('notifications')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;font-size:1rem;cursor:pointer">🔔</div>
+    <!-- Kop: titel + zoekicoon (geen permanente balk) -->
+    <div class="m-top">
+      <div>
+        <div class="m-titel">Media</div>
+        <div class="m-sub">Photos, videos, posts and more</div>
       </div>
-    </div>
-    <div onclick="navScherm('search')" style="width:100%;max-width:560px;background:rgba(255,255,255,.06);border:1.5px solid var(--bdr);border-radius:.9rem;padding:.7rem 1rem;color:var(--sl2);font-size:.85rem;margin-bottom:.85rem;cursor:pointer">🔍 Search photos, videos, posts or news...</div>
-
-    <div class="sec" style="width:100%;max-width:560px">
-      <div class="sh" style="display:flex;align-items:center;justify-content:space-between">
-        <div class="st">📸 Stories</div>
-        <span style="font-size:.7rem;color:var(--sl2)">Disappear after 24h</span>
-      </div>
-      <div style="font-size:.82rem;color:var(--sl2);margin-bottom:.65rem">Share a thought or quote with friends</div>
-      <button class="btn bp bsm" onclick="openStoryCreator()" style="display:flex;align-items:center;gap:.5rem;justify-content:center">📸 Create Story</button>
+      <div class="m-zoek" onclick="navScherm('search')">🔍</div>
     </div>
 
-    <!-- Vier hoofdkaarten -->
-    <div style="width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.85rem">
-      <div class="hub-kaart" onclick="openPhotos()">
-        <div class="hub-ico" style="background:rgba(155,111,255,.25);border:1px solid rgba(155,111,255,.4)">🖼️</div>
-        <div class="hub-t">Photos<span>›</span></div>
-        <div class="hub-d">Islamic photos and moments</div>
-        <div class="hub-thumbs" id="mFotoThumbs"></div>
-        <div class="hub-count" id="mFotoCount">–</div>
-      </div>
-      <div class="hub-kaart" onclick="openVideos()">
-        <div class="hub-ico" style="background:rgba(16,185,129,.22);border:1px solid rgba(16,185,129,.4)">🎥</div>
-        <div class="hub-t">Videos<span>›</span></div>
-        <div class="hub-d">Short videos and lectures</div>
-        <div class="hub-thumbs" id="mVidThumbs"></div>
-        <div class="hub-count" id="mVidCount">–</div>
-      </div>
-      <div class="hub-kaart" onclick="openVerhalen()">
-        <div class="hub-ico" style="background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.45)">📝</div>
-        <div class="hub-t">Posts<span>›</span></div>
-        <div class="hub-d">Share thoughts with the community</div>
-        <div id="mPostPreview" style="margin-top:.4rem"></div>
-        <div class="hub-count" id="mPostCount">–</div>
-      </div>
-      <div class="hub-kaart" onclick="openAnnouncements()">
-        <div class="hub-ico" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4)">📢</div>
-        <div class="hub-t">News<span>›</span></div>
-        <div class="hub-d">Official updates and news</div>
-        <div id="mAnnPreview" style="margin-top:.4rem"></div>
-        <div class="hub-count" id="mAnnCount">–</div>
+    <!-- Compacte stories-rij -->
+    <div class="m-stories-kop">
+      <div class="m-stories-t">Stories</div>
+      <div onclick="navScherm('home')" class="m-seeall">See all ›</div>
+    </div>
+    <div class="m-stories" id="mStories">
+      <div class="m-story-add" onclick="openStoryCreator()">
+        <div class="m-add-cirkel">+</div>
+        <div class="m-story-nm">Your story</div>
       </div>
     </div>
 
-    <!-- Nieuwste media -->
-    <div style="width:100%;max-width:560px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin:.3rem 0 .5rem">
-        <div style="font-family:'Fredoka One',cursive;font-size:1rem">Latest photos</div>
-        <div onclick="openPhotos()" style="font-size:.75rem;color:var(--b3);font-weight:700;cursor:pointer">View all ›</div>
+    <!-- 2×2 hoofdkaarten -->
+    <div class="m-grid">
+      <div class="m-kaart" onclick="openPhotos()">
+        <div class="m-kaart-kop">
+          <div class="m-ico" style="background:rgba(155,111,255,.25);border:1px solid rgba(155,111,255,.4)">🖼️</div>
+          <div class="m-pijl">›</div>
+        </div>
+        <div class="m-kaart-t">Photos</div>
+        <div class="m-kaart-d">Islamic photos & moments</div>
+        <div class="m-thumbs" id="mFotoThumbs"></div>
+        <div class="m-badge" id="mFotoCount">–</div>
       </div>
-      <div class="hub-strip" id="mFotoStrip"><div class="hub-leeg">Loading...</div></div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;margin:.85rem 0 .5rem">
-        <div style="font-family:'Fredoka One',cursive;font-size:1rem">Latest videos</div>
-        <div onclick="openVideos()" style="font-size:.75rem;color:var(--b3);font-weight:700;cursor:pointer">View all ›</div>
+      <div class="m-kaart" onclick="openVideos()">
+        <div class="m-kaart-kop">
+          <div class="m-ico" style="background:rgba(16,185,129,.22);border:1px solid rgba(16,185,129,.4)">🎬</div>
+          <div class="m-pijl">›</div>
+        </div>
+        <div class="m-kaart-t">Videos</div>
+        <div class="m-kaart-d">Islamic videos & lectures</div>
+        <div class="m-thumbs" id="mVidThumbs"></div>
+        <div class="m-badge" id="mVidCount">–</div>
       </div>
-      <div class="hub-strip" id="mVidStrip"><div class="hub-leeg">Loading...</div></div>
+      <div class="m-kaart" onclick="openVerhalen()">
+        <div class="m-kaart-kop">
+          <div class="m-ico" style="background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.45)">📝</div>
+          <div class="m-pijl">›</div>
+        </div>
+        <div class="m-kaart-t">Posts</div>
+        <div class="m-kaart-d">Community thoughts & reminders</div>
+        <div id="mPostPreview" class="m-preview"></div>
+        <div class="m-badge" id="mPostCount">–</div>
+      </div>
+      <div class="m-kaart" onclick="openAnnouncements()">
+        <div class="m-kaart-kop">
+          <div class="m-ico" style="background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.4)">📢</div>
+          <div class="m-pijl">›</div>
+        </div>
+        <div class="m-kaart-t">News</div>
+        <div class="m-kaart-d">Official Tolaanfur updates</div>
+        <div id="mAnnPreview" class="m-preview"></div>
+        <div class="m-badge" id="mAnnCount">–</div>
+      </div>
     </div>
-    <div class="sec" style="width:100%;max-width:560px">
+
+    <!-- Latest: filters + horizontale rij -->
+    <div class="m-latest-kop">
+      <div class="m-latest-t">Latest</div>
+    </div>
+    <div class="m-filters">
+      <button class="m-filter on" data-filter="all" onclick="zetFilter('all')">All</button>
+      <button class="m-filter" data-filter="photos" onclick="zetFilter('photos')">🖼️ Photos</button>
+      <button class="m-filter" data-filter="videos" onclick="zetFilter('videos')">🎬 Videos</button>
+      <button class="m-filter" data-filter="posts" onclick="zetFilter('posts')">📝 Posts</button>
+    </div>
+    <div class="m-latest" id="mLatest"><div class="hub-leeg">Loading...</div></div>
+
+    <!-- Volg ons -->
+    <div class="sec" style="width:100%;max-width:560px;margin-top:1rem">
       <div class="sh"><div class="st">🌐 Follow Us</div></div>
       <div style="font-size:.8rem;color:var(--sl2);margin-bottom:.85rem">Follow Tolaanfur on social media</div>
       <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
@@ -549,12 +601,14 @@ function rMedia(){
     </div>
   </div>`;
 }
+
 // Start direct
 render();
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
 // ══ DASHBOARD-GEGEVENS: tellers en nieuwste items ══
 var CFG={
@@ -566,6 +620,7 @@ var CFG={
   appId:'1:188890145767:web:6ec8fe6fae4ddd90891342'
 };
 var fbApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(CFG);
+var rtdb = fbApp.database();
 var db = fbApp.firestore();
 var auth = fbApp.auth();
 
@@ -586,34 +641,42 @@ function laadDashboard(){
   tel('verhalen','mPostCount','posts');
   tel('announcements','mAnnCount','announcements');
 
-  db.collection('photos').orderBy('ts','desc').limit(6).get().then(function(snap){
-    var thumbs='', strip='';
+  db.collection('photos').orderBy('ts','desc').limit(10).get().then(function(snap){
+    var thumbs='';
+    latestData.photos=[];
     snap.docs.forEach(function(d,i){
-      var v=d.data();
+      var v=d.data(); v._ts=(v.ts&&v.ts.seconds?v.ts.seconds*1000:0);
       if(i<3) thumbs+='<img src="'+escT(v.img||'')+'" alt="" loading="lazy"/>';
-      strip+='<img src="'+escT(v.img||'')+'" alt="" loading="lazy" onclick="openPhotos()"/>';
+      latestData.photos.push(v);
     });
     var t=document.getElementById('mFotoThumbs'); if(t)t.innerHTML=thumbs;
-    var st=document.getElementById('mFotoStrip'); if(st)st.innerHTML=strip||'<div class="hub-leeg">No photos yet</div>';
+    toonLatest();
   }).catch(function(){});
 
-  db.collection('videos').orderBy('ts','desc').limit(3).get().then(function(snap){
-    var thumbs='', strip='';
+  db.collection('videos').orderBy('ts','desc').limit(10).get().then(function(snap){
+    var thumbs='';
+    latestData.videos=[];
     snap.docs.forEach(function(d,i){
-      var v=d.data();
-      if(i<3) thumbs+='<div class="vplak">▶</div>';
-      strip+='<video src="'+escT(v.url||'')+'" preload="metadata" muted playsinline onclick="openVideos()"></video>';
+      var v=d.data(); v._ts=(v.ts&&v.ts.seconds?v.ts.seconds*1000:0);
+      if(i<3){
+        if(v.type==='youtube'&&v.ytId) thumbs+='<img src="https://i.ytimg.com/vi/'+escT(v.ytId)+'/mqdefault.jpg" alt="" loading="lazy"/>';
+        else thumbs+='<div class="vplak">▶</div>';
+      }
+      latestData.videos.push(v);
     });
     var t=document.getElementById('mVidThumbs'); if(t)t.innerHTML=thumbs;
-    var st=document.getElementById('mVidStrip'); if(st)st.innerHTML=strip||'<div class="hub-leeg">No videos yet</div>';
+    toonLatest();
   }).catch(function(){});
 
-  db.collection('verhalen').orderBy('ts','desc').limit(1).get().then(function(snap){
+  db.collection('verhalen').orderBy('ts','desc').limit(10).get().then(function(snap){
+    latestData.posts=[];
+    snap.docs.forEach(function(d){ var v=d.data(); v._ts=(v.ts&&v.ts.seconds?v.ts.seconds*1000:0); latestData.posts.push(v); });
     var el=document.getElementById('mPostPreview');
     if(el&&snap.docs.length){
       var v=snap.docs[0].data();
-      el.innerHTML='<div class="hub-mini"><b>'+escT(v.displayName||'User')+'</b> '+escT(String(v.text||'').substring(0,90))+'</div>';
+      el.innerHTML='<div class="hub-mini"><b>'+escT(v.displayName||'User')+'</b> '+escT(String(v.text||'').substring(0,80))+'</div>';
     }
+    toonLatest();
   }).catch(function(){});
 
   db.collection('announcements').orderBy('ts','desc').limit(1).get().then(function(snap){
@@ -625,8 +688,68 @@ function laadDashboard(){
   }).catch(function(){});
 }
 
+// ── Stories in de compacte rij ──
+function laadMediaStories(){
+  rtdb.ref('stories').once('value').then(function(snap){
+    var val = snap.val() || {};
+    var groepen = [];
+    var grens = Date.now() - 24*60*60*1000;
+    Object.keys(val).forEach(function(uid){
+      var items = val[uid] || {};
+      var verhalen = Object.keys(items).map(function(k){return items[k];}).filter(function(st){return st && st.ts && st.ts > grens;});
+      if(verhalen.length){
+        var laatste = verhalen[verhalen.length-1];
+        groepen.push({uid:uid, naam:laatste.displayName||'User', avatar:laatste.avatar||0, avatarColor:laatste.avatarColor||0, photoURL:laatste.photoURL||'', img:laatste.img||''});
+      }
+    });
+    var vak = document.getElementById('mStories');
+    if(!vak) return;
+    var html = '<div class="m-story-add" onclick="openStoryCreator()"><div class="m-add-cirkel">+</div><div class="m-story-nm">Your story</div></div>';
+    groepen.slice(0,15).forEach(function(g){
+      var beeld = g.photoURL ? '<img src="'+escT(g.photoURL)+'"/>' : (g.img ? '<img src="'+escT(g.img)+'"/>' : '🌙');
+      html += '<div class="m-story-item" onclick="navScherm(\'home\')">'
+        +'<div class="m-story-ring"><div class="m-story-av">'+beeld+'</div></div>'
+        +'<div class="m-story-nm">'+escT(g.naam)+'</div></div>';
+    });
+    vak.innerHTML = html;
+  }).catch(function(){});
+}
+
+// ── Latest: gemengde rij met filter ──
+var latestData = {photos:[], videos:[], posts:[]};
+var latestFilter = 'all';
+
+function zetFilter(f){
+  latestFilter = f;
+  document.querySelectorAll('.m-filter').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-filter')===f); });
+  toonLatest();
+}
+
+function toonLatest(){
+  var vak = document.getElementById('mLatest');
+  if(!vak) return;
+  var items = [];
+  if(latestFilter==='all'||latestFilter==='photos') latestData.photos.forEach(function(p){items.push({soort:'photo',data:p,ts:p._ts});});
+  if(latestFilter==='all'||latestFilter==='videos') latestData.videos.forEach(function(p){items.push({soort:'video',data:p,ts:p._ts});});
+  if(latestFilter==='all'||latestFilter==='posts') latestData.posts.forEach(function(p){items.push({soort:'post',data:p,ts:p._ts});});
+  items.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  if(!items.length){ vak.innerHTML='<div class="hub-leeg">Nothing yet</div>'; return; }
+  var html='';
+  items.slice(0,20).forEach(function(it){
+    if(it.soort==='photo'){
+      html+='<div class="m-tegel" onclick="openPhotos()"><img src="'+escT(it.data.img||'')+'" loading="lazy"/></div>';
+    } else if(it.soort==='video'){
+      var poster = it.data.type==='youtube'&&it.data.ytId ? 'https://i.ytimg.com/vi/'+escT(it.data.ytId)+'/hqdefault.jpg' : '';
+      html+='<div class="m-tegel" onclick="openVideos()">'+(poster?'<img src="'+poster+'" loading="lazy"/>':'<div style="width:100%;height:100%;background:#000"></div>')+'<div class="m-play">▶</div></div>';
+    } else {
+      html+='<div class="m-tegel m-tegel-post" onclick="openVerhalen()">'+escT(String(it.data.text||'').substring(0,80))+'</div>';
+    }
+  });
+  vak.innerHTML = html;
+}
+
 auth.onAuthStateChanged(function(user){
-  if(user) laadDashboard();
+  if(user){ laadDashboard(); laadMediaStories(); }
 });
 </script>
 </body>

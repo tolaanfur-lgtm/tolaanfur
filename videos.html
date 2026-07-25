@@ -279,7 +279,7 @@ function renderFeed(){
         +'<a class="yt-knop" href="https://www.youtube.com/watch?v='+esc(v.ytId)+'" target="_blank" rel="noopener">Watch on <b>YouTube</b></a>';
     } else {
       html+='<div class="vulling" data-vul="'+esc(v.id)+'" style="background:#0a0a14"></div>'
-        +'<video data-video="'+esc(v.id)+'" src="'+esc(v.url||'')+'" playsinline webkit-playsinline loop preload="metadata"></video>'
+        +'<video data-video="'+esc(v.id)+'" src="'+esc(v.url||'')+'#t=0.1" playsinline webkit-playsinline loop muted preload="auto"></video>'
         +'<div class="speel-teken" id="pt-'+esc(v.id)+'"><div>▶</div></div>';
     }
 
@@ -371,10 +371,10 @@ function startWaarneming(){
       var el=it.target;
       var v=el.querySelector('video');
       if(it.isIntersecting&&it.intersectionRatio>0.6){
-        if(v) v.play().catch(function(){});
+        if(v){ try{ v.muted=false; if(v.currentTime<0.2) v.currentTime=0; }catch(e){} v.play().catch(function(){ v.muted=true; v.play().catch(function(){}); }); }
         laadCommentTel(el.getAttribute('data-slide'));
       } else {
-        if(v) v.pause();
+        if(v){ v.pause(); }
         var f=el.querySelector('.yt-laag iframe');
         if(f) f.src=f.src;   // stopt een YouTube-video die uit beeld gaat
       }
