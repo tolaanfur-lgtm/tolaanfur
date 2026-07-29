@@ -1,0 +1,78 @@
+{
+  "_uitleg": [
+    "TOLAANFUR — DAGELIJKSE CONTENT",
+    "Vul dit bestand met authentieke teksten. De app toont elke dag een ander item,",
+    "en verspringt vanzelf naar de volgende dag (op basis van de dag van het jaar).",
+    "",
+    "Er zijn twee lijsten:",
+    "  'dagen'      = de dagelijkse kaart op Home (hadith + dua + reminder samen)",
+    "  'uitdagingen'= de dagelijkse uitdaging met afvinkbare taken",
+    "",
+    "Je hoeft niet 365 items te maken. Zet er zoveel als je wilt (bv. 30);",
+    "de app begint vanzelf weer bij het begin als de lijst op is.",
+    "",
+    "── VELDEN per dag (kaart op Home) ──",
+    "  hadith_en / hadith_nl : de hadith-tekst (Engels verplicht, NL optioneel)",
+    "  hadith_bron           : exacte bron, bv. 'Sahih al-Bukhari 1'",
+    "  dua_ar                : Arabische tekst van de dua (met tashkeel)",
+    "  dua_translit          : transliteratie (optioneel)",
+    "  dua_en / dua_nl       : vertaling van de dua",
+    "  dua_bron              : bron van de dua",
+    "  reminder_en / reminder_nl : een korte opbeurende herinnering",
+    "",
+    "── VELDEN per uitdaging (afvinkbare taken) ──",
+    "  titel_en / titel_nl : titel van de dag, bv. 'Gratitude day'",
+    "  taken               : lijst van taken; elke taak heeft en (+ optioneel nl)",
+    "",
+    "Verwijder dit _uitleg-blok gerust als je klaar bent.",
+    "Belangrijk: vul alleen authentieke, correct gecontroleerde teksten in."
+  ],
+
+  "dagen": [
+    {
+      "hadith_en": "(Fill in an authentic hadith here in English.)",
+      "hadith_nl": "",
+      "hadith_bron": "Sahih al-Bukhari",
+      "dua_ar": "",
+      "dua_translit": "",
+      "dua_en": "(Fill in the translation of the dua.)",
+      "dua_nl": "",
+      "dua_bron": "Hisn al-Muslim",
+      "reminder_en": "(A short uplifting reminder for the day.)",
+      "reminder_nl": ""
+    },
+    {
+      "hadith_en": "(Second example — fill in an authentic hadith.)",
+      "hadith_nl": "",
+      "hadith_bron": "Sahih Muslim",
+      "dua_ar": "",
+      "dua_translit": "",
+      "dua_en": "(Fill in the translation of the dua.)",
+      "dua_nl": "",
+      "dua_bron": "Hisn al-Muslim",
+      "reminder_en": "(Another short reminder.)",
+      "reminder_nl": ""
+    }
+  ],
+
+  "uitdagingen": [
+    {
+      "titel_en": "Example — Day of remembrance",
+      "titel_nl": "Voorbeeld — Dag van gedenking",
+      "taken": [
+        { "en": "Read Ayat al-Kursi after every prayer", "nl": "Lees Ayat al-Kursi na elk gebed" },
+        { "en": "Say SubhanAllah 33 times", "nl": "Zeg 33x SubhanAllah" },
+        { "en": "Send salawat upon the Prophet 10 times", "nl": "Stuur 10x salawat op de Profeet" }
+      ]
+    },
+    {
+      "titel_en": "Example — Day of kindness",
+      "titel_nl": "Voorbeeld — Dag van vriendelijkheid",
+      "taken": [
+        { "en": "Give a sincere smile to someone", "nl": "Geef iemand een oprechte glimlach" },
+        { "en": "Help a family member without being asked", "nl": "Help een familielid ongevraagd" },
+        { "en": "Make dua for a friend", "nl": "Maak dua voor een vriend" }
+      ]
+    }
+  ]
+}

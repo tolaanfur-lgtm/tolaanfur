@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Today — Tolaanfur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#060818;--card:rgba(20,30,100,.4);--bdr:rgba(100,140,255,.18);--text:#EEF2FF;--muted:#718096;
+  --b3:#00BFFF;--pu:#6B3FFF;--pu2:#9B6FFF;--gold:#F59E0B;--gr:#10B981}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;overflow:hidden}
+#app{height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;padding:0 1rem 2rem}
+.screen{width:100%;max-width:560px}
+.kop{position:sticky;top:0;z-index:20;width:calc(100% + 2rem);margin:0 -1rem;background:rgba(6,8,24,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(100,140,255,.1);display:flex;align-items:center;gap:.6rem;padding:max(env(safe-area-inset-top),.7rem) 1rem .7rem}
+.terug{width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);
+  display:grid;place-items:center;font-size:1rem;cursor:pointer;flex-shrink:0}
+.kop-t{font-family:'Fredoka One',cursive;font-size:1.05rem}
+.kop-sub{font-size:.68rem;color:var(--muted)}
+
+.kaart{background:var(--card);border:1px solid var(--bdr);border-radius:1.2rem;padding:1.1rem;margin-top:1rem}
+.kaart-kop{display:flex;align-items:center;gap:.5rem;font-family:'Fredoka One',cursive;font-size:.95rem;margin-bottom:.7rem}
+.label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pu2);margin-bottom:.35rem}
+.hadith{font-size:.95rem;line-height:1.6}
+.bron{font-size:.68rem;color:var(--muted);margin-top:.4rem}
+.scheiding{height:1px;background:var(--bdr);margin:1rem 0}
+.dua-ar{font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;text-align:right;direction:rtl;color:#fff;margin-bottom:.5rem}
+.dua-translit{font-size:.82rem;font-style:italic;color:var(--pu2);margin-bottom:.4rem}
+.dua-vert{font-size:.9rem;line-height:1.55}
+.reminder{font-size:.92rem;line-height:1.55;font-style:italic}
+
+.uit-kaart{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(0,191,255,.08));border:1px solid rgba(16,185,129,.3);
+  border-radius:1.2rem;padding:1.1rem;margin-top:1rem}
+.taak{display:flex;align-items:center;gap:.7rem;padding:.7rem 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06)}
+.taak:last-child{border-bottom:none}
+.vink{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;font-size:.85rem;flex-shrink:0;transition:all .2s}
+.taak.done .vink{background:var(--gr);border-color:var(--gr);color:#fff}
+.taak-tekst{font-size:.9rem;line-height:1.4;flex:1}
+.taak.done .taak-tekst{color:var(--muted);text-decoration:line-through}
+.uit-voort{margin-top:.8rem}
+.uit-bar{height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.uit-vul{height:100%;background:linear-gradient(90deg,var(--gr),var(--b3));transition:width .4s;width:0}
+.uit-tel{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.5rem}
+.klaar-vlag{text-align:center;padding:.8rem;font-family:'Fredoka One',cursive;color:var(--gr);font-size:.95rem}
+
+.taal-knop{font-size:.72rem;color:var(--b3);font-weight:700;cursor:pointer;margin-left:auto}
+.leeg{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.leeg-ico{font-size:2.5rem}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="kop">
+    <div class="terug" onclick="terug()">←</div>
+    <div style="flex:1"><div class="kop-t">☀️ Today</div><div class="kop-sub" id="kopSub">Your daily reminder</div></div>
+    <div class="taal-knop" id="taalKnop" onclick="wisselTaal()"></div>
+  </div>
+  <div id="inhoud" class="screen"><div class="leeg"><div class="leeg-ico">☀️</div><div style="margin-top:.5rem">Loading...</div></div></div>
+</div>
+
+<script>
+var DATA = null;
+var taal = localStorage.getItem('tf_daily_taal');
+if(taal !== 'nl') taal = 'en';   // Engels als basis
+
+function laad(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function bewaar(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var afgevinkt = laad('tf_daily_taken', {});   // {datum: {taakIndex:true}}
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function vandaag(){return new Date().toISOString().slice(0,10);}
+
+// Dag van het jaar (1-366), bepaalt welk item getoond wordt
+function dagVanJaar(){
+  var nu = new Date();
+  var begin = new Date(nu.getFullYear(), 0, 0);
+  return Math.floor((nu - begin) / 86400000);
+}
+
+function terug(){
+  try{ if(window.parent&&window.parent!==window) window.parent.postMessage('go-home','*'); }catch(e){}
+}
+function wisselTaal(){
+  taal = taal==='en'?'nl':'en';
+  localStorage.setItem('tf_daily_taal', taal);
+  render();
+}
+function tekst(o, veld){
+  if(taal==='nl' && o[veld+'_nl']) return o[veld+'_nl'];
+  return o[veld+'_en'] || o[veld+'_nl'] || '';
+}
+
+fetch('daily/content.json',{cache:'no-cache'})
+  .then(function(r){return r.json();})
+  .then(function(d){ DATA=d; render(); })
+  .catch(function(){
+    document.getElementById('inhoud').innerHTML='<div class="leeg"><div class="leeg-ico">☀️</div>'
+      +'<div style="margin-top:.5rem">Could not load the daily content.</div>'
+      +'<div style="font-size:.75rem;margin-top:.3rem">Make sure daily/content.json is uploaded.</div></div>';
+  });
+
+function render(){
+  if(!DATA) return;
+  document.getElementById('taalKnop').textContent = taal==='en'?'NL':'EN';
+  var el = document.getElementById('inhoud');
+  var html = '';
+
+  // ── Dagelijkse content-kaart ──
+  var dagen = DATA.dagen || [];
+  if(dagen.length){
+    var dag = dagen[dagVanJaar() % dagen.length];
+    html += '<div class="kaart">';
+    // Hadith
+    if(tekst(dag,'hadith')){
+      html += '<div class="label">📜 Hadith of the day</div>';
+      html += '<div class="hadith">'+esc(tekst(dag,'hadith'))+'</div>';
+      if(dag.hadith_bron) html += '<div class="bron">— '+esc(dag.hadith_bron)+'</div>';
+    }
+    // Dua
+    if(dag.dua_ar || tekst(dag,'dua')){
+      html += '<div class="scheiding"></div>';
+      html += '<div class="label">🤲 Dua of the day</div>';
+      if(dag.dua_ar) html += '<div class="dua-ar">'+esc(dag.dua_ar)+'</div>';
+      if(dag.dua_translit) html += '<div class="dua-translit">'+esc(dag.dua_translit)+'</div>';
+      if(tekst(dag,'dua')) html += '<div class="dua-vert">'+esc(tekst(dag,'dua'))+'</div>';
+      if(dag.dua_bron) html += '<div class="bron">— '+esc(dag.dua_bron)+'</div>';
+    }
+    // Reminder
+    if(tekst(dag,'reminder')){
+      html += '<div class="scheiding"></div>';
+      html += '<div class="label">💡 Reminder</div>';
+      html += '<div class="reminder">'+esc(tekst(dag,'reminder'))+'</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── Dagelijkse uitdaging ──
+  var uitdagingen = DATA.uitdagingen || [];
+  if(uitdagingen.length){
+    var uit = uitdagingen[dagVanJaar() % uitdagingen.length];
+    var taken = uit.taken || [];
+    var d = vandaag();
+    var vink = afgevinkt[d] || {};
+    var gedaan = taken.filter(function(t,i){return vink[i];}).length;
+    var pct = taken.length ? Math.round(gedaan/taken.length*100) : 0;
+
+    html += '<div class="uit-kaart">';
+    html += '<div class="kaart-kop">🎯 '+esc(taal==='nl'?(uit.titel_nl||uit.titel_en):(uit.titel_en||uit.titel_nl||'Daily challenge'))+'</div>';
+    taken.forEach(function(t,i){
+      var af = vink[i];
+      var tk = taal==='nl'?(t.nl||t.en):(t.en||t.nl||'');
+      html += '<div class="taak'+(af?' done':'')+'" data-taak="'+i+'">'
+        +'<div class="vink">'+(af?'✓':'')+'</div>'
+        +'<div class="taak-tekst">'+esc(tk)+'</div></div>';
+    });
+    html += '<div class="uit-voort"><div class="uit-bar"><div class="uit-vul" style="width:'+pct+'%"></div></div>';
+    if(gedaan === taken.length && taken.length > 0){
+      html += '<div class="klaar-vlag">🎉 '+(taal==='nl'?'Alle taken voltooid! MashaAllah':'All tasks completed! MashaAllah')+'</div>';
+    } else {
+      html += '<div class="uit-tel">'+gedaan+' / '+taken.length+' '+(taal==='nl'?'voltooid vandaag':'completed today')+'</div>';
+    }
+    html += '</div></div>';
+  }
+
+  if(!html){
+    html = '<div class="leeg"><div class="leeg-ico">☀️</div><div style="margin-top:.5rem">No content yet</div>'
+      +'<div style="font-size:.75rem;margin-top:.3rem">Add items in daily/content.json</div></div>';
+  }
+
+  el.innerHTML = html;
+
+  // Taken afvinken
+  el.querySelectorAll('[data-taak]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = b.getAttribute('data-taak');
+      var d = vandaag();
+      afgevinkt[d] = afgevinkt[d] || {};
+      if(afgevinkt[d][i]) delete afgevinkt[d][i]; else afgevinkt[d][i] = true;
+      bewaar('tf_daily_taken', afgevinkt);
+      if(navigator.vibrate) navigator.vibrate(12);
+      render();
+    });
+  });
+}
+</script>
+</body>
+</html>
