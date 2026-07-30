@@ -227,13 +227,13 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 /* MENU: horizontaal scrollende kaarten (2 rijen, groeit mee) */
 .mgh{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;width:100%;max-width:520px;margin-top:.5rem;flex-shrink:0}
 /* Sectie-titel met 'bekijk alles' */
-.sec-titel{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin:1.15rem 0 .1rem}
+.sec-titel{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin:1.25rem 0 .5rem}
 .sec-titel .st-t{font-family:'Fredoka One',cursive;font-size:1.05rem}
 .sec-titel .st-a{font-size:.76rem;color:var(--b3);font-weight:700;cursor:pointer}
 /* Lees de Zikr knop */
 .zikr-knop{background:rgba(37,99,235,.9);color:#fff;font-weight:700;font-size:.78rem;padding:.55rem .85rem;border-radius:.7rem;white-space:nowrap;display:flex;align-items:center;gap:.3rem;flex-shrink:0;box-shadow:0 4px 14px -4px rgba(37,99,235,.7)}
 /* Continue learning kaart */
-.cl-kaart{width:100%;max-width:560px;margin-top:.7rem;cursor:pointer;background:var(--card);border:1px solid var(--bdr);border-radius:1.2rem;padding:1rem;display:flex;align-items:center;gap:.85rem;backdrop-filter:blur(12px);box-shadow:0 6px 20px -10px rgba(107,63,255,.4)}
+.cl-kaart{width:100%;max-width:560px;margin-top:.4rem;cursor:pointer;background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.65rem;display:flex;align-items:center;gap:.7rem;backdrop-filter:blur(12px);box-shadow:0 6px 20px -10px rgba(107,63,255,.4)}
 .cl-ico{width:3rem;height:3rem;border-radius:.85rem;background:linear-gradient(135deg,rgba(107,63,255,.35),rgba(0,191,255,.2));border:1px solid rgba(155,111,255,.4);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0}
 .cl-bar{height:8px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;margin-top:.5rem}
 .cl-vul{height:100%;background:linear-gradient(90deg,var(--pu2),var(--b3));border-radius:5px;transition:width .6s ease}
@@ -248,7 +248,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 .tfy-d{font-size:.54rem;color:var(--sl2);margin-top:.03rem;line-height:1.1}
 .tfy-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:.15rem}
 .tfy-vul{height:100%;border-radius:4px;transition:width .5s}
-.kop-hero{position:relative;width:calc(100% + 2rem);margin:0 -1rem;min-height:14rem;
+.kop-hero{position:relative;width:calc(100% + 2rem);margin:0 -1rem;min-height:16rem;
   padding:max(env(safe-area-inset-top),.7rem) 1.1rem 1.1rem;
   background-size:cover;background-position:center 35%;
   display:flex;flex-direction:column;justify-content:space-between}
@@ -413,7 +413,7 @@ select.inp2 option{background:var(--bg2)}
 
 /* ═══ STORIES ═══ */
 .story-tip{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px dashed var(--bdr);border-radius:.9rem;padding:.6rem .75rem;min-width:14rem;flex-shrink:0;cursor:pointer;align-self:center}
-.stories-bar{display:flex;gap:.75rem;overflow-x:auto;padding:.5rem 0 .75rem;scrollbar-width:none;width:100%;max-width:560px;flex-shrink:0;min-height:5.6rem;align-items:flex-start}
+.stories-bar{display:flex;gap:.7rem;overflow-x:auto;padding:.3rem 0 .4rem;scrollbar-width:none;width:100%;max-width:560px;flex-shrink:0;min-height:5rem;align-items:flex-start}
 .stories-bar::-webkit-scrollbar{display:none}
 .story-bubble{display:flex;flex-direction:column;align-items:center;gap:.35rem;cursor:pointer;flex-shrink:0}
 .story-ring{width:3.8rem;height:3.8rem;border-radius:50%;padding:3px;background:linear-gradient(135deg,#F59E0B,#EF4444,#8B5CF6);flex-shrink:0}
@@ -647,7 +647,7 @@ const storage = firebase.storage();  // Bestandsopslag (profielfoto's, story-fot
 
 // ══ PUSH-MELDINGEN ══
 // Deze sleutel haal je uit Firebase Console → Project settings → Cloud Messaging → Web Push certificates
-const VAPID_KEY = "BPM-20rj3FJU_XPBY38kkxyNrkT93q5IuHlVMrG3-xqIlrM5LPQ6aSPs_EF2hFMGYHB_64b9GkbaQZ4pTf49bZA";
+const VAPID_KEY = "VERVANG_DIT_DOOR_JE_VAPID_SLEUTEL";
 let messaging = null;
 try { messaging = firebase.messaging(); } catch(e) { /* niet ondersteund op dit toestel */ }
 
@@ -944,6 +944,7 @@ let storyPaused = false;       // vasthouden = pauzeren
 let _cmpH = null;              // Kompas-handler (Qibla)
 let userProfileUid = null;     // Wiens profiel open staat
 let prevSC = 'home';           // Vorige scherm (voor terugknop vanuit profielen)
+let navGeschiedenis = [];      // Stapel van bezochte schermen voor stap-terug
 
 // ══ EIGEN GETEKENDE ICONEN (SVG, nemen de kleur van hun kaart over) ══
 const _sv = (p, vul) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
@@ -1559,8 +1560,17 @@ auth.onAuthStateChanged(async user => {
 // ROUTER
 // ══════════════════════════════════════════════
 function go(s, d={}) {
-  if(s==='__back'){s=prevSC||'home';prevSC='home';}
-  else if(s!==SC){prevSC=SC;}
+  if(s==='__back'){
+    // Eén stap terug in de geschiedenis
+    s = navGeschiedenis.pop() || 'home';
+    prevSC = navGeschiedenis[navGeschiedenis.length-1] || 'home';
+  } else if(s!==SC){
+    // Vooruit: huidig scherm op de stapel bewaren (behalve login/loading)
+    if(SC && SC!=='loading' && SC!=='login'){ navGeschiedenis.push(SC); }
+    // Stapel niet oneindig laten groeien
+    if(navGeschiedenis.length>20) navGeschiedenis.shift();
+    prevSC = SC;
+  }
   SC = s;
   CX = d;
   render();
@@ -2119,10 +2129,10 @@ function rHome() {
 
 
       <!-- 2. MOMENT VAN DE DAG (brede kaart met Lees de Zikr knop) -->
-    <div style="width:100%;max-width:560px;margin-top:.9rem;position:relative;overflow:hidden;border-radius:1.2rem;
+    <div style="width:100%;max-width:560px;margin-top:.5rem;position:relative;overflow:hidden;border-radius:1rem;
       background:linear-gradient(115deg,rgba(11,14,38,.9) 15%,rgba(107,63,255,.5) 82%,rgba(245,158,11,.4) 125%),url('img/home/moment-bg.jpg');background-size:cover;background-position:center right;
       border:1px solid rgba(155,111,255,.4);box-shadow:inset 0 0 0 1px rgba(155,111,255,.15),0 8px 26px -10px rgba(107,63,255,.55);
-      padding:1.05rem 1.1rem">
+      padding:.75rem .85rem">
       <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem">
         <span style="font-size:1rem">✨</span>
         <span style="font-family:'Fredoka One',cursive;font-size:.95rem;color:#C9B8FF">Moment of the day</span>
@@ -2169,8 +2179,8 @@ function rHome() {
     </div>
 
     <!-- 6. VANDAAG VOOR JOU (voortgang - vorm nu, echte data later) -->
-    ${!isGuest ? `<div class="sec-titel"><div class="st-t">Today for you</div></div>
-    <div class="tfy">
+    ${!isGuest ? `<div class="sec-titel" style="margin-top:.55rem"><div class="st-t">Today for you</div></div>
+    <div class="tfy" style="margin-top:.35rem">
       <div class="tfy-k" onclick="go('azkar')">
         <div class="tfy-top"><div class="tfy-ico" style="background:rgba(245,158,11,.25);border:1px solid rgba(245,158,11,.4)">🌅</div><div><div class="tfy-t">Morning Zikr</div><div class="tfy-d">Start your day</div></div></div>
         <div style="font-size:.68rem;color:var(--sl2)">0 / 10 done</div>
@@ -2373,7 +2383,7 @@ function rExplore() {
   ];
   return `<div class="screen" style="padding-top:1rem">
     <div style="width:100%;max-width:560px;display:flex;align-items:center;gap:.7rem;margin-bottom:1rem">
-      <div onclick="go('home')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;cursor:pointer">←</div>
+      <div onclick="go('__back')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;cursor:pointer">←</div>
       <div style="font-family:'Fredoka One',cursive;font-size:1.25rem">Explore Tolaanfur</div>
     </div>
     ${groepen.map(g => `
@@ -3168,7 +3178,7 @@ auth.getRedirectResult().catch(function(e){
 // ══════════════════════════════════════════════
 window.addEventListener('message', function(ev){
   const d=ev.data;
-  if(d==='go-home'){go('home');return;}
+  if(d==='go-home'){go('__back');return;}
   if(!d||typeof d!=='object')return;
   if(d.type==='immersive'){
     document.body.classList.toggle('volscherm', !!d.on);
