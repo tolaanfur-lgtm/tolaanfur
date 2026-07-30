@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -184,13 +183,13 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
   color:#fff;font-size:.8rem;cursor:pointer}
 
 /* Kaartstijl naar het ontwerp */
-.mc2{background:var(--card);border:1px solid var(--bdr);border-radius:1.1rem;padding:.85rem .9rem;cursor:pointer;display:flex;flex-direction:column;gap:.4rem;transition:transform .12s;backdrop-filter:blur(12px)}
-.mc2-vol{background-size:cover;background-position:center;background-blend-mode:normal;border-color:var(--bdr);justify-content:flex-start;min-height:10rem;position:relative;overflow:hidden}
+.mc2{background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.55rem;cursor:pointer;display:flex;flex-direction:column;gap:.25rem;transition:transform .18s ease,box-shadow .25s ease;backdrop-filter:blur(12px);min-height:6.2rem}
+.mc2-vol{background-size:cover;background-position:center;background-blend-mode:normal;border:none;justify-content:flex-start;min-height:6.2rem;position:relative;overflow:hidden}
 .mc2-vol .mc2-t,.mc2-vol .mc2-d{text-shadow:0 1px 5px rgba(0,0,0,.6)}
 .mc2-vol .mc2-badge{margin-top:auto}
 .mc2:active{transform:scale(.96)}
-.mc2-ico{width:2.6rem;height:2.6rem;border-radius:.8rem;display:grid;place-items:center;color:#fff}
-.mc2-ico svg{width:1.45rem;height:1.45rem;display:block}
+.mc2-ico{width:1.9rem;height:1.9rem;border-radius:.55rem;display:grid;place-items:center;color:#fff;margin-bottom:.1rem}
+.mc2-ico svg{width:1.05rem;height:1.05rem;display:block}
 .io svg,.story-av svg,.sv-av svg,#avatarPreview svg,.prof-avatar svg{width:64%;height:64%;display:block;color:#fff}
 .io img,.story-av img,.sv-av img,#avatarPreview img,.prof-avatar img,.hdr-av img{width:88%;height:88%;object-fit:contain;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 #avatarPreview img{width:92%;height:92%}
@@ -221,12 +220,34 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 #chatBadge{animation:pols 1.8s ease-in-out infinite}
 .mc2-strip img{transition:opacity .4s ease;animation:zachtIn .5s ease-out}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-.mc2-t{font-family:'Fredoka One',cursive;font-size:.92rem;display:flex;align-items:center;justify-content:space-between}
+.mc2-t{font-family:'Fredoka One',cursive;font-size:.74rem;line-height:1.05}
 .mc2-chev{color:var(--sl2);font-weight:400;font-size:1.1rem}
-.mc2-d{color:var(--sl2);font-size:.68rem;line-height:1.35}
+.mc2-d{color:var(--sl2);font-size:.58rem;line-height:1.2}
 
 /* MENU: horizontaal scrollende kaarten (2 rijen, groeit mee) */
-.mgh{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;width:100%;max-width:560px;margin-top:.6rem;flex-shrink:0}
+.mgh{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;width:100%;max-width:520px;margin-top:.5rem;flex-shrink:0}
+/* Sectie-titel met 'bekijk alles' */
+.sec-titel{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin:1.15rem 0 .1rem}
+.sec-titel .st-t{font-family:'Fredoka One',cursive;font-size:1.05rem}
+.sec-titel .st-a{font-size:.76rem;color:var(--b3);font-weight:700;cursor:pointer}
+/* Lees de Zikr knop */
+.zikr-knop{background:rgba(37,99,235,.9);color:#fff;font-weight:700;font-size:.78rem;padding:.55rem .85rem;border-radius:.7rem;white-space:nowrap;display:flex;align-items:center;gap:.3rem;flex-shrink:0;box-shadow:0 4px 14px -4px rgba(37,99,235,.7)}
+/* Continue learning kaart */
+.cl-kaart{width:100%;max-width:560px;margin-top:.7rem;cursor:pointer;background:var(--card);border:1px solid var(--bdr);border-radius:1.2rem;padding:1rem;display:flex;align-items:center;gap:.85rem;backdrop-filter:blur(12px);box-shadow:0 6px 20px -10px rgba(107,63,255,.4)}
+.cl-ico{width:3rem;height:3rem;border-radius:.85rem;background:linear-gradient(135deg,rgba(107,63,255,.35),rgba(0,191,255,.2));border:1px solid rgba(155,111,255,.4);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0}
+.cl-bar{height:8px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;margin-top:.5rem}
+.cl-vul{height:100%;background:linear-gradient(90deg,var(--pu2),var(--b3));border-radius:5px;transition:width .6s ease}
+.cl-knop{background:rgba(37,99,235,.85);color:#fff;font-weight:700;font-size:.76rem;padding:.5rem .8rem;border-radius:.7rem;white-space:nowrap;flex-shrink:0}
+/* Today for you - 2x2 raster */
+.tfy{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;width:100%;max-width:520px;margin-top:.5rem}
+.tfy-k{background:var(--card);border:1px solid var(--bdr);border-radius:.85rem;padding:.5rem;cursor:pointer;backdrop-filter:blur(10px);transition:transform .14s}
+.tfy-k:active{transform:scale(.97)}
+.tfy-top{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;margin-bottom:.35rem}
+.tfy-ico{width:1.7rem;height:1.7rem;border-radius:.5rem;display:grid;place-items:center;font-size:.9rem;flex-shrink:0}
+.tfy-t{font-size:.66rem;font-weight:700;line-height:1.05}
+.tfy-d{font-size:.54rem;color:var(--sl2);margin-top:.03rem;line-height:1.1}
+.tfy-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:.15rem}
+.tfy-vul{height:100%;border-radius:4px;transition:width .5s}
 .kop-hero{position:relative;width:calc(100% + 2rem);margin:0 -1rem;min-height:14rem;
   padding:max(env(safe-area-inset-top),.7rem) 1.1rem 1.1rem;
   background-size:cover;background-position:center 35%;
@@ -245,7 +266,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
   border-radius:2rem;background:var(--b3);border:2px solid rgba(6,8,24,.9);color:#fff;font-size:.6rem;font-weight:700;
   display:grid;place-items:center}
 .kop-groet{width:100%;max-width:560px;margin:0 auto;text-shadow:0 2px 10px rgba(0,0,0,.75)}
-.mc2-badge{align-self:flex-end;border-radius:2rem;padding:.14rem .6rem;font-size:.6rem;font-weight:700;color:#fff}
+.mc2-badge{align-self:flex-start;margin-top:auto;border-radius:.5rem;padding:.2rem .45rem;font-size:.54rem;font-weight:700;color:#fff}
 .mc2-strip{display:flex;gap:.35rem;margin-top:.1rem}
 .mc2-strip:empty{display:none}
 .volg-gebed{display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:linear-gradient(120deg,rgba(5,150,105,.22),rgba(255,255,255,.04));border:1px solid rgba(16,185,129,.35);border-radius:.8rem;padding:.7rem .75rem;margin-top:.25rem}
@@ -1837,6 +1858,7 @@ function render() {
       'sirah-quiz': function(){ return rIframe('sirah_quiz.html'); },
       azkar: function(){ return rIframe('azkar.html'); },
       daily: function(){ return rIframe('daily.html'); },
+      explore: rExplore,
       media: function(){ return rIframe('media.html'); },
       verhalen: function(){ return rIframe('verhalen.html'); },
       photos: function(){ return rIframe('photos.html'); },
@@ -1884,7 +1906,7 @@ function render() {
 }
 
 function needsTabs() {
-  const noTab = ['loading','login','register','forgot-pw','qiblah','chat','story-view','story-create','group-chat','tasbih','sirah-quiz','media','hijri-cal','azkar','daily'];
+  const noTab = ['loading','login','register','forgot-pw','qiblah','chat','story-view','story-create','group-chat','tasbih','sirah-quiz','media','hijri-cal','azkar','daily','explore'];
   return !noTab.includes(SC);
 }
 
@@ -2024,9 +2046,7 @@ function rHome() {
     {id:'quran',i:IC.quran,n:'Quran',d:'Read the Mushaf',c:'#1D8348'},
     {id:'play-cats',i:IC['play-cats'],n:'Lessons',d:'Islamic knowledge',c:'#2563EB'},
     {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Prophet Muhammad ﷺ',c:'#7C3AED'},
-    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Dhikr, adhkar & tasbih'),c:'#6B3FFF'},
-    {id:'prayer',i:IC.prayer,n:_om('Prayer Times'),d:_om('Prayer times & Adhan'),c:'#059669'},
-    {id:'media',i:IC.media,n:'Media',d:'Photos, Videos & Stories',c:'#BE185D'},
+    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Daily Zikr'),c:'#6B3FFF'},
   ];
   // Eigen achtergrondbeeld per kaart (premium look)
   const kaartBeeld = {
@@ -2098,83 +2118,86 @@ function rHome() {
     <div style="position:relative;display:flex;flex-direction:column;align-items:center;padding:.15rem 1rem .5rem;width:100%">
 
 
-      <!-- Moment van de dag: dagelijkse Zikr -->
-    <div onclick="go('azkar')" style="width:100%;max-width:560px;margin-top:.9rem;cursor:pointer;position:relative;overflow:hidden;
-      background:linear-gradient(120deg,rgba(11,14,38,.86) 20%,rgba(107,63,255,.42) 78%,rgba(245,158,11,.35) 120%),url('img/home/moment-bg.jpg');background-size:cover;background-position:center right;
-      border:1px solid rgba(155,111,255,.4);box-shadow:inset 0 0 0 1px rgba(155,111,255,.15),0 8px 24px -10px rgba(107,63,255,.55);
-      border-radius:1.2rem;padding:1.05rem 1.1rem;display:flex;align-items:center;gap:.85rem">
-      <div style="width:2.8rem;height:2.8rem;border-radius:.8rem;background:rgba(255,255,255,.12);backdrop-filter:blur(4px);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0">📿</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'Fredoka One',cursive;font-size:.92rem">Moment of the day</div>
-        <div style="font-size:.72rem;color:var(--sl2);margin-top:.1rem">"Remember Me, and I will remember you." (Qur'an 2:152)</div>
+      <!-- 2. MOMENT VAN DE DAG (brede kaart met Lees de Zikr knop) -->
+    <div style="width:100%;max-width:560px;margin-top:.9rem;position:relative;overflow:hidden;border-radius:1.2rem;
+      background:linear-gradient(115deg,rgba(11,14,38,.9) 15%,rgba(107,63,255,.5) 82%,rgba(245,158,11,.4) 125%),url('img/home/moment-bg.jpg');background-size:cover;background-position:center right;
+      border:1px solid rgba(155,111,255,.4);box-shadow:inset 0 0 0 1px rgba(155,111,255,.15),0 8px 26px -10px rgba(107,63,255,.55);
+      padding:1.05rem 1.1rem">
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem">
+        <span style="font-size:1rem">✨</span>
+        <span style="font-family:'Fredoka One',cursive;font-size:.95rem;color:#C9B8FF">Moment of the day</span>
       </div>
-      <div style="color:var(--sl2);font-size:1.1rem">›</div>
-    </div>
-
-    <!-- Today: dagelijkse hadith, dua en uitdaging -->
-    <div onclick="go('daily')" style="width:100%;max-width:560px;margin-top:.7rem;cursor:pointer;
-      background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(0,191,255,.1));border:1px solid rgba(16,185,129,.3);
-      border-radius:1.1rem;padding:.95rem 1.05rem;display:flex;align-items:center;gap:.8rem">
-      <div style="width:2.8rem;height:2.8rem;border-radius:.8rem;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:1.4rem;flex-shrink:0">☀️</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'Fredoka One',cursive;font-size:.92rem">Today</div>
-        <div style="font-size:.72rem;color:var(--sl2);margin-top:.1rem">Hadith, dua & your daily challenge</div>
-      </div>
-      <div style="color:var(--sl2);font-size:1.1rem">›</div>
-    </div>
-
-    <!-- Dua + datum-kaart -->
-      <div style="width:100%;max-width:560px;background:var(--card);border:1px solid var(--bdr);border-radius:1rem;padding:.85rem 1rem;margin-top:.7rem;display:flex;align-items:center;gap:.75rem;backdrop-filter:blur(12px)">
+      <div style="display:flex;align-items:center;gap:.85rem">
+        <div style="width:3.6rem;height:3.6rem;border-radius:50%;flex-shrink:0;background-image:url('img/home/round-lantern1.jpg');background-size:cover;background-position:center;border:2px solid rgba(245,158,11,.5);box-shadow:0 0 14px -2px rgba(245,158,11,.5)"></div>
         <div style="flex:1;min-width:0">
-          <div class="l-ar" style="margin:0;text-align:left;font-size:1.02rem">وَقَل رَبِّ زِدْنِيْ عِلْمَا</div>
-          <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-top:.2rem;font-family:'Inter',sans-serif">(Jedhi: 'Yaa Rabbii koo, beekumsa naaf dabali)</div>
+          <div class="l-ar" style="margin:0;text-align:left;font-size:1.15rem;line-height:1.7">اذكُرُونِي أَذكُركُمَ</div>
+          <div style="font-size:.74rem;color:rgba(238,242,255,.85);margin-top:.15rem">"Remember Me, and I will remember you." (Qur'an 2:152)</div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:.82rem;font-weight:700">${esc(dt)}</div>
-          <div id="home-hijri" style="font-size:.68rem;color:var(--gold2);margin-top:.2rem"></div>
-        </div>
+        <div onclick="go('azkar')" class="zikr-knop cursor-pointer">Read Zikr ›</div>
       </div>
     </div>
 
-    <!-- Stories balk (cirkels van vrienden) -->
-    ${!isGuest ? `<div style="width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-top:.8rem"><div style="font-family:'Fredoka One',cursive;font-size:1.05rem">› Stories</div>${allStories.length ? `<div onclick="openStoryGroup(0)" style="font-size:.78rem;color:var(--b3);font-weight:700;cursor:pointer">See all</div>` : ''}</div>` : ''}
+    <!-- 3. STORIES -->
+    ${!isGuest ? `<div class="sec-titel"><div class="st-t">◎ Stories</div>${allStories.length ? `<div onclick="openStoryGroup(0)" class="st-a">See all ›</div>` : ''}</div>` : ''}
     ${!isGuest ? rStoriesBar() : ''}
 
-    <!-- Menu: originele kaarten, horizontaal scrollbaar (groeit mee met nieuwe items) -->
+    <!-- 4. CONTINUE LEARNING (voortgang - vorm nu, echte data later) -->
+    ${!isGuest ? `<div class="cl-kaart cursor-pointer" onclick="go('sirah-quiz')">
+      <div class="cl-ico">📖</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Fredoka One',cursive;font-size:.82rem;color:var(--sl2);margin-bottom:.15rem">Continue where you left off</div>
+        <div style="font-size:.72rem;color:var(--sl2)">Sirah of the Prophet ﷺ</div>
+        <div style="font-size:.92rem;font-weight:700;margin-bottom:.1rem">Level 7 of 30</div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div class="cl-bar" style="flex:1"><div class="cl-vul" style="width:70%"></div></div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--sl2)">70%</div>
+        </div>
+      </div>
+      <div style="width:4.2rem;height:4.2rem;border-radius:.8rem;flex-shrink:0;background-image:url('img/scenes/sc_${String(((sceneVanDeDag()+3)%15)+1).padStart(2,'0')}.jpg');background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.12)"></div>
+      <div class="cl-knop">Continue ›</div>
+    </div>` : ''}
+
+    <!-- 5. VERKEN TOLAANFUR -->
+    <div class="sec-titel"><div class="st-t">Explore Tolaanfur</div><div class="st-a" onclick="go('explore')">View all ›</div></div>
     <div class="mgh">
       ${items.map(m=>`<div class="mc2 cursor-pointer${kaartBeeld[m.id]?' mc2-vol':''}" data-go="${m.id}"${kaartBeeld[m.id]?` style="background-image:linear-gradient(160deg,rgba(11,14,38,.92) 8%,rgba(11,14,38,.74) 42%,${ha(m.c,.5)} 108%),url('img/home/${kaartBeeld[m.id]}');box-shadow:inset 0 0 0 1px ${ha(m.c,.35)},0 6px 20px -8px ${ha(m.c,.5)}"`:''}>
-        <div style="display:flex;align-items:flex-start;gap:.6rem">
-          <div class="mc2-ico" style="background:${m.c}30;border:1px solid ${ha(m.c,.45)}">${m.i}</div>
-          <div style="flex:1;min-width:0">
-            <div class="mc2-t">${m.n}<span class="mc2-chev">›</span></div>
-            <div class="mc2-d">${m.d}</div>
-          </div>
-        </div>
-        ${BDG[m.id]?`<div class="mc2-badge" style="background:${m.c}45;border:1px solid ${ha(m.c,.55)}">${BDG[m.id]}</div>`:''}
-        ${m.id==='prayer' && vg ? `<div class="volg-gebed">
-          <div>
-            <div class="vg-lbl">Next Prayer</div>
-            <div class="vg-naam">${vg.naam}</div>
-          </div>
-          <div style="text-align:right">
-            <div class="vg-tijd">🕐 ${vg.tijd}</div>
-            <div class="vg-over">in ${vg.over}</div>
-          </div>
-        </div>` : `<div class="mc2-strip" id="strip-${m.id}">${m.id==='quran'?'':m.id==='media'?'':[1,2,3].map(nn=>`<img src="img/home/${m.id}_${nn}.jpg" loading="lazy" onerror="this.style.display='none'"/>`).join('')}</div>`}
+        <div class="mc2-ico" style="background:${m.c}35;border:1px solid ${ha(m.c,.5)}">${m.i}</div>
+        <div class="mc2-t">${m.n}</div>
+        <div class="mc2-d">${m.d}</div>
+        ${BDG[m.id]?`<div class="mc2-badge" style="background:${m.c}55;border:1px solid ${ha(m.c,.6)}">${BDG[m.id]}</div>`:''}
       </div>`).join('')}
     </div>
 
-    <!-- Kennis-quote (authentieke hadith) -->
-    <div style="width:100%;max-width:560px;background:linear-gradient(100deg,rgba(76,29,149,.92) 25%,rgba(76,29,149,.55) 60%,rgba(76,29,149,.2)),url('img/scenes/sc_${String(((sceneVanDeDag()+6)%15)+1).padStart(2,'0')}.jpg');background-size:cover;background-position:center;border:1px solid rgba(155,111,255,.35);border-radius:1.1rem;padding:1.1rem;margin-top:.85rem">
-      <div style="font-size:1.7rem;color:var(--pu2);line-height:1;font-family:Georgia,serif">“</div>
-      <div style="font-family:'Fredoka One',cursive;font-size:1rem;line-height:1.55;margin:.2rem 0 .45rem">Whoever follows a path in pursuit of knowledge, Allah makes easy for him a path to Paradise.</div>
-      <div style="font-size:.7rem;color:var(--sl2)">— Prophet Muhammad ﷺ · Sahih Muslim</div>
-    </div>
+    <!-- 6. VANDAAG VOOR JOU (voortgang - vorm nu, echte data later) -->
+    ${!isGuest ? `<div class="sec-titel"><div class="st-t">Today for you</div></div>
+    <div class="tfy">
+      <div class="tfy-k" onclick="go('azkar')">
+        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(245,158,11,.25);border:1px solid rgba(245,158,11,.4)">🌅</div><div><div class="tfy-t">Morning Zikr</div><div class="tfy-d">Start your day</div></div></div>
+        <div style="font-size:.68rem;color:var(--sl2)">0 / 10 done</div>
+        <div class="tfy-bar"><div class="tfy-vul" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div>
+      </div>
+      <div class="tfy-k" onclick="go('azkar')">
+        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(107,63,255,.25);border:1px solid rgba(155,111,255,.4)">🌙</div><div><div class="tfy-t">Evening Zikr</div><div class="tfy-d">End your day</div></div></div>
+        <div style="font-size:.68rem;color:var(--sl2)">0 / 10 done</div>
+        <div class="tfy-bar"><div class="tfy-vul" style="width:0%;background:linear-gradient(90deg,#6B3FFF,#9B6FFF)"></div></div>
+      </div>
+      <div class="tfy-k" onclick="go('quran')">
+        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(16,185,129,.25);border:1px solid rgba(16,185,129,.4)">📖</div><div><div class="tfy-t">Quran Goal</div><div class="tfy-d">12 pages</div></div></div>
+        <div style="font-size:.68rem;color:var(--sl2);text-align:right">6 / 12</div>
+        <div class="tfy-bar"><div class="tfy-vul" style="width:50%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
+      </div>
+      <div class="tfy-k" onclick="go('daily')">
+        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(0,191,255,.25);border:1px solid rgba(0,191,255,.4)">🎯</div><div><div class="tfy-t">Daily Goal</div><div class="tfy-d">Stay consistent</div></div></div>
+        <div style="font-size:.68rem;color:var(--sl2)">2 / 5 done</div>
+        <div class="tfy-bar"><div class="tfy-vul" style="width:40%;background:linear-gradient(90deg,#00BFFF,#60A5FA)"></div></div>
+      </div>
+    </div>` : ''}
 
     ${isGuest ? `<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:.85rem;padding:.75rem 1rem;width:100%;max-width:560px;margin-top:.75rem;display:flex;align-items:center;gap:.65rem">
       <span>⚠️</span><div style="flex:1;font-size:.8rem;color:var(--gold2)">Create an account to use everything</div>
       <button class="btn bt bsm" data-go="register">Account</button>
     </div>` : ''}
+    <div style="height:1.5rem"></div>
   </div>`;
 }
 
@@ -2326,6 +2349,52 @@ function rIframe(src) {
   return '<div class="screen" style="padding:0;overflow:hidden"><iframe src="' + src + '" style="width:100%;height:' + h + ';border:none;display:block" allow="geolocation; gyroscope; accelerometer; deviceorientation"></iframe></div>';
 }
 
+
+function rExplore() {
+  const groepen = [
+    { titel: 'Learn', items: [
+      {id:'quran', i:'📖', n:'Quran', d:'Read the Mushaf', c:'#1D8348'},
+      {id:'play-cats', i:'📚', n:'Lessons', d:'Islamic knowledge', c:'#2563EB'},
+      {id:'sirah-quiz', i:'🏆', n:'Sirah Quiz', d:'Test your knowledge', c:'#7C3AED'},
+      {id:'azkar', i:'📿', n:'Azkar & Dua', d:'Daily Zikr & tasbih', c:'#6B3FFF'},
+      {id:'daily', i:'☀️', n:'Today', d:'Hadith, dua & challenge', c:'#10B981'},
+    ]},
+    { titel: 'Worship', items: [
+      {id:'prayer', i:'🕌', n:'Prayer Times', d:'Times & Adhan', c:'#059669'},
+      {id:'qiblah', i:'🧭', n:'Qibla', d:'Find the direction', c:'#0EA5E9'},
+      {id:'hijri-cal', i:'🌙', n:'Calendar', d:'Islamic dates', c:'#F59E0B'},
+    ]},
+    { titel: 'Community', items: [
+      {id:'community', i:'🌐', n:'Community', d:'Groups & discussions', c:'#BE185D'},
+      {id:'friends', i:'👥', n:'Friends', d:'Chat & connect', c:'#3B82F6'},
+      {id:'media', i:'🖼️', n:'Media', d:'Photos, videos & stories', c:'#EC4899'},
+      {id:'announcements', i:'📢', n:'Announcements', d:'Latest news', c:'#8B5CF6'},
+    ]},
+  ];
+  return `<div class="screen" style="padding-top:1rem">
+    <div style="width:100%;max-width:560px;display:flex;align-items:center;gap:.7rem;margin-bottom:1rem">
+      <div onclick="go('home')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;cursor:pointer">←</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.25rem">Explore Tolaanfur</div>
+    </div>
+    ${groepen.map(g => `
+      <div style="width:100%;max-width:560px;margin-bottom:.4rem">
+        <div style="font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--sl2);margin:.8rem 0 .5rem">${g.titel}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+          ${g.items.map(m => `<div class="mc2 cursor-pointer" data-go="${m.id}" style="min-height:auto;box-shadow:inset 0 0 0 1px ${ha(m.c,.3)}">
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <div class="mc2-ico" style="background:${m.c}30;border:1px solid ${ha(m.c,.45)};font-size:1.2rem">${m.i}</div>
+              <div style="flex:1;min-width:0">
+                <div class="mc2-t" style="font-size:.88rem">${m.n}</div>
+                <div class="mc2-d">${m.d}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    `).join('')}
+    <div style="height:2rem"></div>
+  </div>`;
+}
 
 function rComingSoon() {
   const phases = [
