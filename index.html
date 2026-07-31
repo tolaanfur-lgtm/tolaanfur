@@ -39,7 +39,7 @@
 }
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
-#app{height:100vh;position:relative;overflow:hidden}
+#app{height:100dvh;position:relative;overflow:hidden}
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 20% 15%,rgba(37,99,235,.22) 0%,transparent 50%),
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
@@ -57,7 +57,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 
 /* TABS */
 .volscherm .tabs{display:none}
-.volscherm iframe{height:100vh!important}
+.volscherm iframe{height:100dvh!important}
 .tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(6,8,24,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bdr);display:flex;padding:.5rem .3rem calc(.5rem + env(safe-area-inset-bottom));touch-action:manipulation}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.18rem;background:none;
   border:none;color:var(--sl2);cursor:pointer;padding:.5rem .1rem;border-radius:.6rem;min-width:0;transition:color .2s;position:relative}
@@ -2472,7 +2472,7 @@ function rEditProfile() {
 // ══════════════════════════════════════════════
 
 function rIframe(src) {
-  const h = needsTabs() ? 'calc(100vh - 6rem - env(safe-area-inset-bottom) - env(safe-area-inset-top))' : 'calc(100vh - env(safe-area-inset-top))';
+  const h = needsTabs() ? 'calc(100dvh - 6rem - env(safe-area-inset-bottom) - env(safe-area-inset-top))' : 'calc(100dvh - env(safe-area-inset-top))';
   return '<div class="screen" style="padding:0;overflow:hidden"><iframe src="' + src + '" style="width:100%;height:' + h + ';border:none;display:block" allow="geolocation; gyroscope; accelerometer; deviceorientation"></iframe></div>';
 }
 
