@@ -33,7 +33,7 @@
   --sl:#4A5568;--sl2:#718096;--wh:#EEF2FF;
   --card:rgba(20,30,100,.4);--bdr:rgba(100,140,255,.18);
   /* v0-ontwerp kleuren (blauwdruk) */
-  --v0-bg:#090F1C;--v0-card:rgba(20,29,45,.7);--v0-primary:#3E71E9;
+  --v0-bg:#0D1240;--v0-card:rgba(30,45,120,.55);--v0-primary:#3E71E9;
   --v0-gold:#EBAE42;--v0-success:#3BB974;--v0-info:#2389E2;--v0-violet:#955BE3;
   --v0-muted:#8E99AB;--v0-fg:#F1F5FC;--v0-bdr:rgba(255,255,255,.12);
 }
@@ -2200,10 +2200,10 @@ function rHome() {
   const isGuest = !currentUser || currentUser.isAnonymous;
 
   const items = [
-    {id:'quran',i:IC.quran,n:'Quran',d:'Lees de Mushaf',c:'#3E71E9',bdg:"604 pagina's"},
-    {id:'play-cats',i:IC['play-cats'],n:'Lessen',d:'Islamitische kennis',c:'#2389E2',bdg:'9 lessen'},
-    {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Test je kennis',c:'#955BE3',bdg:'Level 7'},
-    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Dagelijkse Zikr'),c:'#EBAE42',bdg:'Vandaag 2/5'},
+    {id:'quran',i:IC.quran,n:'Quran',d:'Read the Mushaf',c:'#3E71E9',bdg:"604 pages"},
+    {id:'play-cats',i:IC['play-cats'],n:'Lessons',d:'Islamic knowledge',c:'#2389E2',bdg:'9 lessons'},
+    {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Test your knowledge',c:'#955BE3',bdg:'Level 7'},
+    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Daily Zikr'),c:'#EBAE42',bdg:'Today 2/5'},
   ];
   // Eigen achtergrondbeeld per kaart (premium look)
   const kaartBeeld = {
@@ -2265,9 +2265,9 @@ function rHome() {
           <div style="min-width:0;flex:1">
             <p class="v0-sm">Assalaamu alaikum,</p>
             <h1 class="v0-h1"><span class="v0-nm">${name}</span> 🤚</h1>
-            <p class="v0-sub">MashaAllah, laat je vandaag een dag vol barakah zijn. ❤️</p>
+            <p class="v0-sub">MashaAllah, may your day be full of barakah. ❤️</p>
           </div>
-          ${vg?`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>${vg.naam}</b><span>over <i>${vg.tijd}</i></span></span><span style="color:var(--v0-muted)">›</span></div>`:`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>Gebedstijden</b><span>Instellen</span></span><span style="color:var(--v0-muted)">›</span></div>`}
+          ${vg?`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>${vg.naam}</b><span>over <i>${vg.tijd}</i></span></span><span style="color:var(--v0-muted)">›</span></div>`:`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>Prayer Times</b><span>Set up</span></span><span style="color:var(--v0-muted)">›</span></div>`}
         </div>
       </div>
     </div>
@@ -2279,16 +2279,16 @@ function rHome() {
       <section class="v0-moment" onclick="go('azkar')">
         <div class="v0-lan" style="background-image:url('img/home/round-lantern1.jpg')"></div>
         <div class="v0-mtxt">
-          <div class="v0-mlbl">🌙 Moment van de dag</div>
-          <p class="v0-ar" dir="rtl">اذكروني أذكركم</p>
-          <p class="v0-mtr">"Gedenk Mij, dan zal Ik jullie gedenken." (Qur'an 2:152)</p>
+          <div class="v0-mlbl">🌙 Moment of the day</div>
+          <p class="v0-ar" dir="rtl">فَٱذۡكُرُونِيٓ أَذۡكُرۡكُمۡ</p>
+          <p class="v0-mtr">"Ana yaadadhaa; Anis isiniin yaadadhaa" (Qur'an 2:152)</p>
         </div>
-        <div class="v0-btn">Lees de Zikr ›</div>
+        <div class="v0-btn">Read Zikr ›</div>
       </section>
 
       <!-- 3. STORIES -->
       ${!isGuest ? `<section class="v0-stories">
-        <div class="v0-sechead"><h2>Stories</h2>${allStories.length?`<a onclick="openStoryGroup(0)">Alles bekijken ›</a>`:''}</div>
+        <div class="v0-sechead"><h2>Stories</h2>${allStories.length?`<a onclick="openStoryGroup(0)">View all ›</a>`:''}</div>
         ${rStoriesBar()}
       </section>` : ''}
 
@@ -2298,18 +2298,18 @@ function rHome() {
         <div class="v0-cont-ov"></div>
         <div class="v0-cont-in">
           <div style="min-width:0;flex:1">
-            <div class="v0-cont-lbl"><span class="v0-bk">📖</span> Ga verder waar je gebleven bent</div>
-            <p class="v0-cont-p1">Sirah van de Profeet ﷺ</p>
-            <p class="v0-cont-p2">Level 7 van 30</p>
+            <div class="v0-cont-lbl"><span class="v0-bk">📖</span> Continue where you left off</div>
+            <p class="v0-cont-p1">Sirah of the Prophet ﷺ</p>
+            <p class="v0-cont-p2">Level 7 of 30</p>
             <div class="v0-cont-bar"><div class="v0-cont-track"><div class="v0-cont-fill" style="width:70%"></div></div><span class="v0-cont-pct">70%</span></div>
           </div>
-          <div class="v0-btn">Verdergaan ›</div>
+          <div class="v0-btn">Continue ›</div>
         </div>
       </section>` : ''}
 
       <!-- 5. VERKEN TOLAANFUR -->
       <section class="v0-gsec">
-        <div class="v0-sechead"><h2>Verken Tolaanfur</h2><a onclick="go('explore')">Bekijk alles ›</a></div>
+        <div class="v0-sechead"><h2>Explore Tolaanfur</h2><a onclick="go('explore')">View all ›</a></div>
         <div class="v0-grid4">
           ${items.map(m=>`<div class="v0-fcard" data-go="${m.id}">
             <span class="v0-fico" style="background:${ha(m.c,.15)};border:1px solid ${ha(m.c,.3)};color:${m.c}">${m.i}</span>
@@ -2321,37 +2321,37 @@ function rHome() {
 
       <!-- 6. VANDAAG VOOR JOU -->
       ${!isGuest ? `<section class="v0-gsec">
-        <div class="v0-sechead"><h2>Vandaag voor jou</h2></div>
+        <div class="v0-sechead"><h2>Today for you</h2></div>
         <div class="v0-grid4">
           <div class="v0-fcard" onclick="go('azkar')">
             <span class="v0-fico" style="background:${ha('#EBAE42',.15)};border:1px solid ${ha('#EBAE42',.3)};color:#EBAE42">🌅</span>
-            <span class="v0-ft">Ochtend Zikr</span>
+            <span class="v0-ft">Morning Zikr</span>
             <div class="v0-tbar"><div class="v0-tfill" style="width:0%;background:#EBAE42"></div></div>
-            <span class="v0-fm">0/10 voltooid</span>
+            <span class="v0-fm">0/10 done</span>
           </div>
           <div class="v0-fcard" onclick="go('azkar')">
             <span class="v0-fico" style="background:${ha('#2389E2',.15)};border:1px solid ${ha('#2389E2',.3)};color:#2389E2">🌇</span>
-            <span class="v0-ft">Avond Zikr</span>
+            <span class="v0-ft">Evening Zikr</span>
             <div class="v0-tbar"><div class="v0-tfill" style="width:0%;background:#2389E2"></div></div>
-            <span class="v0-fm">0/10 voltooid</span>
+            <span class="v0-fm">0/10 done</span>
           </div>
           <div class="v0-fcard" onclick="go('quran')">
             <span class="v0-fico" style="background:${ha('#3E71E9',.15)};border:1px solid ${ha('#3E71E9',.3)};color:#3E71E9">📖</span>
-            <span class="v0-ft">Quran Doel</span>
+            <span class="v0-ft">Quran Goal</span>
             <div class="v0-tbar"><div class="v0-tfill" style="width:50%;background:#3E71E9"></div></div>
             <span class="v0-fm">6/12</span>
           </div>
           <div class="v0-fcard" onclick="go('daily')">
             <span class="v0-fico" style="background:${ha('#3BB974',.15)};border:1px solid ${ha('#3BB974',.3)};color:#3BB974">🎯</span>
-            <span class="v0-ft">Dagelijkse Doel</span>
+            <span class="v0-ft">Daily Goal</span>
             <div class="v0-tbar"><div class="v0-tfill" style="width:40%;background:#3BB974"></div></div>
-            <span class="v0-fm">2/5 voltooid</span>
+            <span class="v0-fm">2/5 done</span>
           </div>
         </div>
       </section>` : ''}
 
       ${isGuest ? `<div style="background:${ha('#EBAE42',.1)};border:1px solid ${ha('#EBAE42',.25)};border-radius:.85rem;padding:.7rem .9rem;display:flex;align-items:center;gap:.6rem">
-        <span>⚠️</span><div style="flex:1;font-size:.78rem;color:var(--v0-gold)">Maak een account om alles te gebruiken</div>
+        <span>⚠️</span><div style="flex:1;font-size:.78rem;color:var(--v0-gold)">Create an account to use everything</div>
         <button class="btn bt bsm" data-go="register">Account</button>
       </div>` : ''}
 
@@ -2529,8 +2529,8 @@ function rExplore() {
       {id:'announcements', i:'📢', n:'Announcements', d:'Latest news', c:'#8B5CF6'},
     ]},
   ];
-  return `<div class="screen" style="padding-top:1rem">
-    <div style="width:100%;max-width:560px;display:flex;align-items:center;gap:.7rem;margin-bottom:1rem">
+  return `<div class="screen" style="padding-top:calc(env(safe-area-inset-top) + 1.2rem)">
+    <div style="width:100%;max-width:560px;display:flex;align-items:center;gap:.7rem;margin-bottom:1rem;position:relative;z-index:2">
       <div onclick="go('__back')" style="width:2.3rem;height:2.3rem;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bdr);display:grid;place-items:center;cursor:pointer">←</div>
       <div style="font-family:'Fredoka One',cursive;font-size:1.25rem">Explore Tolaanfur</div>
     </div>
