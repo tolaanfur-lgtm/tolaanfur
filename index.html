@@ -32,6 +32,10 @@
   --gold:#F59E0B;--gr:#10B981;--rd:#F43F5E;
   --sl:#4A5568;--sl2:#718096;--wh:#EEF2FF;
   --card:rgba(20,30,100,.4);--bdr:rgba(100,140,255,.18);
+  /* v0-ontwerp kleuren (blauwdruk) */
+  --v0-bg:#090F1C;--v0-card:rgba(20,29,45,.7);--v0-primary:#3E71E9;
+  --v0-gold:#EBAE42;--v0-success:#3BB974;--v0-info:#2389E2;--v0-violet:#955BE3;
+  --v0-muted:#8E99AB;--v0-fg:#F1F5FC;--v0-bdr:rgba(255,255,255,.12);
 }
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
@@ -248,10 +252,84 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 .tfy-d{font-size:.54rem;color:var(--sl2);margin-top:.03rem;line-height:1.1}
 .tfy-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:.15rem}
 .tfy-vul{height:100%;border-radius:4px;transition:width .5s}
-.kop-hero{position:relative;width:calc(100% + 2rem);margin:0 -1rem;min-height:16rem;
+/* Home volgens v0-blauwdruk: volle hoogte, secties delen de ruimte gelijk, geen scroll */
+.home-screen{padding:0!important;height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:stretch}
+.home-screen .kop-hero{flex-shrink:0}
+.home-screen .home-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:.6rem;padding:.6rem 1rem;overflow:hidden}
+.home-screen .home-body > *{flex-shrink:0;max-width:520px;width:100%;margin-left:auto;margin-right:auto}
+.home-screen .home-sec-flex{flex:1;min-height:0;display:flex;flex-direction:column}
+.home-screen .mgh,.home-screen .tfy{flex:1;min-height:0}
+.home-screen .mc2,.home-screen .tfy-k{min-height:0}
+
+/* ══ v0-ONTWERP STIJLEN ══ */
+.home-screen{background:var(--v0-bg)}
+/* Header */
+.v0-hdr{position:relative;flex-shrink:0;overflow:hidden;border-radius:0 0 2rem 2rem}
+.v0-hdr-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%}
+.v0-hdr-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(9,15,28,.5),rgba(9,15,28,.7),var(--v0-bg))}
+.v0-hdr-in{position:relative;display:flex;flex-direction:column;gap:.6rem;padding:max(.75rem,env(safe-area-inset-top)) 1rem 1rem}
+.v0-hrow{display:flex;align-items:center;justify-content:space-between}
+.v0-logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.1rem;color:var(--v0-fg)}
+.v0-star{width:2rem;height:2rem;border-radius:.75rem;background:rgba(235,174,66,.2);color:var(--v0-gold);display:grid;place-items:center;border:1px solid rgba(235,174,66,.3);font-size:1rem}
+.v0-acts{display:flex;align-items:center;gap:.5rem}
+.v0-ib{position:relative;width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--v0-bdr);background:rgba(20,29,45,.6);backdrop-filter:blur(8px);display:grid;place-items:center;color:var(--v0-fg);cursor:pointer;font-size:1rem}
+.v0-ib svg{width:1.15rem;height:1.15rem}
+.v0-dot{position:absolute;top:.4rem;right:.4rem;width:.4rem;height:.4rem;border-radius:50%;background:var(--v0-gold)}
+.v0-av{width:2.25rem;height:2.25rem;border-radius:50%;overflow:hidden;border:2px solid rgba(62,113,233,.6);cursor:pointer;display:grid;place-items:center;font-size:1.2rem;color:#fff}
+.v0-greet{display:flex;align-items:flex-end;justify-content:space-between;gap:.75rem}
+.v0-sm{font-size:.875rem;color:rgba(241,245,252,.8)}
+.v0-h1{display:flex;align-items:center;gap:.375rem;font-size:1.35rem;font-weight:800;line-height:1.1;color:var(--v0-gold)}
+.v0-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:11rem}
+.v0-sub{margin-top:.15rem;font-size:.75rem;color:rgba(241,245,252,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v0-pray{display:flex;flex-shrink:0;align-items:center;gap:.5rem;border-radius:1rem;border:1px solid var(--v0-bdr);background:rgba(20,29,45,.7);padding:.5rem .75rem;backdrop-filter:blur(12px);cursor:pointer}
+.v0-mn{color:var(--v0-gold);font-size:1.1rem}
+.v0-pray b{font-size:.875rem;font-weight:600;display:block;color:var(--v0-fg)}
+.v0-pray>span:nth-child(2)>span{font-size:.6875rem;color:var(--v0-muted)}
+.v0-pray i{color:var(--v0-gold);font-style:normal}
+/* Kaart-basis */
+.v0-moment,.v0-cont,.v0-fcard{border:1px solid var(--v0-bdr);background:var(--v0-card);backdrop-filter:blur(4px)}
+/* Moment */
+.v0-moment{position:relative;display:flex;flex-shrink:0;align-items:center;gap:.75rem;padding:.7rem;border-radius:1.5rem;cursor:pointer}
+.v0-lan{width:4rem;height:4rem;flex-shrink:0;border-radius:1rem;background-size:cover;background-position:center}
+.v0-mtxt{min-width:0;flex:1}
+.v0-mlbl{display:flex;align-items:center;gap:.375rem;color:var(--v0-gold);font-size:.75rem;font-weight:600}
+.v0-ar{margin-top:.15rem;font-family:'Amiri',serif;font-size:1.35rem;line-height:1.2;color:var(--v0-fg)}
+.v0-mtr{margin-top:.15rem;font-size:.6875rem;font-style:italic;color:var(--v0-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v0-btn{flex-shrink:0;align-self:flex-end;display:flex;align-items:center;gap:.25rem;border-radius:999px;background:var(--v0-primary);padding:.5rem .75rem;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;cursor:pointer}
+/* Stories */
+.v0-stories{display:flex;min-height:0;flex-direction:column}
+.v0-sechead{display:flex;align-items:center;justify-content:space-between;margin-bottom:.375rem}
+.v0-sechead h2{font-size:.875rem;font-weight:700;color:var(--v0-fg)}
+.v0-sechead a{font-size:.75rem;font-weight:600;color:var(--v0-primary);cursor:pointer}
+/* Continue */
+.v0-cont{position:relative;flex-shrink:0;overflow:hidden;border-radius:1.5rem;cursor:pointer}
+.v0-cont-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.v0-cont-ov{position:absolute;inset:0;background:linear-gradient(to right,rgba(9,15,28,.92),rgba(9,15,28,.72),rgba(9,15,28,.35))}
+.v0-cont-in{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.7rem}
+.v0-cont-lbl{display:flex;align-items:center;gap:.375rem;font-size:.75rem;font-weight:600;color:rgba(241,245,252,.85)}
+.v0-bk{color:var(--v0-gold)}
+.v0-cont-p1{margin-top:.25rem;font-size:.6875rem;color:rgba(241,245,252,.7)}
+.v0-cont-p2{font-size:1rem;font-weight:800;line-height:1.1;color:var(--v0-fg)}
+.v0-cont-bar{margin-top:.375rem;display:flex;align-items:center;gap:.5rem}
+.v0-cont-track{height:.375rem;flex:1;overflow:hidden;border-radius:999px;background:rgba(241,245,252,.15)}
+.v0-cont-fill{height:100%;border-radius:999px;background:linear-gradient(to right,var(--v0-primary),var(--v0-gold))}
+.v0-cont-pct{font-size:.6875rem;font-weight:600;color:rgba(241,245,252,.8)}
+/* Explore + Today rasters */
+.v0-gsec{display:flex;min-height:0;flex-direction:column}
+.v0-grid4{display:grid;min-height:0;flex:1;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.v0-fcard{display:flex;min-height:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:.375rem;overflow:hidden;border-radius:1rem;padding:.6rem;text-align:left;cursor:pointer}
+.v0-fico{width:1.75rem;height:1.75rem;flex-shrink:0;border-radius:.5rem;display:grid;place-items:center;font-size:.95rem}
+.v0-fico svg{width:1rem;height:1rem}
+.v0-ft{font-size:.72rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;color:var(--v0-fg)}
+.v0-fm{font-size:.6rem;color:var(--v0-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.v0-tbar{margin-top:.2rem;height:.25rem;width:100%;overflow:hidden;border-radius:999px;background:rgba(241,245,252,.15)}
+.v0-tfill{height:100%;border-radius:999px}
+/* Stories-bar hergebruik: v0-stijl ringen */
+.home-screen .stories-bar{min-height:0;padding:.15rem 0}
+.kop-hero{position:relative;width:100%;min-height:auto;
   padding:max(env(safe-area-inset-top),.7rem) 1.1rem 1.1rem;
-  background-size:cover;background-position:center 35%;
-  display:flex;flex-direction:column;justify-content:space-between}
+  background-size:cover;background-position:center 35%;border-radius:0 0 2rem 2rem;
+  display:flex;flex-direction:column;gap:.5rem;justify-content:flex-start}
 .kop-rij{display:flex;align-items:flex-start;justify-content:space-between;width:100%;max-width:560px;margin:0 auto}
 .kop-logo{font-family:'Fredoka One',cursive;font-size:1.35rem;margin-top:.3rem;
   background:linear-gradient(135deg,var(--b3),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -1559,6 +1637,44 @@ auth.onAuthStateChanged(async user => {
 // ══════════════════════════════════════════════
 // ROUTER
 // ══════════════════════════════════════════════
+// ══ Home AUTOMATISCHE schaal: past de blokken aan de schermhoogte aan ══
+// Jouw goedgekeurde verhoudingen worden zo geschaald dat de zes blokken
+// op ELK toestel precies passen zonder scrollen.
+function pasBewaardeSchaalToe(){
+  var el = document.getElementById('homeScreen');
+  if(!el) return;
+  // Even wachten tot het scherm getekend is, dan meten
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      autoSchaalHome();
+    });
+  });
+}
+
+function autoSchaalHome(){
+  var el = document.getElementById('homeScreen');
+  if(!el) return;
+  el.style.setProperty('--schaal', 1);
+  var beschikbaar = window.innerHeight;
+  // Standaard telefoons (±667px hoog, iPhone SE) en groter: NIETS aanpassen.
+  // Alleen echt korte schermen krijgen schaling.
+  if(beschikbaar >= 660){ return; }   // normale telefoons blijven op jouw verhoudingen
+  // Alleen voor écht kleine schermen: schaal zodat het net past
+  var nodig = el.scrollHeight;
+  var navRuimte = 78;
+  var doel = beschikbaar - navRuimte;
+  if(nodig > doel && nodig > 0){
+    var schaal = doel / nodig;
+    if(schaal < 0.78) schaal = 0.78;   // leesbaarheids-ondergrens
+    el.style.setProperty('--schaal', schaal);
+  }
+}
+
+// Herbereken bij draaien of venstergrootte-wijziging
+window.addEventListener('resize', function(){
+  if(SC === 'home') autoSchaalHome();
+});
+
 function go(s, d={}) {
   if(s==='__back'){
     // Eén stap terug in de geschiedenis
@@ -1894,7 +2010,7 @@ function render() {
     app2.innerHTML = '<div id="screen-wrap" style="position:absolute;inset:0;">' + screenHtml + '</div>' + '<div id="tabs-wrap" style="position:fixed;bottom:0;left:0;right:0;z-index:100">' + tabsHtml + '</div>';
     bind();
     if(SC === 'profile') loadFollowStats();
-  if(SC === 'home') vulMediaStrip();
+  if(SC === 'home') { vulMediaStrip(); pasBewaardeSchaalToe(); }
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
       // Auto-laad tijden als locatie bekend maar tijden leeg
@@ -2053,10 +2169,10 @@ function rHome() {
   const isGuest = !currentUser || currentUser.isAnonymous;
 
   const items = [
-    {id:'quran',i:IC.quran,n:'Quran',d:'Read the Mushaf',c:'#1D8348'},
-    {id:'play-cats',i:IC['play-cats'],n:'Lessons',d:'Islamic knowledge',c:'#2563EB'},
-    {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Prophet Muhammad ﷺ',c:'#7C3AED'},
-    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Daily Zikr'),c:'#6B3FFF'},
+    {id:'quran',i:IC.quran,n:'Quran',d:'Lees de Mushaf',c:'#3E71E9',bdg:"604 pagina's"},
+    {id:'play-cats',i:IC['play-cats'],n:'Lessen',d:'Islamitische kennis',c:'#2389E2',bdg:'9 lessen'},
+    {id:'sirah-quiz',i:IC['sirah-quiz'],n:'Sirah Quiz',d:'Test je kennis',c:'#955BE3',bdg:'Level 7'},
+    {id:'azkar',i:IC.tasbih,n:_om('Azkar & Dua'),d:_om('Dagelijkse Zikr'),c:'#EBAE42',bdg:'Vandaag 2/5'},
   ];
   // Eigen achtergrondbeeld per kaart (premium look)
   const kaartBeeld = {
@@ -2100,114 +2216,115 @@ function rHome() {
     media:'New',
     prayer: vg ? '5 Times' : 'Set up'
   };
-  return `<div class="screen" style="padding-top:0">
-    <!-- Afgewerkte kop: sfeerbeeld over de volle breedte met knoppen erover -->
-    <div class="kop-hero" style="background-image:linear-gradient(to top,var(--bg) 0%,rgba(6,8,24,.85) 30%,rgba(6,8,24,.35) 68%,rgba(6,8,24,.55) 100%),url('img/home/hdr-mosque.jpg')">
-      <div class="kop-rij">
-        <div class="kop-logo">Tolaanfur</div>
-        <div style="display:flex;gap:.85rem;align-items:flex-start">
-          <div class="kop-knop-wrap" data-go="search">
-            <div class="kop-knop">${IC.search}</div>
-            <div class="kop-lbl">${isOm?'Barbaadi':'Search'}</div>
-          </div>
-          <div class="kop-knop-wrap" data-go="notifications">
-            <div class="kop-knop">${IC.notifications}
-              ${unreadNotifs>0?`<span class="kop-badge">${unreadNotifs>99?'99+':unreadNotifs}</span>`:''}
-            </div>
-            <div class="kop-lbl">${isOm?'Beeksisa':'Alerts'}</div>
+  return `<div class="screen home-screen" id="homeScreen" style="padding-top:0">
+    <!-- 1. HEADER (v0-look): moskee-achtergrond, logo, knoppen, begroeting, gebedswidget -->
+    <div class="v0-hdr">
+      <div class="v0-hdr-bg" style="background-image:url('img/home/hdr-mosque.jpg')"></div>
+      <div class="v0-hdr-ov"></div>
+      <div class="v0-hdr-in">
+        <div class="v0-hrow">
+          <div class="v0-logo"><span class="v0-star">✦</span>Tolaanfur</div>
+          <div class="v0-acts">
+            <div class="v0-ib" data-go="search">${IC.search||'🔍'}</div>
+            <div class="v0-ib" data-go="notifications">${IC.bell||'🔔'}${(typeof notifications!=='undefined' && notifications.length>0)?'<span class="v0-dot"></span>':''}</div>
+            <div class="v0-av" data-go="profile" style="background:${ac}">${av}</div>
           </div>
         </div>
-      </div>
-      <div class="kop-groet">
-        <div style="font-size:1.15rem;font-weight:700">Assalaamu alaikum 👋</div>
-        <div style="font-size:.8rem;color:rgba(238,242,255,.72);margin-top:.15rem">${esc(_om('Welcome back'))}, ${esc(name)}!</div>
-      </div>
-    </div>
-
-    <!-- Inhoud onder de kop -->
-    <div style="position:relative;display:flex;flex-direction:column;align-items:center;padding:.15rem 1rem .5rem;width:100%">
-
-
-      <!-- 2. MOMENT VAN DE DAG (brede kaart met Lees de Zikr knop) -->
-    <div style="width:100%;max-width:560px;margin-top:.5rem;position:relative;overflow:hidden;border-radius:1rem;
-      background:linear-gradient(115deg,rgba(11,14,38,.9) 15%,rgba(107,63,255,.5) 82%,rgba(245,158,11,.4) 125%),url('img/home/moment-bg.jpg');background-size:cover;background-position:center right;
-      border:1px solid rgba(155,111,255,.4);box-shadow:inset 0 0 0 1px rgba(155,111,255,.15),0 8px 26px -10px rgba(107,63,255,.55);
-      padding:.75rem .85rem">
-      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem">
-        <span style="font-size:1rem">✨</span>
-        <span style="font-family:'Fredoka One',cursive;font-size:.95rem;color:#C9B8FF">Moment of the day</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:.85rem">
-        <div style="width:3.6rem;height:3.6rem;border-radius:50%;flex-shrink:0;background-image:url('img/home/round-lantern1.jpg');background-size:cover;background-position:center;border:2px solid rgba(245,158,11,.5);box-shadow:0 0 14px -2px rgba(245,158,11,.5)"></div>
-        <div style="flex:1;min-width:0">
-          <div class="l-ar" style="margin:0;text-align:left;font-size:1.15rem;line-height:1.7">اذكُرُونِي أَذكُركُمَ</div>
-          <div style="font-size:.74rem;color:rgba(238,242,255,.85);margin-top:.15rem">"Remember Me, and I will remember you." (Qur'an 2:152)</div>
-        </div>
-        <div onclick="go('azkar')" class="zikr-knop cursor-pointer">Read Zikr ›</div>
-      </div>
-    </div>
-
-    <!-- 3. STORIES -->
-    ${!isGuest ? `<div class="sec-titel"><div class="st-t">◎ Stories</div>${allStories.length ? `<div onclick="openStoryGroup(0)" class="st-a">See all ›</div>` : ''}</div>` : ''}
-    ${!isGuest ? rStoriesBar() : ''}
-
-    <!-- 4. CONTINUE LEARNING (voortgang - vorm nu, echte data later) -->
-    ${!isGuest ? `<div class="cl-kaart cursor-pointer" onclick="go('sirah-quiz')">
-      <div class="cl-ico">📖</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'Fredoka One',cursive;font-size:.82rem;color:var(--sl2);margin-bottom:.15rem">Continue where you left off</div>
-        <div style="font-size:.72rem;color:var(--sl2)">Sirah of the Prophet ﷺ</div>
-        <div style="font-size:.92rem;font-weight:700;margin-bottom:.1rem">Level 7 of 30</div>
-        <div style="display:flex;align-items:center;gap:.5rem">
-          <div class="cl-bar" style="flex:1"><div class="cl-vul" style="width:70%"></div></div>
-          <div style="font-size:.72rem;font-weight:700;color:var(--sl2)">70%</div>
+        <div class="v0-greet">
+          <div style="min-width:0;flex:1">
+            <p class="v0-sm">Assalaamu alaikum,</p>
+            <h1 class="v0-h1"><span class="v0-nm">${name}</span> 🤚</h1>
+            <p class="v0-sub">MashaAllah, laat je vandaag een dag vol barakah zijn. ❤️</p>
+          </div>
+          ${vg?`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>${vg.naam}</b><span>over <i>${vg.tijd}</i></span></span><span style="color:var(--v0-muted)">›</span></div>`:`<div class="v0-pray" data-go="prayer"><span class="v0-mn">🌙</span><span><b>Gebedstijden</b><span>Instellen</span></span><span style="color:var(--v0-muted)">›</span></div>`}
         </div>
       </div>
-      <div style="width:4.2rem;height:4.2rem;border-radius:.8rem;flex-shrink:0;background-image:url('img/scenes/sc_${String(((sceneVanDeDag()+3)%15)+1).padStart(2,'0')}.jpg');background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.12)"></div>
-      <div class="cl-knop">Continue ›</div>
-    </div>` : ''}
-
-    <!-- 5. VERKEN TOLAANFUR -->
-    <div class="sec-titel"><div class="st-t">Explore Tolaanfur</div><div class="st-a" onclick="go('explore')">View all ›</div></div>
-    <div class="mgh">
-      ${items.map(m=>`<div class="mc2 cursor-pointer${kaartBeeld[m.id]?' mc2-vol':''}" data-go="${m.id}"${kaartBeeld[m.id]?` style="background-image:linear-gradient(160deg,rgba(11,14,38,.92) 8%,rgba(11,14,38,.74) 42%,${ha(m.c,.5)} 108%),url('img/home/${kaartBeeld[m.id]}');box-shadow:inset 0 0 0 1px ${ha(m.c,.35)},0 6px 20px -8px ${ha(m.c,.5)}"`:''}>
-        <div class="mc2-ico" style="background:${m.c}35;border:1px solid ${ha(m.c,.5)}">${m.i}</div>
-        <div class="mc2-t">${m.n}</div>
-        <div class="mc2-d">${m.d}</div>
-        ${BDG[m.id]?`<div class="mc2-badge" style="background:${m.c}55;border:1px solid ${ha(m.c,.6)}">${BDG[m.id]}</div>`:''}
-      </div>`).join('')}
     </div>
 
-    <!-- 6. VANDAAG VOOR JOU (voortgang - vorm nu, echte data later) -->
-    ${!isGuest ? `<div class="sec-titel" style="margin-top:.55rem"><div class="st-t">Today for you</div></div>
-    <div class="tfy" style="margin-top:.35rem">
-      <div class="tfy-k" onclick="go('azkar')">
-        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(245,158,11,.25);border:1px solid rgba(245,158,11,.4)">🌅</div><div><div class="tfy-t">Morning Zikr</div><div class="tfy-d">Start your day</div></div></div>
-        <div style="font-size:.68rem;color:var(--sl2)">0 / 10 done</div>
-        <div class="tfy-bar"><div class="tfy-vul" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div>
-      </div>
-      <div class="tfy-k" onclick="go('azkar')">
-        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(107,63,255,.25);border:1px solid rgba(155,111,255,.4)">🌙</div><div><div class="tfy-t">Evening Zikr</div><div class="tfy-d">End your day</div></div></div>
-        <div style="font-size:.68rem;color:var(--sl2)">0 / 10 done</div>
-        <div class="tfy-bar"><div class="tfy-vul" style="width:0%;background:linear-gradient(90deg,#6B3FFF,#9B6FFF)"></div></div>
-      </div>
-      <div class="tfy-k" onclick="go('quran')">
-        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(16,185,129,.25);border:1px solid rgba(16,185,129,.4)">📖</div><div><div class="tfy-t">Quran Goal</div><div class="tfy-d">12 pages</div></div></div>
-        <div style="font-size:.68rem;color:var(--sl2);text-align:right">6 / 12</div>
-        <div class="tfy-bar"><div class="tfy-vul" style="width:50%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
-      </div>
-      <div class="tfy-k" onclick="go('daily')">
-        <div class="tfy-top"><div class="tfy-ico" style="background:rgba(0,191,255,.25);border:1px solid rgba(0,191,255,.4)">🎯</div><div><div class="tfy-t">Daily Goal</div><div class="tfy-d">Stay consistent</div></div></div>
-        <div style="font-size:.68rem;color:var(--sl2)">2 / 5 done</div>
-        <div class="tfy-bar"><div class="tfy-vul" style="width:40%;background:linear-gradient(90deg,#00BFFF,#60A5FA)"></div></div>
-      </div>
-    </div>` : ''}
+    <!-- Body: secties 2-6 verdelen de ruimte gelijk (v0 flex-model, past op 1 scherm) -->
+    <div class="home-body">
 
-    ${isGuest ? `<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:.85rem;padding:.75rem 1rem;width:100%;max-width:560px;margin-top:.75rem;display:flex;align-items:center;gap:.65rem">
-      <span>⚠️</span><div style="flex:1;font-size:.8rem;color:var(--gold2)">Create an account to use everything</div>
-      <button class="btn bt bsm" data-go="register">Account</button>
-    </div>` : ''}
-    <div style="height:1.5rem"></div>
+      <!-- 2. MOMENT VAN DE DAG -->
+      <section class="v0-moment" onclick="go('azkar')">
+        <div class="v0-lan" style="background-image:url('img/home/round-lantern1.jpg')"></div>
+        <div class="v0-mtxt">
+          <div class="v0-mlbl">🌙 Moment van de dag</div>
+          <p class="v0-ar" dir="rtl">اذكروني أذكركم</p>
+          <p class="v0-mtr">"Gedenk Mij, dan zal Ik jullie gedenken." (Qur'an 2:152)</p>
+        </div>
+        <div class="v0-btn">Lees de Zikr ›</div>
+      </section>
+
+      <!-- 3. STORIES -->
+      ${!isGuest ? `<section class="v0-stories">
+        <div class="v0-sechead"><h2>Stories</h2>${allStories.length?`<a onclick="openStoryGroup(0)">Alles bekijken ›</a>`:''}</div>
+        ${rStoriesBar()}
+      </section>` : ''}
+
+      <!-- 4. GA VERDER -->
+      ${!isGuest ? `<section class="v0-cont" onclick="go('sirah-quiz')">
+        <div class="v0-cont-bg" style="background-image:url('img/scenes/sc_${String(((sceneVanDeDag()+3)%15)+1).padStart(2,'0')}.jpg')"></div>
+        <div class="v0-cont-ov"></div>
+        <div class="v0-cont-in">
+          <div style="min-width:0;flex:1">
+            <div class="v0-cont-lbl"><span class="v0-bk">📖</span> Ga verder waar je gebleven bent</div>
+            <p class="v0-cont-p1">Sirah van de Profeet ﷺ</p>
+            <p class="v0-cont-p2">Level 7 van 30</p>
+            <div class="v0-cont-bar"><div class="v0-cont-track"><div class="v0-cont-fill" style="width:70%"></div></div><span class="v0-cont-pct">70%</span></div>
+          </div>
+          <div class="v0-btn">Verdergaan ›</div>
+        </div>
+      </section>` : ''}
+
+      <!-- 5. VERKEN TOLAANFUR -->
+      <section class="v0-gsec">
+        <div class="v0-sechead"><h2>Verken Tolaanfur</h2><a onclick="go('explore')">Bekijk alles ›</a></div>
+        <div class="v0-grid4">
+          ${items.map(m=>`<div class="v0-fcard" data-go="${m.id}">
+            <span class="v0-fico" style="background:${ha(m.c,.15)};border:1px solid ${ha(m.c,.3)};color:${m.c}">${m.i}</span>
+            <span class="v0-ft">${m.n}</span>
+            <span class="v0-fm">${m.bdg}</span>
+          </div>`).join('')}
+        </div>
+      </section>
+
+      <!-- 6. VANDAAG VOOR JOU -->
+      ${!isGuest ? `<section class="v0-gsec">
+        <div class="v0-sechead"><h2>Vandaag voor jou</h2></div>
+        <div class="v0-grid4">
+          <div class="v0-fcard" onclick="go('azkar')">
+            <span class="v0-fico" style="background:${ha('#EBAE42',.15)};border:1px solid ${ha('#EBAE42',.3)};color:#EBAE42">🌅</span>
+            <span class="v0-ft">Ochtend Zikr</span>
+            <div class="v0-tbar"><div class="v0-tfill" style="width:0%;background:#EBAE42"></div></div>
+            <span class="v0-fm">0/10 voltooid</span>
+          </div>
+          <div class="v0-fcard" onclick="go('azkar')">
+            <span class="v0-fico" style="background:${ha('#2389E2',.15)};border:1px solid ${ha('#2389E2',.3)};color:#2389E2">🌇</span>
+            <span class="v0-ft">Avond Zikr</span>
+            <div class="v0-tbar"><div class="v0-tfill" style="width:0%;background:#2389E2"></div></div>
+            <span class="v0-fm">0/10 voltooid</span>
+          </div>
+          <div class="v0-fcard" onclick="go('quran')">
+            <span class="v0-fico" style="background:${ha('#3E71E9',.15)};border:1px solid ${ha('#3E71E9',.3)};color:#3E71E9">📖</span>
+            <span class="v0-ft">Quran Doel</span>
+            <div class="v0-tbar"><div class="v0-tfill" style="width:50%;background:#3E71E9"></div></div>
+            <span class="v0-fm">6/12</span>
+          </div>
+          <div class="v0-fcard" onclick="go('daily')">
+            <span class="v0-fico" style="background:${ha('#3BB974',.15)};border:1px solid ${ha('#3BB974',.3)};color:#3BB974">🎯</span>
+            <span class="v0-ft">Dagelijkse Doel</span>
+            <div class="v0-tbar"><div class="v0-tfill" style="width:40%;background:#3BB974"></div></div>
+            <span class="v0-fm">2/5 voltooid</span>
+          </div>
+        </div>
+      </section>` : ''}
+
+      ${isGuest ? `<div style="background:${ha('#EBAE42',.1)};border:1px solid ${ha('#EBAE42',.25)};border-radius:.85rem;padding:.7rem .9rem;display:flex;align-items:center;gap:.6rem">
+        <span>⚠️</span><div style="flex:1;font-size:.78rem;color:var(--v0-gold)">Maak een account om alles te gebruiken</div>
+        <button class="btn bt bsm" data-go="register">Account</button>
+      </div>` : ''}
+
+    </div>
   </div>`;
 }
 
