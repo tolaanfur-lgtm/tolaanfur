@@ -39,8 +39,8 @@
 }
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html{height:-webkit-fill-available}
-html,body{height:100dvh;min-height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
-#app{height:100dvh;position:relative;overflow:hidden}
+html,body{height:var(--echte-vh,100dvh);min-height:var(--echte-vh,100dvh);overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
+#app{height:var(--echte-vh,100dvh);position:relative;overflow:hidden}
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 20% 15%,rgba(37,99,235,.22) 0%,transparent 50%),
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
@@ -1967,6 +1967,22 @@ function getDistanceToMecca(lat, lng) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+// Meet de ECHTE zichtbare schermhoogte (betrouwbaar op iOS) en zet als CSS-variabele.
+// Dit lost het probleem op dat de nav niet tot onderaan reikt door onbetrouwbare CSS-hoogtes.
+function zetEchteHoogte(){
+  try {
+    var h = window.innerHeight;
+    if(h && document.documentElement && document.documentElement.style){
+      document.documentElement.style.setProperty('--echte-vh', h + 'px');
+    }
+  } catch(e){}
+}
+try { zetEchteHoogte(); } catch(e){}
+window.addEventListener('resize', zetEchteHoogte);
+window.addEventListener('orientationchange', function(){ setTimeout(zetEchteHoogte, 100); });
+// Op iOS ook meten na volledig laden (adresbalk kan hoogte veranderen)
+window.addEventListener('load', function(){ setTimeout(zetEchteHoogte, 200); });
+
 function render() {
   try {
     const map = {
@@ -2012,6 +2028,7 @@ function render() {
     app2.innerHTML = '<div id="screen-wrap" style="position:absolute;inset:0;">' + screenHtml + '</div>' + '<div id="tabs-wrap" style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--v0-bg)">' + tabsHtml + '</div>';
     bind();
     if(SC === 'profile') loadFollowStats();
+  try { zetEchteHoogte(); } catch(e){}
   if(SC === 'home') { vulMediaStrip(); pasBewaardeSchaalToe(); }
     if(SC === 'prayer') {
       setTimeout(()=>{if(SC==='prayer')render();}, 60000);
