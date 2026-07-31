@@ -39,8 +39,8 @@
 }
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html{height:-webkit-fill-available}
-html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--v0-bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
-#app{height:100vh;height:100dvh;position:relative;overflow:hidden}
+html,body{height:100vh;height:100dvh;height:var(--echte-vh,100dvh);overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--v0-bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
+#app{height:100vh;height:100dvh;height:var(--echte-vh,100dvh);position:relative;overflow:hidden}
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 20% 15%,rgba(37,99,235,.22) 0%,transparent 50%),
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
@@ -59,7 +59,7 @@ html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;f
 /* TABS */
 .volscherm .tabs{display:none}
 .volscherm iframe{height:100dvh!important}
-.tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--v0-bg);backdrop-filter:blur(20px);border-top:1px solid var(--v0-bdr);display:flex;padding:.5rem .3rem calc(.5rem + env(safe-area-inset-bottom));touch-action:manipulation}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--v0-bg);backdrop-filter:blur(20px);border-top:1px solid var(--v0-bdr);display:flex;padding:.5rem .3rem max(1.4rem, calc(.5rem + env(safe-area-inset-bottom)));touch-action:manipulation}
 .tabs::after{content:'';position:absolute;top:100%;left:0;right:0;height:env(safe-area-inset-bottom);background:var(--v0-bg)}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.18rem;background:none;
   border:none;color:var(--sl2);cursor:pointer;padding:.5rem .1rem;border-radius:.6rem;min-width:0;transition:color .2s;position:relative}
@@ -1971,27 +1971,21 @@ function getDistanceToMecca(lat, lng) {
 // Dit lost het probleem op dat de nav niet tot onderaan reikt door onbetrouwbare CSS-hoogtes.
 function zetEchteHoogte(){
   try {
-    // visualViewport is op iOS de meest accurate bron; anders innerHeight
-    var h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+    // In een PWA (op beginscherm) is het venster fullscreen; gebruik dan de volledige schermhoogte
+    // zodat de nav tot de echte onderrand loopt. De safe-area padding houdt de knoppen leesbaar.
+    var staandalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    var h;
+    if(staandalone && window.screen && window.screen.height){
+      h = window.screen.height;  // volledige schermhoogte in PWA-modus
+    } else {
+      h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+    }
     if(h && document.documentElement && document.documentElement.style){
       document.documentElement.style.setProperty('--echte-vh', Math.round(h) + 'px');
     }
   } catch(e){}
 }
 try { zetEchteHoogte(); } catch(e){}
-// TIJDELIJKE DIAGNOSE (verwijderen na debuggen): toont de echte schermmaten
-function toonDiagnose(){
-  try {
-    var vv = window.visualViewport ? Math.round(window.visualViewport.height) : '?';
-    var ih = window.innerHeight;
-    var ch = document.documentElement.clientHeight;
-    var sh = window.screen ? window.screen.height : '?';
-    var d = document.getElementById('tf-diag');
-    if(!d){ d=document.createElement('div'); d.id='tf-diag'; d.style.cssText='position:fixed;top:env(safe-area-inset-top);left:0;z-index:99999;background:rgba(255,0,0,.85);color:#fff;font-size:10px;padding:4px 6px;font-family:monospace;pointer-events:none'; document.body.appendChild(d); }
-    d.textContent='vv:'+vv+' ih:'+ih+' ch:'+ch+' scr:'+sh;
-  } catch(e){}
-}
-window.addEventListener('load', function(){ setTimeout(toonDiagnose, 600); });
 window.addEventListener('resize', zetEchteHoogte);
 window.addEventListener('orientationchange', function(){ setTimeout(zetEchteHoogte, 150); setTimeout(zetEchteHoogte, 400); });
 if(window.visualViewport){ window.visualViewport.addEventListener('resize', zetEchteHoogte); }
