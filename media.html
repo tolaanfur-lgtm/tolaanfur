@@ -434,6 +434,11 @@ function render(){
   const fn=map[SC]||rMedia;
   app.innerHTML=fn();
   bind();
+  // Media-scherm getekend: stories en dashboard (opnieuw) laden zodra het element bestaat
+  if(SC==='media' && typeof auth!=='undefined' && auth.currentUser){
+    try { laadMediaStories(); } catch(e){}
+    try { laadDashboard(); } catch(e){}
+  }
 }
 
 function bind(){
@@ -708,7 +713,7 @@ function laadMediaStories(){
       }
     });
     var vak = document.getElementById('mStories');
-    if(!vak) return;
+    if(!vak){ setTimeout(laadMediaStories, 200); return; }
     var html = '<div class="m-story-add" onclick="openStoryCreator()"><div class="m-add-cirkel">+</div><div class="m-story-nm">Your story</div></div>';
     groepen.slice(0,15).forEach(function(g){
       var beeld = g.photoURL ? '<img src="'+escT(g.photoURL)+'"/>' : (g.img ? '<img src="'+escT(g.img)+'"/>' : '🌙');
