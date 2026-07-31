@@ -39,8 +39,8 @@
 }
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 html{height:-webkit-fill-available}
-html,body{height:var(--echte-vh,100dvh);min-height:var(--echte-vh,100dvh);overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
-#app{height:var(--echte-vh,100dvh);position:relative;overflow:hidden}
+html,body{height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation;font-family:'Inter',sans-serif;background:var(--v0-bg);color:var(--wh);-webkit-tap-highlight-color:transparent;user-select:none;width:100%;max-width:100vw;overflow-x:hidden}
+#app{height:100vh;height:100dvh;position:relative;overflow:hidden}
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(ellipse at 20% 15%,rgba(37,99,235,.22) 0%,transparent 50%),
   radial-gradient(ellipse at 80% 80%,rgba(107,63,255,.18) 0%,transparent 50%),#060818}
@@ -1971,17 +1971,35 @@ function getDistanceToMecca(lat, lng) {
 // Dit lost het probleem op dat de nav niet tot onderaan reikt door onbetrouwbare CSS-hoogtes.
 function zetEchteHoogte(){
   try {
-    var h = window.innerHeight;
+    // visualViewport is op iOS de meest accurate bron; anders innerHeight
+    var h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
     if(h && document.documentElement && document.documentElement.style){
-      document.documentElement.style.setProperty('--echte-vh', h + 'px');
+      document.documentElement.style.setProperty('--echte-vh', Math.round(h) + 'px');
     }
   } catch(e){}
 }
 try { zetEchteHoogte(); } catch(e){}
+// TIJDELIJKE DIAGNOSE (verwijderen na debuggen): toont de echte schermmaten
+function toonDiagnose(){
+  try {
+    var vv = window.visualViewport ? Math.round(window.visualViewport.height) : '?';
+    var ih = window.innerHeight;
+    var ch = document.documentElement.clientHeight;
+    var sh = window.screen ? window.screen.height : '?';
+    var d = document.getElementById('tf-diag');
+    if(!d){ d=document.createElement('div'); d.id='tf-diag'; d.style.cssText='position:fixed;top:env(safe-area-inset-top);left:0;z-index:99999;background:rgba(255,0,0,.85);color:#fff;font-size:10px;padding:4px 6px;font-family:monospace;pointer-events:none'; document.body.appendChild(d); }
+    d.textContent='vv:'+vv+' ih:'+ih+' ch:'+ch+' scr:'+sh;
+  } catch(e){}
+}
+window.addEventListener('load', function(){ setTimeout(toonDiagnose, 600); });
 window.addEventListener('resize', zetEchteHoogte);
-window.addEventListener('orientationchange', function(){ setTimeout(zetEchteHoogte, 100); });
-// Op iOS ook meten na volledig laden (adresbalk kan hoogte veranderen)
-window.addEventListener('load', function(){ setTimeout(zetEchteHoogte, 200); });
+window.addEventListener('orientationchange', function(){ setTimeout(zetEchteHoogte, 150); setTimeout(zetEchteHoogte, 400); });
+if(window.visualViewport){ window.visualViewport.addEventListener('resize', zetEchteHoogte); }
+// iOS settelt de hoogte pas na een moment: meerdere metingen na laden
+window.addEventListener('load', function(){
+  [50,200,500,900,1500].forEach(function(ms){ setTimeout(zetEchteHoogte, ms); });
+});
+document.addEventListener('DOMContentLoaded', zetEchteHoogte);
 
 function render() {
   try {
