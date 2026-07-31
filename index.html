@@ -253,7 +253,7 @@ html,body{height:100%;overflow:hidden;touch-action:manipulation;font-family:'Int
 .tfy-bar{height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-top:.15rem}
 .tfy-vul{height:100%;border-radius:4px;transition:width .5s}
 /* Home volgens v0-blauwdruk: volle hoogte, secties delen de ruimte gelijk, geen scroll */
-.home-screen{padding:0!important;height:calc(100dvh - 3.75rem - env(safe-area-inset-bottom));overflow:hidden;display:flex;flex-direction:column;align-items:stretch}
+.home-screen{position:absolute;inset:0;padding:0 0 calc(3.75rem + env(safe-area-inset-bottom)) 0!important;overflow:hidden;display:flex;flex-direction:column;align-items:stretch}
 .home-screen .kop-hero{flex-shrink:0}
 .home-screen .home-body{flex:1;min-height:0;display:flex;flex-direction:column;gap:.6rem;padding:.6rem 1rem;overflow:hidden}
 .home-screen .home-body > *{flex-shrink:0;max-width:520px;width:100%;margin-left:auto;margin-right:auto}
