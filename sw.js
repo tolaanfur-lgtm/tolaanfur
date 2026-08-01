@@ -42,7 +42,7 @@ self.addEventListener("notificationclick", function (event) {
     })
   );
 });
-const CACHE = 'tolaanfur-v33';
+const CACHE = 'tolaanfur-v34';
 const FILES = [
   '/',
   '/index.html',

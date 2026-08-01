@@ -150,7 +150,7 @@ function terug(){
 }
 
 // ══ INLADEN ══
-fetch('azkar/adhkar.json',{cache:'no-cache'})
+fetch('azkar/adhkar.json?v='+Date.now(),{cache:'no-store'})
   .then(function(r){return r.json();})
   .then(function(d){ DATA=d; render(); })
   .catch(function(){
