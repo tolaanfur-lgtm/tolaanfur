@@ -122,11 +122,12 @@ var KLEUREN = ['#1E3A8A','#4C1D95','#065F46','#7C2D12','#831843','#0E7490'];
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function terug(){
-  // Terug naar het Media-scherm in de hoofdapp
   try{
     if(window.parent&&window.parent!==window){
       window.parent.postMessage({type:'navigate',screen:'media'},'*');
     }
+  }catch(e){}
+}
   }catch(e){}
 }
 
@@ -441,6 +442,7 @@ auth.onAuthStateChanged(function(user){
   luisterFeed();
   luisterBlocks();
 });
+
 </script>
 </body>
 </html>

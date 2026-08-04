@@ -211,8 +211,12 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function vidVan(id){var r=null;videos.forEach(function(v){if(v.id===id)r=v;});return r;}
 
 function terug(){
-  volScherm(false);
-  try{ if(window.parent&&window.parent!==window) window.parent.postMessage({type:'navigate',screen:'media'},'*'); }catch(e){}
+  try{
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'navigate',screen:'media'},'*');
+    }
+  }catch(e){}
+}
 }
 
 // De app verbergt zijn menubalk zolang de videofeed open staat
@@ -688,6 +692,7 @@ auth.onAuthStateChanged(function(user){
 
 volScherm(true);
 window.addEventListener('pagehide',function(){volScherm(false);});
+
 </script>
 </body>
 </html>
