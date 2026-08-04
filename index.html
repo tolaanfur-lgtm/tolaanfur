@@ -3010,10 +3010,24 @@ function bind(){
     el.addEventListener('click',fn);
   };
 
-  // Navigatie
-  document.querySelectorAll('[data-go]').forEach(function(el){
-    tap(el,function(){go(el.dataset.go);});
-  });
+  // Navigatie via event-delegatie: werkt voor alle huidige EN toekomstige data-go knoppen.
+  // Lost op: eerste klik reageert niet, en tabs die opnieuw getekend worden verliezen hun handler.
+  (function(){
+    var bezig=false;
+    function verwerk(e){
+      var el = e.target.closest ? e.target.closest('[data-go]') : null;
+      if(!el) return;
+      if(bezig) return;              // dubbel-tik (touch+click) voorkomen
+      bezig=true; setTimeout(function(){bezig=false;}, 350);
+      e.preventDefault();
+      go(el.dataset.go);
+    }
+    document.addEventListener('click', verwerk, false);
+    document.addEventListener('touchend', function(e){
+      var el = e.target.closest ? e.target.closest('[data-go]') : null;
+      if(el){ verwerk(e); }
+    }, {passive:false});
+  })();
 
   // ── Inloggen ──
   tap($('loginBtn'), async function(){
@@ -3359,11 +3373,7 @@ window.addEventListener('message', function(ev){
   const tw=document.getElementById('tabs-wrap');
   if(tw&&needsTabs()){
     tw.innerHTML=rTabs();
-    tw.querySelectorAll('[data-go]').forEach(function(el){
-      const f=function(){go(el.dataset.go);};
-      el.addEventListener('click',f);
-      el.addEventListener('touchend',function(e){e.preventDefault();f();},{passive:false});
-    });
+    // Klik-afhandeling gebeurt via event-delegatie op document (geen losse koppeling meer nodig)
   }
 });
 
