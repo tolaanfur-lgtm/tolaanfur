@@ -213,7 +213,7 @@ function vidVan(id){var r=null;videos.forEach(function(v){if(v.id===id)r=v;});re
 function terug(){
   try{
     if(window.parent&&window.parent!==window){
-      window.parent.postMessage({type:'navigate',screen:'media'},'*');
+      window.parent.postMessage('go-home','*');
     }
   }catch(e){}
 }
@@ -666,14 +666,25 @@ function laadFollows(){
   }).catch(function(){});
 }
 
+var feedGeladen=false;
 function luisterFeed(){
   db.collection('videos').orderBy('ts','desc').limit(FEED_LIMIET)
     .onSnapshot(function(snap){
+      feedGeladen=true;
       videos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       renderFeed();
     },function(){
-      document.getElementById('statusVak').innerHTML='<div>❌ Could not load videos</div>';
+      feedGeladen=true;
+      var st=document.getElementById('statusVak');
+      if(st){ st.style.display='grid'; st.innerHTML='<div style="color:#fff">Could not load videos.<br><span style="font-size:.8rem;color:rgba(255,255,255,.6)">Check your connection and try again.</span></div>'; }
     });
+  // Vangnet: als het na 7 seconden nog niet geladen is, niet eeuwig "Loading..." tonen
+  setTimeout(function(){
+    if(!feedGeladen){
+      var st=document.getElementById('statusVak');
+      if(st){ st.style.display='grid'; st.innerHTML='<div style="color:#fff">Still loading…<br><span style="font-size:.8rem;color:rgba(255,255,255,.6)">Tap ← to go back, or check your connection.</span></div>'; }
+    }
+  }, 7000);
 }
 
 auth.onAuthStateChanged(function(user){

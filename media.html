@@ -401,6 +401,68 @@ select.inp2 option{background:var(--bg2)}
 
 /* Groep chat scherm */
 .gchat-screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;background:#060A18;overflow:hidden}
+
+/* ══ MEDIA v0-LOOK ══ */
+.mediaV2{padding:0 0 calc(4rem + env(safe-area-inset-bottom))!important;background:#0A1024;max-width:600px;margin:0 auto;overflow-y:auto;height:100%;align-items:stretch!important;width:100%}
+.mv-hdr{position:relative;padding:calc(env(safe-area-inset-top) + 1.1rem) 1.1rem 1.1rem;background:linear-gradient(160deg,#141d3a 0%,#0A1024 90%);border-radius:0 0 1.6rem 1.6rem;overflow:hidden}
+.mv-hdr-row{display:flex;align-items:flex-start;gap:.8rem;position:relative;z-index:2}
+.mv-back{width:2.6rem;height:2.6rem;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-size:1.2rem;cursor:pointer;flex-shrink:0;color:#fff}
+.mv-htxt{flex:1;min-width:0}
+.mv-titel{font-size:1.9rem;font-weight:800;color:#fff;line-height:1.1}
+.mv-sub{font-size:.9rem;color:#9aa8c7;margin-top:.15rem}
+.mv-tags{font-size:.8rem;color:#7c8bb0;margin-top:.35rem}
+.mv-zoek{width:2.9rem;height:2.9rem;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-size:1.15rem;cursor:pointer;flex-shrink:0}
+.mv-sec-kop{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.2rem 1.1rem .6rem}
+.mv-sec-t{white-space:nowrap}
+.mv-seeall{white-space:nowrap;flex-shrink:0}
+.mv-sec-t{font-size:1.15rem;font-weight:800;color:#fff}
+.mv-seeall{font-size:.85rem;font-weight:600;color:#3E71E9;cursor:pointer}
+/* Stories */
+.mv-stories{display:flex;gap:1rem;overflow-x:auto;padding:.5rem 1.1rem .5rem;scrollbar-width:none}
+.mv-stories::-webkit-scrollbar{display:none}
+.mv-story-add,.mv-story{display:flex;flex-direction:column;align-items:center;gap:.4rem;flex-shrink:0;width:4.4rem;cursor:pointer}
+.mv-add-cirkel{width:4.2rem;height:4.2rem;border-radius:50%;border:2px dashed rgba(120,140,200,.5);display:grid;place-items:center;font-size:1.8rem;color:#7c8bb0;font-weight:300}
+.mv-story-ring{width:4.2rem;height:4.2rem;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,#955BE3,#3E71E9)}
+.mv-story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #0A1024}
+.mv-story-nm{font-size:.72rem;color:#9aa8c7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+/* Filters */
+.mv-filters{display:flex;gap:.6rem;overflow-x:auto;padding:.3rem 1.1rem .5rem;scrollbar-width:none}
+.mv-filters::-webkit-scrollbar{display:none}
+.mv-filter{flex-shrink:0;padding:.6rem 1.1rem;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#c5cee3;font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+.mv-filter.on{background:#3E71E9;border-color:#3E71E9;color:#fff}
+/* Featured */
+.mv-featured{position:relative;margin:0 1.1rem;height:13rem;border-radius:1.3rem;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,#1a2545,#0D1240)}
+.mv-feat-img{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1a2545}
+.mv-feat-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,16,36,.95),rgba(10,16,36,.3) 60%,transparent)}
+.mv-feat-body{position:absolute;left:0;right:0;bottom:0;padding:1.1rem}
+.mv-feat-badge{display:inline-block;background:#3E71E9;color:#fff;font-size:.7rem;font-weight:700;padding:.25rem .6rem;border-radius:.5rem;margin-bottom:.5rem}
+.mv-feat-titel{font-size:1.3rem;font-weight:800;color:#fff;line-height:1.2}
+.mv-feat-d{font-size:.82rem;color:#c5cee3;margin-top:.3rem;line-height:1.4}
+/* Grid */
+.mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;padding:0 1.1rem}
+.mv-tegel{position:relative;aspect-ratio:1;border-radius:1rem;overflow:hidden;background:#1a2545;cursor:pointer;border:1px solid rgba(255,255,255,.06)}
+.mv-tegel img{width:100%;height:100%;object-fit:cover}
+.mv-tegel-play{position:absolute;inset:0;display:grid;place-items:center;font-size:2rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.mv-tegel-dur{position:absolute;bottom:.5rem;right:.5rem;background:rgba(0,0,0,.75);color:#fff;font-size:.7rem;font-weight:600;padding:.15rem .45rem;border-radius:.4rem}
+.mv-tegel-type{position:absolute;top:.5rem;left:.5rem;font-size:1rem}
+.mv-tegel-post{padding:.9rem;display:flex;flex-direction:column;justify-content:center;height:100%}
+.mv-tegel-post .pt{font-size:.8rem;color:#e5ebf7;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mv-leeg{grid-column:1/-1;text-align:center;color:#7c8bb0;font-size:.85rem;padding:2rem 1rem;background:rgba(255,255,255,.02);border-radius:1rem;border:1px dashed rgba(255,255,255,.1)}
+/* News */
+.mv-news{display:flex;flex-direction:column;gap:.7rem;padding:0 1.1rem}
+.mv-nieuws-k{display:flex;align-items:center;gap:.8rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.9rem}
+.mv-nieuws-ic{width:2.6rem;height:2.6rem;border-radius:.8rem;display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
+.mv-nieuws-txt{flex:1;min-width:0}
+.mv-nieuws-t{font-size:.9rem;font-weight:700;color:#fff}
+.mv-nieuws-d{font-size:.76rem;color:#9aa8c7;margin-top:.1rem}
+.mv-nieuws-tijd{font-size:.68rem;color:#6c7ba0;margin-top:.2rem}
+/* Social */
+.mv-social{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;padding:0 1.1rem}
+.mv-soc{display:flex;align-items:center;gap:.7rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.85rem;text-decoration:none}
+.mv-soc-ic{width:2.6rem;height:2.6rem;border-radius:.7rem;display:grid;place-items:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+.mv-soc-t{font-size:.85rem;font-weight:700;color:#fff}
+.mv-soc-h{font-size:.7rem;color:#9aa8c7}
+.mv-soc div:not(.mv-soc-ic){min-width:0;overflow:hidden}
 </style>
 </head>
 <body>
@@ -505,110 +567,92 @@ function openStoryCreator(){
 }
 
 function rMedia(){
-  return `<div class="screen">
-    <!-- Kop: titel + zoekicoon (geen permanente balk) -->
-    <div class="m-top">
-      <div style="display:flex;align-items:center;gap:.7rem">
-        <div class="m-terug" onclick="goBack()">←</div>
-        <div>
-          <div class="m-titel">Media</div>
-          <div class="m-sub">Photos, videos, posts and more</div>
+  return `<div class="screen mediaV2">
+    <!-- HEADER -->
+    <div class="mv-hdr">
+      <div class="mv-hdr-row">
+        <div class="mv-back" onclick="goBack()">←</div>
+        <div class="mv-htxt">
+          <div class="mv-titel">Media</div>
+          <div class="mv-sub">Discover Islamic content</div>
+          <div class="mv-tags">Photos • Videos • Posts • News</div>
         </div>
-      </div>
-      <div class="m-zoek" onclick="navScherm('search')">🔍</div>
-    </div>
-
-    <!-- Compacte stories-rij -->
-    <div class="m-stories-kop">
-      <div class="m-stories-t">Stories</div>
-      <div onclick="navScherm('home')" class="m-seeall">See all ›</div>
-    </div>
-    <div class="m-stories" id="mStories">
-      <div class="m-story-add" onclick="openStoryCreator()">
-        <div class="m-add-cirkel">+</div>
-        <div class="m-story-nm">Your story</div>
+        <div class="mv-zoek" onclick="navScherm('search')">🔍</div>
       </div>
     </div>
 
-    <!-- 2×2 hoofdkaarten -->
-    <div class="m-grid">
-      <div class="m-kaart" onclick="openPhotos()">
-        <div class="m-kaart-kop">
-          <div class="m-ico" style="background:rgba(155,111,255,.25);border:1px solid rgba(155,111,255,.4)">🖼️</div>
-          <div class="m-pijl">›</div>
-        </div>
-        <div class="m-kaart-t">Photos</div>
-        <div class="m-kaart-d">Islamic photos & moments</div>
-        <div class="m-thumbs" id="mFotoThumbs"></div>
-        <div class="m-badge" id="mFotoCount">–</div>
-      </div>
-      <div class="m-kaart" onclick="openVideos()">
-        <div class="m-kaart-kop">
-          <div class="m-ico" style="background:rgba(16,185,129,.22);border:1px solid rgba(16,185,129,.4)">🎬</div>
-          <div class="m-pijl">›</div>
-        </div>
-        <div class="m-kaart-t">Videos</div>
-        <div class="m-kaart-d">Islamic videos & lectures</div>
-        <div class="m-thumbs" id="mVidThumbs"></div>
-        <div class="m-badge" id="mVidCount">–</div>
-      </div>
-      <div class="m-kaart" onclick="openVerhalen()">
-        <div class="m-kaart-kop">
-          <div class="m-ico" style="background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.45)">📝</div>
-          <div class="m-pijl">›</div>
-        </div>
-        <div class="m-kaart-t">Posts</div>
-        <div class="m-kaart-d">Community thoughts & reminders</div>
-        <div id="mPostPreview" class="m-preview"></div>
-        <div class="m-badge" id="mPostCount">–</div>
-      </div>
-      <div class="m-kaart" onclick="openAnnouncements()">
-        <div class="m-kaart-kop">
-          <div class="m-ico" style="background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.4)">📢</div>
-          <div class="m-pijl">›</div>
-        </div>
-        <div class="m-kaart-t">News</div>
-        <div class="m-kaart-d">Official Tolaanfur updates</div>
-        <div id="mAnnPreview" class="m-preview"></div>
-        <div class="m-badge" id="mAnnCount">–</div>
+    <!-- STORIES -->
+    <div class="mv-sec-kop">
+      <div class="mv-sec-t">Stories</div>
+      <div class="mv-seeall" onclick="navScherm('home')">See all ›</div>
+    </div>
+    <div class="mv-stories" id="mStories">
+      <div class="mv-story-add" onclick="openStoryCreator()">
+        <div class="mv-add-cirkel">+</div>
+        <div class="mv-story-nm">Your story</div>
       </div>
     </div>
 
-    <!-- Latest: filters + horizontale rij -->
-    <div class="m-latest-kop">
-      <div class="m-latest-t">Latest</div>
+    <!-- FILTERS -->
+    <div class="mv-filters">
+      <button class="mv-filter on" data-filter="all" onclick="zetFilter('all')">▦ All</button>
+      <button class="mv-filter" data-filter="photos" onclick="zetFilter('photos')">🖼️ Photos</button>
+      <button class="mv-filter" data-filter="videos" onclick="zetFilter('videos')">▶ Videos</button>
+      <button class="mv-filter" data-filter="posts" onclick="zetFilter('posts')">📝 Posts</button>
+      <button class="mv-filter" data-filter="news" onclick="openAnnouncements()">📰 News</button>
     </div>
-    <div class="m-filters">
-      <button class="m-filter on" data-filter="all" onclick="zetFilter('all')">All</button>
-      <button class="m-filter" data-filter="photos" onclick="zetFilter('photos')">🖼️ Photos</button>
-      <button class="m-filter" data-filter="videos" onclick="zetFilter('videos')">🎬 Videos</button>
-      <button class="m-filter" data-filter="posts" onclick="zetFilter('posts')">📝 Posts</button>
-    </div>
-    <div class="m-latest" id="mLatest"><div class="hub-leeg">Loading...</div></div>
 
-    <!-- Volg ons -->
-    <div class="sec" style="width:100%;max-width:560px;margin-top:1rem">
-      <div class="sh"><div class="st">🌐 Follow Us</div></div>
-      <div style="font-size:.8rem;color:var(--sl2);margin-bottom:.85rem">Follow Tolaanfur on social media</div>
-      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
-        <a href="https://www.instagram.com/tolaanfur?igsh=NTRlNzc0aGRncjc5&utm_source=qr" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.85rem 1.1rem;min-width:70px">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><defs><radialGradient id="ig1" cx="30%" cy="107%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig1)"/><circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-          <span style="font-size:.65rem;color:var(--text);font-weight:600">Instagram</span>
-        </a>
-        <a href="https://www.tiktok.com/@tolaanfur" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.85rem 1.1rem;min-width:70px">
-          <svg width="28" height="28" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#000"/><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5 2.592 2.592 0 0 1-2.59-2.5 2.592 2.592 0 0 1 2.59-2.5c.28 0 .54.04.79.1V9.01a5.745 5.745 0 0 0-.79-.05 5.674 5.674 0 0 0-5.67 5.67 5.674 5.674 0 0 0 5.67 5.67 5.674 5.674 0 0 0 5.67-5.67V9.07a7.33 7.33 0 0 0 4.28 1.37V7.37a4.296 4.296 0 0 1-3.11-1.55z" fill="white"/></svg>
-          <span style="font-size:.65rem;color:var(--text);font-weight:600">TikTok</span>
-        </a>
-        <a href="https://youtube.com/@tolaanfur?si=e6MoKdS5B9mnLpAB" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.85rem 1.1rem;min-width:70px">
-          <svg width="28" height="28" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#FF0000"/><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.5 5 12 5 12 5s-4.5 0-7 .1c-.4.1-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.8C6.6 19 12 19 12 19s4.5 0 7-.2c.4-.1 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8zM10 14.5v-5.5l5.5 2.8-5.5 2.7z" fill="white"/></svg>
-          <span style="font-size:.65rem;color:var(--text);font-weight:600">YouTube</span>
-        </a>
-        <a href="https://www.facebook.com/share/1LF3ZtAKMM/?mibextid=wwXIfr" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:.35rem;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:.85rem 1.1rem;min-width:70px">
-          <svg width="28" height="28" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#1877F2"/><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="white"/></svg>
-          <span style="font-size:.65rem;color:var(--text);font-weight:600">Facebook</span>
-        </a>
+    <!-- UITGELICHT -->
+    <div class="mv-sec-kop">
+      <div class="mv-sec-t">✨ Featured</div>
+      <div class="mv-seeall" onclick="openVideos()">See all ›</div>
+    </div>
+    <div class="mv-featured" id="mFeatured" onclick="openVideos()">
+      <div class="mv-feat-img" id="mFeatImg"></div>
+      <div class="mv-feat-ov"></div>
+      <div class="mv-feat-body">
+        <div class="mv-feat-badge">▶ Video</div>
+        <div class="mv-feat-titel" id="mFeatTitel">Islamic content</div>
+        <div class="mv-feat-d" id="mFeatDesc">Discover inspiring photos, videos and reminders.</div>
       </div>
     </div>
+
+    <!-- RECENTE UPLOADS (grid) -->
+    <div class="mv-sec-kop">
+      <div class="mv-sec-t">Recent uploads</div>
+      <div class="mv-seeall" onclick="zetFilter('all')">See all ›</div>
+    </div>
+    <div class="mv-grid" id="mGrid"></div>
+
+    <!-- TOLAANFUR NIEUWS -->
+    <div class="mv-sec-kop">
+      <div class="mv-sec-t">📢 Tolaanfur News</div>
+      <div class="mv-seeall" onclick="openAnnouncements()">See all ›</div>
+    </div>
+    <div class="mv-news" id="mNews"></div>
+
+    <!-- VOLG TOLAANFUR -->
+    <div class="mv-sec-kop"><div class="mv-sec-t">Follow Tolaanfur</div></div>
+    <div class="mv-social">
+      <a href="https://www.instagram.com/tolaanfur?igsh=NTRlNzc0aGRncjc5&utm_source=qr" target="_blank" class="mv-soc">
+        <div class="mv-soc-ic" style="background:linear-gradient(135deg,#F58529,#DD2A7B,#8134AF)">📷</div>
+        <div class="mv-soc-t">Instagram</div><div class="mv-soc-h">@tolaanfur</div>
+      </a>
+      <a href="https://www.tiktok.com/@tolaanfur" target="_blank" class="mv-soc">
+        <div class="mv-soc-ic" style="background:#000">♪</div>
+        <div class="mv-soc-t">TikTok</div><div class="mv-soc-h">@tolaanfur</div>
+      </a>
+      <a href="https://youtube.com/@tolaanfur?si=e6MoKdS5B9mnLpAB" target="_blank" class="mv-soc">
+        <div class="mv-soc-ic" style="background:#FF0000">▶</div>
+        <div class="mv-soc-t">YouTube</div><div class="mv-soc-h">Tolaanfur</div>
+      </a>
+      <a href="https://www.facebook.com/share/1LF3ZtAKMM/?mibextid=wwXIfr" target="_blank" class="mv-soc">
+        <div class="mv-soc-ic" style="background:#1877F2">f</div>
+        <div class="mv-soc-t">Facebook</div><div class="mv-soc-h">Tolaanfur</div>
+      </a>
+    </div>
+
+    <div style="height:2rem"></div>
   </div>`;
 }
 
@@ -689,13 +733,31 @@ function laadDashboard(){
     toonLatest();
   }).catch(function(){});
 
-  db.collection('announcements').orderBy('ts','desc').limit(1).get().then(function(snap){
-    var el=document.getElementById('mAnnPreview');
-    if(el&&snap.docs.length){
-      var v=snap.docs[0].data();
-      el.innerHTML='<div class="hub-mini" style="border-color:rgba(245,158,11,.35)"><b>'+escT(v.title||'Announcement')+'</b><br/>'+escT(String(v.text||'').substring(0,70))+'</div>';
-    }
+  db.collection('announcements').orderBy('ts','desc').limit(3).get().then(function(snap){
+    var el=document.getElementById('mNews');
+    if(!el) return;
+    if(!snap.docs.length){ el.innerHTML='<div class="mv-leeg">No news yet</div>'; return; }
+    var kleuren=[['rgba(62,113,233,.2)','🚀'],['rgba(59,185,116,.2)','📖'],['rgba(149,91,227,.2)','📅']];
+    var html='';
+    snap.docs.forEach(function(d,i){
+      var v=d.data();
+      var k=kleuren[i%3];
+      var tijd = v.ts&&v.ts.seconds ? geledenTekst(v.ts.seconds*1000) : '';
+      html+='<div class="mv-nieuws-k" onclick="openAnnouncements()">'
+        +'<div class="mv-nieuws-ic" style="background:'+k[0]+'">'+k[1]+'</div>'
+        +'<div class="mv-nieuws-txt"><div class="mv-nieuws-t">'+escT(v.title||'Announcement')+'</div>'
+        +'<div class="mv-nieuws-d">'+escT(String(v.text||'').substring(0,60))+'</div>'
+        +(tijd?'<div class="mv-nieuws-tijd">'+tijd+'</div>':'')+'</div></div>';
+    });
+    el.innerHTML=html;
   }).catch(function(){});
+}
+
+function geledenTekst(ms){
+  var d=Math.floor((Date.now()-ms)/86400000);
+  if(d<=0) return 'today';
+  if(d===1) return '1 day ago';
+  return d+' days ago';
 }
 
 // ── Stories in de compacte rij ──
@@ -714,12 +776,12 @@ function laadMediaStories(){
     });
     var vak = document.getElementById('mStories');
     if(!vak){ setTimeout(laadMediaStories, 200); return; }
-    var html = '<div class="m-story-add" onclick="openStoryCreator()"><div class="m-add-cirkel">+</div><div class="m-story-nm">Your story</div></div>';
+    var html = '<div class="mv-story-add" onclick="openStoryCreator()"><div class="mv-add-cirkel">+</div><div class="mv-story-nm">Your story</div></div>';
     groepen.slice(0,15).forEach(function(g){
-      var beeld = g.photoURL ? '<img src="'+escT(g.photoURL)+'"/>' : (g.img ? '<img src="'+escT(g.img)+'"/>' : '🌙');
-      html += '<div class="m-story-item" onclick="navScherm(\'home\')">'
-        +'<div class="m-story-ring"><div class="m-story-av">'+beeld+'</div></div>'
-        +'<div class="m-story-nm">'+escT(g.naam)+'</div></div>';
+      var beeld = g.photoURL ? '<img src="'+escT(g.photoURL)+'"/>' : (g.img ? '<img src="'+escT(g.img)+'"/>' : '<div style=\'width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;background:#1a2545\'>🌙</div>');
+      html += '<div class="mv-story" onclick="navScherm(\'home\')">'
+        +'<div class="mv-story-ring">'+beeld+'</div>'
+        +'<div class="mv-story-nm">'+escT(g.naam)+'</div></div>';
     });
     vak.innerHTML = html;
   });
@@ -736,23 +798,36 @@ function zetFilter(f){
 }
 
 function toonLatest(){
-  var vak = document.getElementById('mLatest');
+  // Featured kaart vullen met nieuwste video (of foto)
+  var featImg=document.getElementById('mFeatImg'), featT=document.getElementById('mFeatTitel'), featD=document.getElementById('mFeatDesc');
+  if(featImg){
+    var fv = latestData.videos[0] || latestData.photos[0];
+    if(fv){
+      var poster = fv.type==='youtube'&&fv.ytId ? 'https://i.ytimg.com/vi/'+escT(fv.ytId)+'/hqdefault.jpg' : (fv.img||'');
+      if(poster) featImg.style.backgroundImage='url('+poster+')';
+      if(featT) featT.textContent = fv.titel||fv.title||'Islamic content';
+      if(featD) featD.textContent = String(fv.desc||fv.beschrijving||fv.text||'Discover inspiring content.').substring(0,90);
+    }
+  }
+  // Grid vullen
+  var vak = document.getElementById('mGrid');
   if(!vak) return;
   var items = [];
   if(latestFilter==='all'||latestFilter==='photos') latestData.photos.forEach(function(p){items.push({soort:'photo',data:p,ts:p._ts});});
   if(latestFilter==='all'||latestFilter==='videos') latestData.videos.forEach(function(p){items.push({soort:'video',data:p,ts:p._ts});});
   if(latestFilter==='all'||latestFilter==='posts') latestData.posts.forEach(function(p){items.push({soort:'post',data:p,ts:p._ts});});
   items.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
-  if(!items.length){ vak.innerHTML='<div class="hub-leeg">Nothing yet</div>'; return; }
+  if(!items.length){ vak.innerHTML='<div class="mv-leeg">Nothing here yet</div>'; return; }
   var html='';
-  items.slice(0,20).forEach(function(it){
+  items.slice(0,12).forEach(function(it){
     if(it.soort==='photo'){
-      html+='<div class="m-tegel" onclick="openPhotos()"><img src="'+escT(it.data.img||'')+'" loading="lazy"/></div>';
+      html+='<div class="mv-tegel" onclick="openPhotos()"><span class="mv-tegel-type">🖼️</span><img src="'+escT(it.data.img||'')+'" loading="lazy"/></div>';
     } else if(it.soort==='video'){
       var poster = it.data.type==='youtube'&&it.data.ytId ? 'https://i.ytimg.com/vi/'+escT(it.data.ytId)+'/hqdefault.jpg' : '';
-      html+='<div class="m-tegel" onclick="openVideos()">'+(poster?'<img src="'+poster+'" loading="lazy"/>':'<div style="width:100%;height:100%;background:#000"></div>')+'<div class="m-play">▶</div></div>';
+      var dur = it.data.duur||it.data.duration||'';
+      html+='<div class="mv-tegel" onclick="openVideos()">'+(poster?'<img src="'+poster+'" loading="lazy"/>':'<div style="width:100%;height:100%;background:#000"></div>')+'<div class="mv-tegel-play">▶</div>'+(dur?'<div class="mv-tegel-dur">'+escT(dur)+'</div>':'')+'</div>';
     } else {
-      html+='<div class="m-tegel m-tegel-post" onclick="openVerhalen()">'+escT(String(it.data.text||'').substring(0,80))+'</div>';
+      html+='<div class="mv-tegel mv-tegel-post" onclick="openVerhalen()"><span class="mv-tegel-type">📝</span><div class="pt">'+escT(String(it.data.text||'').substring(0,120))+'</div></div>';
     }
   });
   vak.innerHTML = html;

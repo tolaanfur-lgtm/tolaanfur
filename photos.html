@@ -138,7 +138,7 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function terug(){
   try{
     if(window.parent&&window.parent!==window){
-      window.parent.postMessage({type:'navigate',screen:'media'},'*');
+      window.parent.postMessage('go-home','*');
     }
   }catch(e){}
 }
