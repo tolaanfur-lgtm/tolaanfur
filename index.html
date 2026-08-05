@@ -3362,7 +3362,6 @@ window.addEventListener('message', function(ev){
   }
   if(d.type==='navigate'&&d.screen){
     if(d.screen==='userprofile'&&d.param){userProfileUid=String(d.param);}
-    try{ toast({i:'🔙',t:'Navigate: '+d.screen,s:'from '+SC}); }catch(e){}
     go(d.screen);return;
   }
   let badgeUpdate=false;
