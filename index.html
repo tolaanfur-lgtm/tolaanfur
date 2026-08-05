@@ -1683,11 +1683,18 @@ function go(s, d={}) {
     s = navGeschiedenis.pop() || 'home';
     prevSC = navGeschiedenis[navGeschiedenis.length-1] || 'home';
   } else if(s!==SC){
-    // Vooruit: huidig scherm op de stapel bewaren (behalve login/loading)
-    if(SC && SC!=='loading' && SC!=='login'){ navGeschiedenis.push(SC); }
-    // Stapel niet oneindig laten groeien
-    if(navGeschiedenis.length>20) navGeschiedenis.shift();
-    prevSC = SC;
+    // Als het doelscherm AL op de stapel staat, is dit eigenlijk teruggaan:
+    // snoei de stapel tot dat punt (voorkomt dat 'terug' later naar een subpagina springt).
+    var bestaandeIndex = navGeschiedenis.lastIndexOf(s);
+    if(bestaandeIndex !== -1){
+      navGeschiedenis = navGeschiedenis.slice(0, bestaandeIndex);
+      prevSC = navGeschiedenis[navGeschiedenis.length-1] || 'home';
+    } else {
+      // Vooruit: huidig scherm op de stapel bewaren (behalve login/loading)
+      if(SC && SC!=='loading' && SC!=='login'){ navGeschiedenis.push(SC); }
+      if(navGeschiedenis.length>20) navGeschiedenis.shift();
+      prevSC = SC;
+    }
   }
   SC = s;
   CX = d;
