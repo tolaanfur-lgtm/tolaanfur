@@ -667,12 +667,15 @@ function laadFollows(){
 }
 
 function luisterFeed(){
+  var st=document.getElementById('statusVak');
+  if(st) st.innerHTML='<div style="color:#fff;font-size:.85rem">⏳ Verbinden met database...</div>';
   db.collection('videos').orderBy('ts','desc').limit(FEED_LIMIET)
     .onSnapshot(function(snap){
+      if(st) st.innerHTML='<div style="color:#0f0;font-size:.85rem">✓ '+snap.size+' video(s) gevonden</div>';
       videos=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       renderFeed();
-    },function(){
-      document.getElementById('statusVak').innerHTML='<div>❌ Could not load videos</div>';
+    },function(err){
+      if(st){ st.style.display='grid'; st.innerHTML='<div style="color:#f66;font-size:.8rem;padding:1rem;text-align:center">❌ Fout bij laden:<br>'+(err&&err.code?err.code:'onbekend')+'<br><span style="font-size:.7rem;color:#999">'+(err&&err.message?err.message:'')+'</span></div>'; }
     });
 }
 
